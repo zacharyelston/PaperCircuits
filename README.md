@@ -9,6 +9,7 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [out/template.pdf](out/template.pdf) | Lesson page template: zones, nets and drawing marks |
 | [out/P1-power.pdf](out/P1-power.pdf) | Power page P1: 3 × AA, resettable fuse, feeds H2/H3 (draft; [teacher notes](docs/lessons/P1.md)) |
 | [out/L01-led-polarity.pdf](out/L01-led-polarity.pdf) | Lesson L01: LEDs only work one way (draft; [teacher notes](docs/lessons/L01.md)) |
+| [out/L02-and-or.pdf](out/L02-and-or.pdf) | Lesson L02: two switches, two ways, AND and OR (draft; [teacher notes](docs/lessons/L02.md)) |
 
 ## Build
 

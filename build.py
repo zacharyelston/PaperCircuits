@@ -7,7 +7,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from papercircuits.sheets import l01_led_polarity, p1_power, t0_contact_tests, template
+from papercircuits.sheets import l01_led_polarity, l02_and_or, p1_power, t0_contact_tests, template
 
 ROOT = Path(__file__).parent
 OUT = ROOT / "out"
@@ -18,6 +18,7 @@ SHEETS = {
     "T0-contact-tests.pdf": t0_contact_tests.build,
     "P1-power.pdf": p1_power.build,
     "L01-led-polarity.pdf": l01_led_polarity.build,
+    "L02-and-or.pdf": l02_and_or.build,
 }
 
 

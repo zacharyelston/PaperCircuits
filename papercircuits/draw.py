@@ -3,6 +3,7 @@
 import os
 
 import reportlab
+from reportlab import rl_config
 from reportlab.lib.colors import HexColor
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
@@ -12,6 +13,9 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Frame, Paragraph
 
 from . import standard as S
+
+# No timestamps or random IDs in the PDFs, so an unchanged sheet rebuilds byte for byte.
+rl_config.invariant = 1
 
 INK = HexColor("#1f1f1f")
 MUTED = HexColor("#666666")

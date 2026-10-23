@@ -168,12 +168,30 @@ def fold_switch(sh, stubs=True):
     `stubs` draws short ones for pages that don't route those lanes."""
     (fx0, fy0), (fx1, fy1) = S.SWITCH_FOLD
     sh.line(fx0, fy0, fx1, fy1, width=0.3, color=INK, dash=(2, 1.2))
-    s = S.SWITCH_PAD
-    px, py = S.SWITCH_FLAP_PAD
-    sh.rect(px - s / 2, py - s / 2, px + s / 2, py + s / 2, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
+    cx, cy = S.SWITCH_CENTER
+    hl, hw = S.FLAP_PAD_LEN / 2, S.TAPE_W / 2
+    landing = [(cx - hl, cy - hw), (cx + hl, cy - hw), (cx + hl, cy + hw), (cx - hl, cy + hw)]
+    sh.polygon([S.reflect_across_fold(*p) for p in landing], stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
+    sh.polygon(landing, stroke=INK, width=0.2, dash=(0.5, 0.7))
     if stubs:
         for x in S.SWITCH_LANE_X:
             lane(sh, [(x, S.SWITCH_LANE_TOP), (x, S.SWITCH_LANE_TOP + 10)])
+
+
+def tab_switch(sh, x, upper_y, label):
+    """Tab switch over a horizontal switch pair whose upper lane is centred on upper_y.
+    The flap is cut above the pair and hinges down onto it; its pad lands across both
+    lanes as a vertical strip."""
+    hinge = upper_y - S.TAPE_W / 2 - S.TAB_HINGE_CLEAR
+    x0, x1, top = x - S.TAB_W / 2, x + S.TAB_W / 2, hinge - S.TAB_H
+    sh.polygon([(x0, hinge), (x0, top), (x1, top), (x1, hinge)], stroke=INK, width=0.35, closed=False)
+    sh.line(x0, hinge, x1, hinge, width=0.3, color=INK, dash=(0.4, 0.9))
+    mid = upper_y + S.PAIR_PITCH / 2
+    hl, hw = S.FLAP_PAD_LEN / 2, S.TAPE_W / 2
+    pad_cy = 2 * hinge - mid
+    sh.rect(x - hw, pad_cy - hl, x + hw, pad_cy + hl, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
+    sh.rect(x - hw, mid - hl, x + hw, mid + hl, stroke=INK, width=0.2, dash=(0.5, 0.7))
+    sh.text(x, top - 1.5, label, size=7.5, bold=True, align="center")
 
 
 # Part footprints, actual size.
@@ -194,7 +212,7 @@ def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):
         for d in (-1.6, -0.6, 0.4):
             sh.line(cx + d, cy - bw / 2, cx + d, cy + bw / 2, width=0.35, color=MUTED)
         if label:
-            sh.text(cx, cy - bw / 2 - 1.2, label, size=6, color=MUTED, align="center")
+            sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
 
 
 def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None):
@@ -210,7 +228,7 @@ def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None)
         if label:
             sh.text(cx + 4.2, cy + 1, label, size=6, color=MUTED)
     else:
-        sh.text(cx + dx * 4.6, cy - 1.6, "+", size=7, bold=True, align="center")
+        sh.text(cx + dx * 4.6, cy - S.TAPE_W / 2 - 0.9, "+", size=7, bold=True, align="center")
         if label:
             sh.text(cx, cy - 4.2, label, size=6, color=MUTED, align="center")
 
@@ -262,7 +280,7 @@ def diode(sh, cx, cy, lead=8.0, label=None):
     sh.rect(cx - bl / 2, cy - bw / 2, cx + bl / 2, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=0.6)
     sh.rect(cx + bl / 2 - 1.0, cy - bw / 2, cx + bl / 2 - 0.4, cy + bw / 2, stroke=None, fill=MUTED)
     if label:
-        sh.text(cx, cy - bw / 2 - 1.2, label, size=6, color=MUTED, align="center")
+        sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
 
 
 def spiral(sh, cx, cy, r=1.7, turns=2.5, color=MUTED):

@@ -76,7 +76,7 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 - **One continuous strip per run.** Turn corners by folding along the printed diagonal crease. Most copper tape has non-conductive glue, so two overlapping pieces don't reliably connect.
 - **One strip per node.** Every lead on a node lands on the same strip. Where a node has three or more connections, route the strip past each lead rather than branching, because a T-junction is an overlap joint.
 - **Joints:** where a joint can't be avoided, it is marked `J` and soldered. **[T0]** decides whether any unsoldered overlap is acceptable.
-- **Clearance:** at least 3 mm, edge to edge, between different nets. The fold switch's 2 mm gap (§6) is the only exception.
+- **Clearance:** at least 3 mm, edge to edge, between different nets. Switch pairs (§6) are the only exception.
 - **Crossings:** marked `X`. Lay a 10 × 10 mm insulating patch (paper or clear tape) before the upper strip.
 
 ## 5. Parts and test points
@@ -93,14 +93,26 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
   - M4: soldered
 - **Test points** are Ø7 mm circles on a lane, labelled `TPn`, with the lane running underneath. Every node a learner is asked to measure gets one.
 
-## 6. Fold switch (optional)
+## 6. Switches
+
+Every switch is a paper flap with a copper pad that folds onto a **switch pair**: two lanes of different nets running side by side, 2 mm apart (7 mm centre to centre). The flap pad is a 10 mm piece of 5 mm tape. Folded down, it lands across both lanes and connects them. A dashed outline on the page shows where it lands.
+
+- **Switch pairs** are the only place two nets may run closer than 3 mm. Keep the pair straight, and separate the lanes again once they're past their last landing.
+- **Momentary:** card springs back, so a switch is on only while it's pressed.
+
+### 6.1 Corner switch (optional)
 
 - **Fold line:** from (172, 0) to (210, 38).
-- **Pads:**
-  - An 8 mm copper square on the front of the flap, centred at (198, 10), lands face-down on (182, 26) when the corner is folded forward.
-  - On the page, the half-pads are the ends of two 5 mm lanes, V+ in at x = 178.5 and V+ out at x = 185.5, both ending at y = 22. The flap pad bridges the 2 mm gap between them.
-  - Below the pads, route the two lanes apart to the 3 mm clearance before they leave the switch corner.
+- **Pads:** the flap pad is a vertical strip centred at (196, 12). Folding the corner forward lands it as a horizontal strip centred on (184, 24).
+- **Lanes:** the switch pair is the ends of two vertical lanes, V+ in at x = 180.5 and V+ out at x = 187.5, both ending at y = 21.5.
 - **Wiring:** the page's V+ runs through the switch, so a page only draws current while its corner is pressed. A fault on one page then can't drain the whole book.
+
+### 6.2 Tab switch
+
+- **Flap:** 14 × 16 mm, cut on three sides (solid line) and hinged on the fourth (dotted line), 2 mm clear of the pair it folds onto.
+- **Pad:** the flap pad is the mirror image of its landing across the hinge.
+- **Keep clear:** nothing else may sit in the flap's cut-out area or its landing area.
+- **Series and parallel:** switches in series zig-zag between the pair's two rows; switches in parallel share one pair. L02 shows both.
 
 ## 7. Power [provisional]
 
@@ -136,6 +148,8 @@ The ID appears at the right of the header and in the footer.
 | Circle, labelled `TPn` | Test point: put a meter probe here |
 | Circle with crosshair, dashed ring | Punch here; the dashed ring is the eyelet flange |
 | Grey outline with leads | Part footprint at actual size |
+| Solid line round a flap, dotted hinge | Tab switch: cut the solid line, crease the dotted one |
+| Thin dashed box across a switch pair | Where the flap pad lands |
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
 
@@ -154,3 +168,4 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 
 - **v0.1:** first draft.
 - **v0.1, revised while drafting L01:** added one strip per node; fold-switch half-pads are now lane ends; Bus B enters at y = 197.
+- **v0.1, revised while drafting L02:** added switch pairs and tab switches. Flap pads are now a 10 mm piece of 5 mm tape (the old 8 mm square couldn't be cut from 5 mm tape), which moved the corner switch to (196, 12) → (184, 24).

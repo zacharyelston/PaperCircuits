@@ -41,11 +41,19 @@ ZONE_SCHEMATIC = (34.0, 203.0, 98.0, 282.0)
 ZONE_WORKBOOK = (102.0, 203.0, 202.0, 282.0)
 ZONE_FOOTER = (30.0, 284.0, 202.0, 291.0)
 
-# Fold switch: folding the corner forward reflects the flap across this line.
-SWITCH_FOLD = ((172.0, 0.0), (210.0, 38.0))
-SWITCH_FLAP_PAD = (198.0, 10.0)
-SWITCH_PAD = 8.0
+# Switches (standard §6). Every flap pad is a 10 mm piece of 5 mm tape laid across a
+# switch pair: two lanes of different nets running 2 mm apart, 7 mm centre to centre.
+FLAP_PAD_LEN = 10.0
 SWITCH_PAD_GAP = 2.0
+PAIR_PITCH = TAPE_W + SWITCH_PAD_GAP
+
+# Corner switch: folding the corner forward reflects the flap across this line.
+SWITCH_FOLD = ((172.0, 0.0), (210.0, 38.0))
+SWITCH_FLAP_PAD = (196.0, 12.0)
+
+# Tab switch: a flap cut on three sides, hinged 2 mm above the pair it folds onto.
+TAB_W, TAB_H = 14.0, 16.0
+TAB_HINGE_CLEAR = 2.0
 
 SCALE_BAR = 100.0
 
@@ -62,11 +70,8 @@ def reflect_across_fold(x, y):
     return 2 * fx - x, 2 * fy - y
 
 
-# The page half-pads under the flap are the ends of two lanes, V+ in and V+ out,
-# a 2 mm gap apart: the only place two nets may sit closer than NET_CLEARANCE.
+# Under the corner flap the switch pair is the ends of two vertical lanes, V+ in and
+# V+ out; the flap pad lands across them as a horizontal strip.
 SWITCH_CENTER = tuple(round(v, 3) for v in reflect_across_fold(*SWITCH_FLAP_PAD))
-SWITCH_LANE_X = (
-    SWITCH_CENTER[0] - (SWITCH_PAD_GAP + TAPE_W) / 2,
-    SWITCH_CENTER[0] + (SWITCH_PAD_GAP + TAPE_W) / 2,
-)
-SWITCH_LANE_TOP = SWITCH_CENTER[1] - SWITCH_PAD / 2
+SWITCH_LANE_X = (SWITCH_CENTER[0] - PAIR_PITCH / 2, SWITCH_CENTER[0] + PAIR_PITCH / 2)
+SWITCH_LANE_TOP = SWITCH_CENTER[1] - TAPE_W / 2
