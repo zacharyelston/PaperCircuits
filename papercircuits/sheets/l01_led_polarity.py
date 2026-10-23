@@ -21,6 +21,7 @@ PAGE_ID = "L01"
 
 # Waiting on the T0 contact tests. Change these when standard v0.2 lands.
 LEAD_STEP = f"Hold each lead flat on its lane with a small patch of copper tape. {T0}"
+SWITCH_STEP = f"Stick a {S.FLAP_PAD_LEN:g} mm piece of copper tape on the corner flap, S1. {T0}"
 
 # Provisional with the power page (standard §7): 220 Ω gives about 11 mA from 4.5 V.
 RESISTOR = "220 Ω"
@@ -103,7 +104,7 @@ def _instructions(sh):
     ], numbered=False)
     steps = [Paragraph("Build it", h)] + items([
         "Lay the five lanes, one piece of tape each. Fold at the creases; never cut.",
-        "Stick a square of copper tape on the corner flap, S1.",
+        SWITCH_STEP,
         HOLE_STEP,
         "Place R1 and R2 across their gaps. Either way round works.",
         "Place LED1 and LED2 <b>exactly as printed</b>: long leg on the +.",

@@ -178,15 +178,15 @@ def fold_switch(sh, stubs=True):
             lane(sh, [(x, S.SWITCH_LANE_TOP), (x, S.SWITCH_LANE_TOP + 10)])
 
 
-def tab_switch(sh, x, upper_y, label):
-    """Tab switch over a horizontal switch pair whose upper lane is centred on upper_y.
-    The flap is cut above the pair and hinges down onto it; its pad lands across both
-    lanes as a vertical strip."""
+def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
+    """Tab switch over a horizontal switch pair whose upper lane is centred on upper_y and
+    whose lower lane is `pitch` below it. The flap is cut above the pair and hinges down
+    onto it; its pad lands across both lanes as a vertical strip."""
     hinge = upper_y - S.TAPE_W / 2 - S.TAB_HINGE_CLEAR
     x0, x1, top = x - S.TAB_W / 2, x + S.TAB_W / 2, hinge - S.TAB_H
     sh.polygon([(x0, hinge), (x0, top), (x1, top), (x1, hinge)], stroke=INK, width=0.35, closed=False)
     sh.line(x0, hinge, x1, hinge, width=0.3, color=INK, dash=(0.4, 0.9))
-    mid = upper_y + S.PAIR_PITCH / 2
+    mid = upper_y + pitch / 2
     hl, hw = S.FLAP_PAD_LEN / 2, S.TAPE_W / 2
     pad_cy = 2 * hinge - mid
     sh.rect(x - hw, pad_cy - hl, x + hw, pad_cy + hl, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))

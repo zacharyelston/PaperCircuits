@@ -2,6 +2,7 @@
 
 Sheet 1 holds the fixtures: print three copies on card, because test 3 needs a stack.
 Sheet 2 is the procedure and the binder results: print one on plain paper.
+Sheet 3 is test 4, switch contacts, with its own steps and results: print one on card.
 """
 
 from reportlab.lib.units import mm
@@ -40,12 +41,37 @@ PART_JOINTS = [
 
 RESULT_X = (167.0, 181.0, 195.0)
 
+# Test 4: the corner switch, then three tab switches that differ only in the pair's gap.
+SWITCH_TABS = [
+    ("TA", "2 mm gap, the standard", S.SWITCH_PAD_GAP),
+    ("TB", "3 mm gap", 3.0),
+    ("TC", "your version", S.SWITCH_PAD_GAP),
+]
+TAB_X = (60.0, 108.0, 156.0)
+TAB_UPPER = 80.0
+SWITCH_ROWS = ("S1 corner", "TA 2 mm", "TB 3 mm", "TC yours")
+SWITCH_COLS = (("Open", "OL?"), ("Light press", "Ω"), ("Firm press", "Ω"),
+               ("Flicker?", "Y / N"), ("After 20", "Ω"), ("Day 7", "Ω"))
+
+H = style(9, bold=True, spaceBefore=5, spaceAfter=2)
+NOTE = style(7, leading=9.2, color=MUTED, spaceBefore=2)
+
+
+def _bullets(items):
+    return [Paragraph(t, style(7.5, leading=9.6, leftIndent=7, bulletIndent=0.5, bulletFontSize=7.5, spaceAfter=1.2), bulletText="•") for t in items]
+
+
+def _steps(items):
+    return [Paragraph(t, style(7.5, leading=9.6, leftIndent=9, bulletIndent=0, bulletFontName=FONT_BOLD, bulletFontSize=7.5, spaceAfter=1.5), bulletText=f"{i}.") for i, t in enumerate(items, 1)]
+
 
 def build(path):
     sh = Sheet(path, "T0 contact tests")
     _fixtures(sh)
     sh.next_page()
     _procedure(sh)
+    sh.next_page()
+    _switch_tests(sh)
     sh.save()
 
 
@@ -53,14 +79,14 @@ def _fixtures(sh):
     E.header(
         sh, PAGE_ID, "T0  Contact tests",
         "Which joints, part contacts and binder contacts stay reliable? Build on 160–200 gsm card.",
-        part="1/2",
+        part="1/3",
     )
     _hole_tests(sh)
     _tape_joints(sh)
     _part_joints(sh)
     sh.rect(LEFT, 264, RIGHT, 281, stroke=GUIDE, width=0.25, radius=1.2)
     sh.text(LEFT + 2, 268, "Notes", size=6.5, bold=True, color=MUTED)
-    E.footer(sh, f"{PAGE_ID} sheet 1 of 2")
+    E.footer(sh, f"{PAGE_ID} sheet 1 of 3")
 
 
 def _hole_tests(sh):
@@ -174,19 +200,11 @@ def _attachment_cue(sh, method, cx, mid):
 def _procedure(sh):
     E.header(
         sh, PAGE_ID, "T0  Running the contact tests",
-        "Print this sheet once on plain paper. Print sheet 1 on 160–200 gsm card, three copies.",
-        part="2/2",
+        "Print this sheet once on plain paper. Print sheet 1 on card three times and sheet 3 once.",
+        part="2/3",
     )
     E.spine(sh)
-
-    h = style(9, bold=True, spaceBefore=5, spaceAfter=2)
-    note = style(7, leading=9.2, color=MUTED, spaceBefore=2)
-
-    def bullets(items):
-        return [Paragraph(t, style(7.5, leading=9.6, leftIndent=7, bulletIndent=0.5, bulletFontSize=7.5, spaceAfter=1.2), bulletText="•") for t in items]
-
-    def steps(items):
-        return [Paragraph(t, style(7.5, leading=9.6, leftIndent=9, bulletIndent=0, bulletFontName=FONT_BOLD, bulletFontSize=7.5, spaceAfter=1.5), bulletText=f"{i}.") for i, t in enumerate(items, 1)]
+    h, note, bullets, steps = H, NOTE, _bullets, _steps
 
     story = [Paragraph("You need", h)]
     story += bullets([
@@ -196,11 +214,11 @@ def _procedure(sh):
         "A 2- or 4-hole punch with 80 mm pitch",
         "A ring binder, and four brass Chicago screws (binding posts) long enough for three sheets",
         "A multimeter with a 200 Ω range",
-        "A soldering iron for J3, M4 and H4; clear tape",
+        "A soldering iron for J3, M4 and H4; clear tape; scissors for sheet 3",
     ])
     story += [Paragraph("Before you start", h)]
     story += steps([
-        "Print sheet 1 at 100 %. Check the footer bar measures 100 mm with a ruler.",
+        "Print sheets 1 and 3 at 100 % on 160–200 gsm card. Check a footer bar measures 100 mm with a ruler.",
         "Lay the four hole lanes (test 3) first, then punch through the crosshairs, through the tape.",
         "Set eyelets in H2, H3 and H4. Leave H1 bare. Solder H4's eyelet to its strip.",
         "Zero the meter: 200 Ω range, probes touching. Write the reading on sheet 1 and subtract it from every reading.",
@@ -234,6 +252,9 @@ def _procedure(sh):
         "Repeat with Chicago screws, finger-tight.",
     ])
     story += [Spacer(1, 2 * mm), _binder_table()]
+    story += [Paragraph("4 · Switch contacts", h),
+              Paragraph("Build, test and record the switches on sheet 3; its steps and pass rule are there.",
+                        style(7.5, leading=9.6))]
 
     story += [Paragraph("Pass or fail", h)]
     story += bullets([
@@ -250,11 +271,11 @@ def _procedure(sh):
     rest = sh.flow([left], left_story) + sh.flow([right], story)
     if rest:
         raise RuntimeError(f"T0 sheet 2 overflowed by {len(rest)} items")
-    E.footer(sh, f"{PAGE_ID} sheet 2 of 2")
+    E.footer(sh, f"{PAGE_ID} sheet 2 of 3")
 
 
 def _table(data, col_widths, row_height):
-    t = Table(data, colWidths=[w * mm for w in col_widths], rowHeights=row_height * mm)
+    t = Table(data, colWidths=[w * mm for w in col_widths], rowHeights=row_height * mm, hAlign="LEFT")
     t.setStyle(TableStyle([
         ("FONT", (0, 0), (-1, -1), FONT, 7),
         ("FONT", (0, 0), (0, -1), FONT_BOLD, 7),
@@ -276,5 +297,83 @@ def _binder_table():
 
 
 def _decision_table():
-    rows = ["Tape overlaps OK?", "Lead attachment", "Hole treatment", "Binding"]
+    rows = ["Tape overlaps OK?", "Lead attachment", "Hole treatment", "Binding", "Switch gap", "Corner switch OK?"]
     return _table([[r, ""] for r in rows], [33, 47], 8.5)
+
+
+def _switch_tests(sh):
+    E.header(
+        sh, PAGE_ID, "T0  Switch contacts",
+        "Do fold switches close every time, and does the gap stay open? Build on 160–200 gsm card.",
+        part="3/3",
+    )
+    E.spine(sh)
+    x0, _, x1, _ = S.ZONE_BUILD
+    sh.text(x0, 31, "4  Switch contacts", size=10, bold=True)
+    sh.paragraph(x0, 33, 106, "Each switch joins lane A to lane B while its flap is pressed. "
+                 "Measure A to B with the meter on its 200 Ω range.", style(7, color=MUTED))
+    _corner_switch_test(sh)
+    for (tab_id, desc, gap), x in zip(SWITCH_TABS, TAB_X):
+        _tab_station(sh, x, TAB_UPPER, tab_id, desc, gap)
+
+    rest = sh.flow([(x0, 104.0, x1, 146.0)], [_switch_table()])
+    story = [Paragraph("How to test", H)] + _steps([
+        "Lay each switch's A and B lanes as separate pieces of tape. Keep the gap between them clear.",
+        "S1: stick a 10 mm piece of tape on the corner flap where shown. Tabs: cut the solid lines, "
+        "crease the dotted hinges and stick a 10 mm piece on each flap.",
+        "<b>Open:</b> with nothing pressed, measure A to B. It must read OL; a number means the gap is bridged.",
+        "<b>Light and firm:</b> rest one finger on the flap and read the meter. Then press hard with a thumb.",
+        "<b>Flicker:</b> keep pressing and rock your finger. Write Y if the reading jumps or drops to OL.",
+        "<b>After 20:</b> press and release 20 times, then take a firm reading. <b>Day 7:</b> repeat a week later.",
+    ])
+    left_story, story = story, [Paragraph("Pass or fail", H)] + _bullets([
+        "<b>Pass:</b> open reads OL, and pressed reads under 10 Ω with no flicker.",
+        "<b>Fail:</b> any reading when open, OL or flicker when pressed, or a rise by day 7.",
+    ])
+    story += [
+        Paragraph("Why 10 Ω: lesson LEDs use 220 Ω, so 10 Ω changes their current by under 5 %. "
+                  "Flicker matters more: it shows up as a flickering LED.", NOTE),
+        Paragraph("If TB passes as well as TA, standard v0.2 can widen switch gaps to 3 mm and drop "
+                  "the 2 mm exception. Write the result on sheet 2.", NOTE),
+    ]
+    rest += sh.flow([(x0, 150.0, 115.0, 210.0)], left_story) + sh.flow([(121.0, 150.0, x1, 210.0)], story)
+    if rest:
+        raise RuntimeError(f"T0 sheet 3 overflowed by {len(rest)} items")
+    sh.rect(x0, 214, x1, 281, stroke=GUIDE, width=0.25, radius=1.2)
+    sh.text(x0 + 2, 218, "Notes", size=6.5, bold=True, color=MUTED)
+    E.footer(sh, f"{PAGE_ID} sheet 3 of 3")
+
+
+def _corner_switch_test(sh):
+    """The standard corner switch, with its pair's lanes led out to two test points."""
+    lane_a, lane_b = S.SWITCH_LANE_X
+    top = S.SWITCH_LANE_TOP
+    E.lane(sh, [(lane_a, top), (lane_a, 31), (146, 31)])
+    E.lane(sh, [(lane_b, top), (lane_b, 40), (156, 40)])
+    E.fold_switch(sh, stubs=False)
+    for x, y, label in ((150.0, 31.0, "A"), (160.0, 40.0, "B")):
+        E.test_point(sh, x, y)
+        sh.text(x - 4.7, y + 1.1, label, size=6, color=MUTED, align="right")
+    sh.text(156, 48.5, "S1 · corner switch", size=7, bold=True)
+    sh.text(156, 52, "fold the corner down to press", size=6.5, color=MUTED)
+
+
+def _tab_station(sh, x, upper, tab_id, desc, gap):
+    """A tab switch whose pair lanes overlap only under the landing, then lead apart to A and B."""
+    pitch = S.TAPE_W + gap
+    lower = upper + pitch
+    E.lane(sh, [(x + 5, upper), (x - 20, upper)])
+    E.lane(sh, [(x - 5, lower), (x + 20, lower)])
+    E.tab_switch(sh, x, upper, tab_id, pitch=pitch)
+    E.test_point(sh, x - 17, upper)
+    E.test_point(sh, x + 17, lower)
+    sh.text(x - 17, upper - 4.7, "A", size=6, color=MUTED, align="center")
+    sh.text(x + 17, lower + 6.7, "B", size=6, color=MUTED, align="center")
+    sh.text(x, lower + 9.5, desc, size=6.5, color=MUTED, align="center")
+
+
+def _switch_table():
+    head = style(6.5, leading=7.5, bold=True)
+    data = [[""] + [Paragraph(f"{name}<br/><font color='#666666'>{unit}</font>", head) for name, unit in SWITCH_COLS]]
+    data += [[row] + [""] * len(SWITCH_COLS) for row in SWITCH_ROWS]
+    return _table(data, [27] + [23] * len(SWITCH_COLS), 8)

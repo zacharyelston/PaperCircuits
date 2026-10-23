@@ -21,6 +21,10 @@ PAGE_ID = "L02"
 
 # Waiting on the T0 contact tests.
 LEAD_STEP = f"Hold each lead flat on its lane with a small patch of copper tape. {T0}"
+LANE_STEP = (f"Lay the seven lanes, one piece of tape each. Where two lanes run close, keep the "
+             f"{S.SWITCH_PAD_GAP:g} mm gap clear. {T0}")
+PAD_STEP = (f"Stick a {S.FLAP_PAD_LEN:g} mm piece of tape on each flap where shown. Folded down, "
+            f"it must cross both lanes. {T0}")
 
 # Provisional with the power page (standard §7): 220 Ω gives about 11 mA from 4.5 V.
 RESISTOR = "220 Ω"
@@ -104,9 +108,9 @@ def _instructions(sh):
         "A multimeter for Test",
     ], numbered=False)
     steps = [Paragraph("Build it", h)] + _items([
-        "Lay the seven lanes, one piece of tape each. Where two lanes run close, keep the 2 mm gap clear.",
+        LANE_STEP,
         "Cut each flap along its solid line and crease it along the dotted hinge.",
-        "Stick a 10 mm piece of tape on each flap where shown. Folded down, it must cross both lanes.",
+        PAD_STEP,
         HOLE_STEP,
         "Place R1 and R2 either way round, and LED1 and LED2 as printed: long leg on the +.",
         LEAD_STEP,

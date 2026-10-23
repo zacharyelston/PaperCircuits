@@ -98,6 +98,7 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 Every switch is a paper flap with a copper pad that folds onto a **switch pair**: two lanes of different nets running side by side, 2 mm apart (7 mm centre to centre). The flap pad is a 10 mm piece of 5 mm tape. Folded down, it lands across both lanes and connects them. A dashed outline on the page shows where it lands.
 
 - **Switch pairs** are the only place two nets may run closer than 3 mm. Keep the pair straight, and separate the lanes again once they're past their last landing.
+- **Gap and pad [T0]:** T0 test 4 measures pressed contact and flicker, and compares a 2 mm gap with 3 mm. If 3 mm works as well, v0.2 widens the gap and switch pairs lose their exception.
 - **Momentary:** card springs back, so a switch is on only while it's pressed.
 
 ### 6.1 Corner switch (optional)
