@@ -9,13 +9,12 @@ Each node is one strip (standard §4): the wire ends lie along their lanes, and 
 LED1 land on the V+ and GND strips as those pass.
 """
 
-from reportlab.platypus import Paragraph
-
 from .. import elements as E
+from .. import lesson
 from .. import schematic as sch
 from .. import standard as S
-from ..draw import COPPER, GUIDE, INK, MUTED, Sheet, style
-from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0, TAG_NOTE
+from ..draw import COPPER, GUIDE, MUTED, Sheet, style
+from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0
 
 PAGE_ID = "P1"
 
@@ -92,26 +91,15 @@ def _parts(sh):
     E.test_point(sh, GND_TURN_X, 162, "TP3")
 
 
-def _items(texts, numbered):
-    out = []
-    for i, t in enumerate(texts, 1):
-        p_style = style(7, leading=8.8, leftIndent=8 if numbered else 7, bulletIndent=0,
-                        bulletFontSize=7, spaceAfter=1.2)
-        out.append(Paragraph(t, p_style, bulletText=f"{i}." if numbered else "•"))
-    return out
-
-
 def _instructions(sh):
-    h = style(8.5, bold=True, spaceAfter=1.5)
-    need = [Paragraph("You need", h)] + _items([
+    lesson.need_and_steps(sh, PAGE_ID, [
         f"BT1: 3 × AA holder with an on/off switch and wire leads {POWER}",
         f"{CELLS} {POWER}",
         f"F1: resettable fuse (PTC), {FUSE} {POWER}",
         f"R1: {INDICATOR_R} ({INDICATOR_R_BANDS}) {POWER}",
         "LED1: green LED, 5 mm",
         "5 mm copper tape, double-sided foam tape",
-    ], numbered=False)
-    steps = [Paragraph("Build it", h)] + _items([
+    ], [
         "Lay the four lanes, one piece of tape each. Fold at the creases; never cut.",
         HOLE_STEP,
         "Stick BT1 down with foam tape, wires toward the spine.",
@@ -119,11 +107,7 @@ def _instructions(sh):
         "Place F1 and R1 across their gaps, either way round. Place LED1 as printed: long leg on the +.",
         LEAD_STEP,
         "Fit the cells, switch BT1 on and fill in Check. Then switch it off.",
-    ], numbered=True)
-    steps.append(Paragraph(TAG_NOTE, style(6.5, leading=8.2, color=MUTED, spaceBefore=2)))
-    rest = sh.flow([(38.0, 31.0, 92.0, 99.0)], need) + sh.flow([(98.0, 31.0, 170.0, 99.0)], steps)
-    if rest:
-        raise RuntimeError(f"P1 instructions overflowed by {len(rest)} items")
+    ], (38.0, 31.0, 92.0, 99.0), (98.0, 31.0, 170.0, 99.0))
 
 
 def _binder_note(sh):
@@ -137,9 +121,7 @@ def _binder_note(sh):
 
 
 def _schematic(sh):
-    x0, y0, x1, y1 = S.ZONE_SCHEMATIC
-    sh.rect(x0, y0, x1, y1, stroke=INK, width=0.3, radius=1.2)
-    sh.text(x0 + 2, y0 + 4, "Schematic", size=7, bold=True)
+    lesson.schematic_panel(sh)
 
     top, bottom = 218.0, 266.0
     bx, ind_x, out_x = 42.0, 84.0, 94.0
@@ -164,31 +146,24 @@ def _schematic(sh):
     sch.junction(sh, 62, bottom)
     sch.wire(sh, [(62, bottom), (62, 270.5)])
     sch.test_point(sh, 62, 271.4, "TP3")
-    sh.text(x0 + 2, y1 - 2.5, "SW is the switch built into the holder.", size=6, color=MUTED)
-
-
-def _write_lines(sh, x0, x1, ys):
-    for y in ys:
-        sh.line(x0, y, x1, y, width=0.2, color=GUIDE)
+    lesson.schematic_note(sh, "SW is the switch built into the holder.")
 
 
 def _workbook(sh):
-    x0, y0, x1, y1 = S.ZONE_WORKBOOK
-    h = (y1 - y0 - 4) / 3
-    boxes = [(x0, y0 + i * (h + 2), x1, y0 + i * (h + 2) + h) for i in range(3)]
-    tx = x0 + 2
+    boxes = lesson.workbook_boxes()
+    tx = boxes[0][0] + 2
 
     _, cy0, _, _ = boxes[0]
     E.workbook_box(sh, boxes[0], "Check", "Switch BT1 on. Black probe on TP3.")
     for i, label in enumerate(("TP1", "TP2")):
         sh.runs(tx + i * 32, cy0 + 11, [(label + "  ", True), ("_______ V", False)], size=7.5)
     sh.runs(tx + 64, cy0 + 11, [("LED1 lit?  ", True), ("Y / N", False)], size=7.5)
-    sh.text(tx, cy0 + 18.5, f"Fresh cells read about 4.5–4.8 V. TP1 and TP2 should match.", size=7, color=MUTED)
+    sh.text(tx, cy0 + 18.5, "Fresh cells read about 4.5–4.8 V. TP1 and TP2 should match.", size=7, color=MUTED)
 
     _, ey0, ex1, _ = boxes[1]
     E.workbook_box(sh, boxes[1], "Explain", "F1 is a fuse that resets itself.")
     sh.text(tx, ey0 + 9, "What could happen to the book if something shorted and F1 wasn't there?", size=7)
-    _write_lines(sh, tx, ex1 - 2, (ey0 + 15.5, ey0 + 21.5))
+    lesson.write_lines(sh, boxes[1], (15.5, 21.5))
 
     _, by0, _, _ = boxes[2]
     E.workbook_box(sh, boxes[2], "Before you bind it", "Tick each one.")

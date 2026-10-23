@@ -348,8 +348,9 @@ def _corner_switch_test(sh):
     """The standard corner switch, with its pair's lanes led out to two test points."""
     lane_a, lane_b = S.SWITCH_LANE_X
     top = S.SWITCH_LANE_TOP
-    E.lane(sh, [(lane_a, top), (lane_a, 31), (146, 31)])
-    E.lane(sh, [(lane_b, top), (lane_b, 40), (156, 40)])
+    a = E.lane(sh, [(lane_a, top), (lane_a, 31), (146, 31)])
+    b = E.lane(sh, [(lane_b, top), (lane_b, 40), (156, 40)])
+    sh.allow(a, b, S.SWITCH_PAD_GAP)
     E.fold_switch(sh, stubs=False)
     for x, y, label in ((150.0, 31.0, "A"), (160.0, 40.0, "B")):
         E.test_point(sh, x, y)
@@ -362,8 +363,9 @@ def _tab_station(sh, x, upper, tab_id, desc, gap):
     """A tab switch whose pair lanes overlap only under the landing, then lead apart to A and B."""
     pitch = S.TAPE_W + gap
     lower = upper + pitch
-    E.lane(sh, [(x + 5, upper), (x - 20, upper)])
-    E.lane(sh, [(x - 5, lower), (x + 20, lower)])
+    a = E.lane(sh, [(x + 5, upper), (x - 20, upper)])
+    b = E.lane(sh, [(x - 5, lower), (x + 20, lower)])
+    sh.allow(a, b, gap)
     E.tab_switch(sh, x, upper, tab_id, pitch=pitch)
     E.test_point(sh, x - 17, upper)
     E.test_point(sh, x + 17, lower)

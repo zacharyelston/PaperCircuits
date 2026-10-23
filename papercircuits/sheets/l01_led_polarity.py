@@ -9,13 +9,12 @@ Each node is one continuous strip routed past every lead on it, so the page has 
 T-junctions (standard §4).
 """
 
-from reportlab.platypus import Paragraph
-
 from .. import elements as E
+from .. import lesson
 from .. import schematic as sch
 from .. import standard as S
-from ..draw import GUIDE, INK, MUTED, Sheet, style
-from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0, TAG_NOTE
+from ..draw import MUTED, Sheet
+from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0
 
 PAGE_ID = "L01"
 
@@ -62,9 +61,10 @@ def _lanes(sh):
     v_plus, gnd = S.hole_y("H2"), S.hole_y("H3")
     x_in = S.NET_STRIP_START_X
     # V+ from H2, up the left side and along the top into the switch.
-    E.lane(sh, [(x_in, v_plus), (40, v_plus), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)])
+    v_in = E.lane(sh, [(x_in, v_plus), (40, v_plus), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)])
     # Switched V+: out of the switch, jog clear of the V+ lane, then along the rail.
-    E.lane(sh, [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (75, RAIL_SW)])
+    v_sw = E.lane(sh, [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (75, RAIL_SW)])
+    sh.allow(v_in, v_sw, S.SWITCH_PAD_GAP)
     for bx in BRANCH_X:
         E.lane(sh, [(bx, NODE[0]), (bx, NODE[1])])
     E.lane(sh, [(x_in, gnd), (45, gnd), (45, RAIL_GND), (170, RAIL_GND)])
@@ -85,24 +85,13 @@ def _parts(sh):
 
 
 def _instructions(sh):
-    h = style(8.5, bold=True, spaceAfter=1.5)
-
-    def items(texts, numbered):
-        out = []
-        for i, t in enumerate(texts, 1):
-            p_style = style(7, leading=8.8, leftIndent=7 if not numbered else 8, bulletIndent=0,
-                            bulletFontSize=7, spaceAfter=1.2)
-            out.append(Paragraph(t, p_style, bulletText=f"{i}." if numbered else "•"))
-        return out
-
-    need = [Paragraph("You need", h)] + items([
+    lesson.need_and_steps(sh, PAGE_ID, [
         "2 red LEDs, 5 mm",
         f"2 resistors, {RESISTOR} ({RESISTOR_BANDS}) {POWER}",
         "5 mm copper tape",
         "Power page P1 in the binder",
         "A multimeter for Measure",
-    ], numbered=False)
-    steps = [Paragraph("Build it", h)] + items([
+    ], [
         "Lay the five lanes, one piece of tape each. Fold at the creases; never cut.",
         SWITCH_STEP,
         HOLE_STEP,
@@ -110,17 +99,11 @@ def _instructions(sh):
         "Place LED1 and LED2 <b>exactly as printed</b>: long leg on the +.",
         LEAD_STEP,
         "Bind this page with P1, then fold the corner down to switch on.",
-    ], numbered=True)
-    steps.append(Paragraph(TAG_NOTE, style(6.5, leading=8.2, color=MUTED, spaceBefore=2)))
-    rest = sh.flow([(54.0, 137.0, 104.0, 196.0)], need) + sh.flow([(110.0, 137.0, 202.0, 196.0)], steps)
-    if rest:
-        raise RuntimeError(f"L01 instructions overflowed by {len(rest)} items")
+    ], (54.0, 137.0, 104.0, 196.0), (110.0, 137.0, 202.0, 196.0))
 
 
 def _schematic(sh):
-    x0, y0, x1, y1 = S.ZONE_SCHEMATIC
-    sh.rect(x0, y0, x1, y1, stroke=INK, width=0.3, radius=1.2)
-    sh.text(x0 + 2, y0 + 4, "Schematic", size=7, bold=True)
+    lesson.schematic_panel(sh)
 
     top, node, bottom = 218.0, 238.0, 266.0
     b1, b2 = 60.0, 84.0
@@ -146,19 +129,12 @@ def _schematic(sh):
     sch.wire(sh, [(70, bottom), (70, 270.5)])
     sch.junction(sh, 70, bottom)
     sch.test_point(sh, 70, 271.4, "TP4")
-    sh.text(x0 + 2, y1 - 2.5, "V+ and GND come from P1 through the binder.", size=6, color=MUTED)
-
-
-def _write_lines(sh, x0, x1, ys):
-    for y in ys:
-        sh.line(x0, y, x1, y, width=0.2, color=GUIDE)
+    lesson.schematic_note(sh, "V+ and GND come from P1 through the binder.")
 
 
 def _workbook(sh):
-    x0, y0, x1, y1 = S.ZONE_WORKBOOK
-    h = (y1 - y0 - 4) / 3
-    boxes = [(x0, y0 + i * (h + 2), x1, y0 + i * (h + 2) + h) for i in range(3)]
-    tx = x0 + 2
+    boxes = lesson.workbook_boxes()
+    tx = boxes[0][0] + 2
 
     bx0, by0, bx1, _ = boxes[0]
     E.workbook_box(sh, boxes[0], "Predict", "LED2 is printed the other way round.")
@@ -176,4 +152,4 @@ def _workbook(sh):
     _, ey0, _, _ = boxes[2]
     E.workbook_box(sh, boxes[2], "Explain", "Why does only one LED light?")
     sh.text(tx, ey0 + 9, "What would you change to make the other one light?", size=7)
-    _write_lines(sh, tx, bx1 - 2, (ey0 + 15.5, ey0 + 21.5))
+    lesson.write_lines(sh, boxes[2], (15.5, 21.5))

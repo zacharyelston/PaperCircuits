@@ -64,9 +64,10 @@ def _legend(sh, x, y):
     caption(y, "J  Joint", "cut, overlap 10 mm, solder")
 
     y += 18
-    E.lane(sh, [(x, y), (x + 40, y)])
+    under = E.lane(sh, [(x, y), (x + 40, y)])
     E.crossing(sh, x + 20, y)
-    E.lane(sh, [(x + 20, y - 8), (x + 20, y + 8)])
+    over = E.lane(sh, [(x + 20, y - 8), (x + 20, y + 8)])
+    sh.allow(under, over, 0)
     caption(y, "X  Crossing", "insulating patch before the upper strip")
 
     y += 20

@@ -10,6 +10,20 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [out/P1-power.pdf](out/P1-power.pdf) | Power page P1: 3 × AA, resettable fuse, feeds H2/H3 (draft; [teacher notes](docs/lessons/P1.md)) |
 | [out/L01-led-polarity.pdf](out/L01-led-polarity.pdf) | Lesson L01: LEDs only work one way (draft; [teacher notes](docs/lessons/L01.md)) |
 | [out/L02-and-or.pdf](out/L02-and-or.pdf) | Lesson L02: two switches, two ways, AND and OR (draft; [teacher notes](docs/lessons/L02.md)) |
+| [out/L03-pencil-resistor.pdf](out/L03-pencil-resistor.pdf) | Lesson L03: draw a resistor, a pencil-track dimmer (draft; [teacher notes](docs/lessons/L03.md)) |
+| [out/L04-resistors.pdf](out/L04-resistors.pdf) | Lesson L04: resistors set the current, with the colour code (draft; [teacher notes](docs/lessons/L04.md)) |
+| [out/L05-series-parallel.pdf](out/L05-series-parallel.pdf) | Lesson L05: two ways to add a resistor, series and parallel (draft; [teacher notes](docs/lessons/L05.md)) |
+| [out/L06-diodes.pdf](out/L06-diodes.pdf) | Lesson L06: diodes are one-way valves (draft; [teacher notes](docs/lessons/L06.md)) |
+| [out/L07-dividers.pdf](out/L07-dividers.pdf) | Lesson L07: share the voltage, voltage dividers (draft; [teacher notes](docs/lessons/L07.md)) |
+| [out/L08-capacitor.pdf](out/L08-capacitor.pdf) | Lesson L08: store some charge, a capacitor fades an LED (draft; [teacher notes](docs/lessons/L08.md)) |
+
+## Chapters
+
+1. **Loops and current:** L01 LEDs only work one way · L02 two switches, two ways · L03 draw a resistor · L04 resistors set the current · L05 two ways to add a resistor
+2. **Parts with a job:** L06 diodes · L07 voltage dividers · L08 capacitors
+3. **Control and systems** (not drafted yet): transistors, pages working together on BUS A and BUS B, and a real circuit board
+
+Build P1 first: every lesson takes its power from P1 through the binder.
 
 ## Build
 
@@ -26,6 +40,8 @@ This writes the PDFs to `out/` and PNG previews to `docs/img/`. Previews need `p
 - `papercircuits/elements.py`: standard elements such as the spine, tape lanes, test points and part footprints.
 - `papercircuits/schematic.py`: circuit-diagram symbols for the schematic panel.
 - `papercircuits/provisional.py`: the `[T0]` and `[P]` tags for choices that wait on an open decision.
+- `papercircuits/lesson.py`: what every lesson page shares: the You need and Build it columns, schematic panel and workbook boxes.
+- `papercircuits/drc.py`: the clearance check every page runs before it's saved.
 - `papercircuits/sheets/`: one module per sheet. Add new sheets to `SHEETS` in `build.py`.
 
 ## Printing

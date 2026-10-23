@@ -77,6 +77,8 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 - **One strip per node.** Every lead on a node lands on the same strip. Where a node has three or more connections, route the strip past each lead rather than branching, because a T-junction is an overlap joint.
 - **Joints:** where a joint can't be avoided, it is marked `J` and soldered. **[T0]** decides whether any unsoldered overlap is acceptable.
 - **Clearance:** at least 3 mm, edge to edge, between different nets. Switch pairs (§6) are the only exception.
+- **Checked on every build.** Each lane is its own node, so the generator measures every pair of lanes on a page and fails the build if any are closer than 3 mm. A sheet declares its switch pairs (2 mm) and insulated crossings (0 mm) as the only allowed exceptions.
+- **Pencil is not wire.** A pencil track (§5) is a resistor. Keep pencil out of every gap between nets: a smudge across a gap is a leak.
 - **Crossings:** marked `X`. Lay a 10 × 10 mm insulating patch (paper or clear tape) before the upper strip.
 
 ## 5. Parts and test points
@@ -85,12 +87,15 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 - **Polarity:**
   - LEDs: the anode is marked `+`, and its leg outline is drawn longer.
   - Diodes: the cathode band is drawn.
+  - Electrolytic capacitors: the − stripe is drawn along the body's edge. A capacitor connected backwards can heat up and fail, so every page that uses one says so in its steps.
 - **Two-lead parts** bridge a 10 mm gap with their leads lying flat on the tape. The gap is between two lane ends, or between a lane end and a strip passing by.
 - **Lead attachment [T0]:** candidates:
   - M1: flat leads under clear tape
   - M2: flat leads under a copper patch
   - M3: spiral leads under a copper patch
   - M4: soldered
+- **Pencil tracks** are hatched bands with a solid outline and a tick every 10 mm. Shade them with a 6B pencil, pressing hard, for at least 10 passes. Hold a metal lead flat on a track with clear tape. Copper tape can't join a track, because its glue faces the pencil. T0 doesn't test lead-on-pencil contact yet.
+- **Cut-out pieces** such as a wiper are printed on the page with a solid cut line and a tape strip to stick on before cutting.
 - **Test points** are Ø7 mm circles on a lane, labelled `TPn`, with the lane running underneath. Every node a learner is asked to measure gets one.
 
 ## 6. Switches
@@ -149,8 +154,11 @@ The ID appears at the right of the header and in the footer.
 | Circle, labelled `TPn` | Test point: put a meter probe here |
 | Circle with crosshair, dashed ring | Punch here; the dashed ring is the eyelet flange |
 | Grey outline with leads | Part footprint at actual size |
+| Body with a striped edge, both legs from one end | Electrolytic capacitor: the stripe marks the − leg |
 | Solid line round a flap, dotted hinge | Tab switch: cut the solid line, crease the dotted one |
 | Thin dashed box across a switch pair | Where the flap pad lands |
+| Grey hatched band, solid outline, ticks | Pencil track: shade with a 6B pencil |
+| Solid outline round a tape strip, "cut out" | A piece to cut out, such as a wiper |
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
 
@@ -170,3 +178,5 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 - **v0.1:** first draft.
 - **v0.1, revised while drafting L01:** added one strip per node; fold-switch half-pads are now lane ends; Bus B enters at y = 197.
 - **v0.1, revised while drafting L02:** added switch pairs and tab switches. Flap pads are now a 10 mm piece of 5 mm tape (the old 8 mm square couldn't be cut from 5 mm tape), which moved the corner switch to (196, 12) → (184, 24).
+- **v0.1, revised while drafting L03:** added pencil tracks, cut-out pieces, and the rule that pencil is not wire.
+- **v0.1, revised while drafting L04–L08:** added the electrolytic capacitor footprint and the automatic clearance check.

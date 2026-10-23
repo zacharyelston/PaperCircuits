@@ -99,3 +99,41 @@ def fuse(sh, x0, x1, y, label, value):
     sh.line(cx - 4.5, y, cx + 4.5, y, width=0.25)
     sh.text(cx, y + 4.6, label, size=6.5, bold=True, align="center")
     sh.text(cx, y + 7.6, value, size=6, color=MUTED, align="center")
+
+
+def rheostat(sh, x, y0, y1, wiper_y, wiper_x, label, value):
+    """Vertical resistor box from y0 to y1 with a wiper arrow coming in from the left at
+    wiper_y. The top end is left open: only the wiper and the bottom end connect."""
+    sh.line(x, y0 - 3, x, y0, width=W)
+    sh.rect(x - 1.5, y0, x + 1.5, y1, stroke=INK, fill=WHITE, width=W)
+    sh.line(wiper_x, wiper_y, x - 3.2, wiper_y, width=W)
+    sh.polygon([(x - 1.6, wiper_y), (x - 3.4, wiper_y - 0.9), (x - 3.4, wiper_y + 0.9)], stroke=None, fill=INK)
+    cy = (y0 + y1) / 2
+    sh.text(x + 3, cy - 0.4, label, size=6.5, bold=True)
+    sh.text(x + 3, cy + 2.8, value, size=6, color=MUTED)
+
+
+def diode(sh, x, y0, y1, label, cathode_bottom=True):
+    """Vertical diode from y0 to y1: the triangle points the way current flows."""
+    cy = (y0 + y1) / 2
+    h, half = 3.4, 2.4
+    base, apex = (cy - h / 2, cy + h / 2) if cathode_bottom else (cy + h / 2, cy - h / 2)
+    top, bottom = min(base, apex), max(base, apex)
+    sh.line(x, y0, x, top, width=W)
+    sh.line(x, bottom, x, y1, width=W)
+    sh.polygon([(x - half, base), (x + half, base), (x, apex)], stroke=INK, fill=WHITE, width=W)
+    sh.line(x - half, apex, x + half, apex, width=W)
+    sh.text(x + 3.4, cy + 1, label, size=6.5, bold=True)
+
+
+def capacitor(sh, x, y0, y1, label, value):
+    """Vertical polarised capacitor from y0 (+) to y1 (−): a thin plate over a solid one."""
+    cy = (y0 + y1) / 2
+    gap, half = 1.6, 3.0
+    sh.line(x, y0, x, cy - gap / 2, width=W)
+    sh.line(x, cy + gap / 2 + 0.9, x, y1, width=W)
+    sh.line(x - half, cy - gap / 2, x + half, cy - gap / 2, width=W)
+    sh.rect(x - half, cy + gap / 2, x + half, cy + gap / 2 + 0.9, stroke=None, fill=INK)
+    sh.text(x - 4.4, cy - 1.6, "+", size=6.5, bold=True, align="center")
+    sh.text(x + 4.2, cy - 0.4, label, size=6.5, bold=True)
+    sh.text(x + 4.2, cy + 2.8, value, size=6, color=MUTED)

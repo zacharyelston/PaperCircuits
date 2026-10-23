@@ -3,7 +3,7 @@
 import math
 
 from . import standard as S
-from .draw import COPPER, COPPER_TINT, GUIDE, INK, MUTED, WHITE
+from .draw import COPPER, COPPER_TINT, FAINT, GUIDE, INK, MUTED, WHITE
 
 
 def _unit(ax, ay, bx, by):
@@ -32,12 +32,15 @@ def _offset_sides(pts, half):
 
 
 def lane(sh, pts, width=S.TAPE_W, folds=True):
-    """A tape lane along a polyline. Interior corners get a fold crease unless folds=False."""
+    """A tape lane along a polyline. Interior corners get a fold crease unless folds=False.
+    Returns the lane's id for the clearance check (see Sheet.allow)."""
     left, right = _offset_sides(pts, width / 2)
     sh.polygon(left + right[::-1], stroke=COPPER, fill=COPPER_TINT, width=0.25, dash=(1.2, 0.8))
     if folds:
         for a, b in zip(left[1:-1], right[1:-1]):
             sh.line(*a, *b, width=0.35, color=COPPER)
+    sh.lanes.append(left + right[::-1])
+    return len(sh.lanes) - 1
 
 
 def joint(sh, x, y, vertical=False, width=S.TAPE_W, label="J"):
@@ -134,6 +137,8 @@ def header(sh, page_id, title, subtitle, part=None, status=None):
     sh.text(x0, 19.2, subtitle, size=7, color=MUTED)
     sh.text(x1, 13, page_id if part is None else f"{page_id} · {part}", size=10, bold=True, align="right")
     if status:
+        if x0 + sh.width(subtitle, 7) > x1 - sh.width(status, 6) - 3:
+            raise ValueError(f"{page_id}: subtitle runs into the header status; shorten it")
         sh.text(x1, 19.2, status, size=6, color=COPPER, align="right")
     sh.line(x0, 22, x1, 22, width=0.2, color=GUIDE)
 
@@ -174,8 +179,8 @@ def fold_switch(sh, stubs=True):
     sh.polygon([S.reflect_across_fold(*p) for p in landing], stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
     sh.polygon(landing, stroke=INK, width=0.2, dash=(0.5, 0.7))
     if stubs:
-        for x in S.SWITCH_LANE_X:
-            lane(sh, [(x, S.SWITCH_LANE_TOP), (x, S.SWITCH_LANE_TOP + 10)])
+        a, b = (lane(sh, [(x, S.SWITCH_LANE_TOP), (x, S.SWITCH_LANE_TOP + 10)]) for x in S.SWITCH_LANE_X)
+        sh.allow(a, b, S.SWITCH_PAD_GAP)
 
 
 def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
@@ -192,6 +197,37 @@ def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
     sh.rect(x - hw, pad_cy - hl, x + hw, pad_cy + hl, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
     sh.rect(x - hw, mid - hl, x + hw, mid + hl, stroke=INK, width=0.2, dash=(0.5, 0.7))
     sh.text(x, top - 1.5, label, size=7.5, bold=True, align="center")
+
+
+def pencil_track(sh, x0, y0, x1, y1, tick=10.0, last_number=None):
+    """A band to shade with a soft pencil: solid outline, light hatching, and a tick every
+    `tick` mm under it, numbered in mm from 0 at x0 up to `last_number`."""
+    step = 2.0
+    c = x0 + y0 + step
+    while c < x1 + y1:
+        xa, xb = max(x0, c - y1), min(x1, c - y0)
+        if xa < xb:
+            sh.line(xa, c - xa, xb, c - xb, width=0.15, color=GUIDE)
+        c += step
+    sh.rect(x0, y0, x1, y1, stroke=INK, width=0.35)
+    last = x1 - x0 if last_number is None else last_number
+    i = 0.0
+    while x0 + i <= x1 + 0.01:
+        sh.line(x0 + i, y1, x0 + i, y1 + 1.6, width=0.25)
+        if i <= last + 0.01:
+            sh.text(x0 + i, y1 + 4.4, f"{i:g}", size=6, color=MUTED, align="center")
+        i += tick
+
+
+def wiper_card(sh, x0, y0, x1, y1, strip_len, label="Wiper"):
+    """A card piece to cut out, with a strip of tape along its length. Turned copper side
+    down, it joins a lane to a pencil track wherever it's pressed."""
+    sh.rect(x0, y0, x1, y1, stroke=INK, width=0.35)
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    hw, hl = S.TAPE_W / 2, strip_len / 2
+    sh.rect(cx - hw, cy - hl, cx + hw, cy + hl, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
+    sh.text(cx, y0 - 1.8, label, size=7.5, bold=True, align="center")
+    sh.text(cx, y1 + 3.6, "cut out", size=6, color=MUTED, align="center")
 
 
 # Part footprints, actual size.
@@ -273,14 +309,62 @@ def checkbox(sh, x, y, size=3.0):
     sh.rect(x, y - size + 0.4, x + size, y + 0.4, stroke=INK, width=0.3)
 
 
-def diode(sh, cx, cy, lead=8.0, label=None):
-    """Small-signal diode (1N4148 size), cathode band on the right."""
+def diode(sh, cx, cy, lead=8.0, label=None, cathode="right"):
+    """Small-signal diode (1N4148 size). The band marks the cathode, which points
+    `cathode`: right, left, up or down."""
     bl, bw = 4.0, 1.9
-    sh.line(cx - lead, cy, cx + lead, cy, width=0.5, color=MUTED, cap=1)
-    sh.rect(cx - bl / 2, cy - bw / 2, cx + bl / 2, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=0.6)
-    sh.rect(cx + bl / 2 - 1.0, cy - bw / 2, cx + bl / 2 - 0.4, cy + bw / 2, stroke=None, fill=MUTED)
+    if cathode in ("right", "left"):
+        sh.line(cx - lead, cy, cx + lead, cy, width=0.5, color=MUTED, cap=1)
+        sh.rect(cx - bl / 2, cy - bw / 2, cx + bl / 2, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=0.6)
+        if cathode == "right":
+            sh.rect(cx + bl / 2 - 1.0, cy - bw / 2, cx + bl / 2 - 0.4, cy + bw / 2, stroke=None, fill=MUTED)
+        else:
+            sh.rect(cx - bl / 2 + 0.4, cy - bw / 2, cx - bl / 2 + 1.0, cy + bw / 2, stroke=None, fill=MUTED)
+        if label:
+            sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
+    else:
+        sh.line(cx, cy - lead, cx, cy + lead, width=0.5, color=MUTED, cap=1)
+        sh.rect(cx - bw / 2, cy - bl / 2, cx + bw / 2, cy + bl / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=0.6)
+        if cathode == "down":
+            sh.rect(cx - bw / 2, cy + bl / 2 - 1.0, cx + bw / 2, cy + bl / 2 - 0.4, stroke=None, fill=MUTED)
+        else:
+            sh.rect(cx - bw / 2, cy - bl / 2 + 0.4, cx + bw / 2, cy - bl / 2 + 1.0, stroke=None, fill=MUTED)
+        if label:
+            sh.text(cx + bw / 2 + 1, cy + 1, label, size=6, color=MUTED)
+
+
+def electrolytic(sh, x, y_plus, y_minus, label=None):
+    """Radial electrolytic capacitor lying on its side, actual size for 2200 µF 10 V
+    (10 × 20 mm). Both legs leave the same end of the body, which lies to the left;
+    bend the + leg up to y_plus and the − leg down to y_minus. The − stripe runs along
+    the body's lower edge, on the − leg's side."""
+    cy = (y_plus + y_minus) / 2
+    bw, bl, pitch = 10.0, 20.0, 5.0
+    bx1 = x - 2
+    bx0 = bx1 - bl
+    for leg_y, end_y in ((cy - pitch / 2, y_plus), (cy + pitch / 2, y_minus)):
+        sh.polygon([(bx1, leg_y), (x, leg_y), (x, end_y)], stroke=MUTED, width=0.5, closed=False)
+    sh.rect(bx0, cy - bw / 2, bx1, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=2)
+    sh.rect(bx0 + 1, cy + bw / 2 - 2.8, bx1, cy + bw / 2 - 0.4, stroke=None, fill=FAINT)
+    for i in range(4):
+        sh.text(bx0 + 4 + i * 4.5, cy + bw / 2 - 0.9, "−", size=6.5, bold=True, color=INK, align="center")
+    sh.text(x + 1.8, y_plus + S.TAPE_W / 2 + 3.2, "+", size=7, bold=True)
     if label:
-        sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
+        sh.text((bx0 + bx1) / 2, cy - 1.2, label, size=6, color=MUTED, align="center")
+
+
+COLOUR_CODE = ("black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "grey", "white")
+
+
+def colour_code_key(sh, x, y, width=46.0):
+    """The resistor colour code in words, so it reads on a black-and-white print."""
+    sh.text(x, y, "Colour code", size=7.5, bold=True)
+    sh.text(x, y + 3.6, "Band 1, band 2, then that many zeros.", size=6.5, color=MUTED)
+    for digit, name in enumerate(COLOUR_CODE):
+        cx = x + (digit // 5) * width / 2
+        ry = y + 8 + (digit % 5) * 3.3
+        sh.runs(cx, ry, [(f"{digit}  ", True), (name, False)], size=6.5)
+    sh.text(x, y + 8 + 5 * 3.3 + 0.8, "e.g. yellow-violet-red = 4, 7 + 00 = 4.7 kΩ", size=6.5, color=MUTED)
 
 
 def spiral(sh, cx, cy, r=1.7, turns=2.5, color=MUTED):

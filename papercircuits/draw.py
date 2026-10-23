@@ -20,6 +20,7 @@ rl_config.invariant = 1
 INK = HexColor("#1f1f1f")
 MUTED = HexColor("#666666")
 GUIDE = HexColor("#a6a6a6")
+FAINT = HexColor("#dedede")
 COPPER = HexColor("#b87333")
 COPPER_TINT = HexColor("#f6e6d8")
 WHITE = HexColor("#ffffff")
@@ -63,6 +64,10 @@ class Sheet:
         self.c = canvas.Canvas(str(path), pagesize=(S.PAGE_W * mm, S.PAGE_H * mm))
         self.c.setTitle(title)
         self.c.setAuthor("PaperCircuits")
+        self.title = title
+        self.page_no = 1
+        self.lanes = []
+        self.allowed = {}
 
     def pt(self, x, y):
         return x * mm, (S.PAGE_H - y) * mm
@@ -141,8 +146,26 @@ class Sheet:
             frame.addFromList(story, self.c)
         return story
 
+    def allow(self, a, b, distance):
+        """Let lanes a and b sit `distance` apart: a switch pair, or 0 for a crossing."""
+        self.allowed[(min(a, b), max(a, b))] = distance
+
+    def check_lanes(self):
+        """Fail the build if any two lanes on this page are closer than allowed."""
+        from .drc import violations
+
+        found = violations(self.lanes, self.allowed)
+        if found:
+            lines = [f"lanes {i} (from {self.lanes[i][0]}) and {j} (from {self.lanes[j][0]}) are {d:.1f} mm "
+                     f"apart, need {limit:g}" for i, j, d, limit in found]
+            raise RuntimeError(f"{self.title}, page {self.page_no}: copper too close\n  " + "\n  ".join(lines))
+
     def next_page(self):
+        self.check_lanes()
+        self.lanes, self.allowed = [], {}
+        self.page_no += 1
         self.c.showPage()
 
     def save(self):
+        self.check_lanes()
         self.c.save()
