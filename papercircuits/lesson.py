@@ -19,8 +19,8 @@ def items(texts, numbered, size=7, leading=8.8, space_after=1.2):
     return out
 
 
-def tag_note():
-    return Paragraph(TAG_NOTE, style(6.5, leading=8.2, color=MUTED, spaceBefore=2))
+def tag_note(text=TAG_NOTE):
+    return Paragraph(text, style(6.5, leading=8.2, color=MUTED, spaceBefore=2))
 
 
 def need_and_steps(sh, page_id, need, steps, need_rect, steps_rect):

@@ -6,6 +6,7 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 |---|---|
 | [docs/page-standard.md](docs/page-standard.md) | The page standard every sheet follows (v0.1 draft) |
 | [out/T0-contact-tests.pdf](out/T0-contact-tests.pdf) | Contact tests to run before fixing the standard |
+| [out/T1-pencil-contacts.pdf](out/T1-pencil-contacts.pdf) | Pencil tests: pencil-treated tape glue, joining tape to pencil, and comparing papers |
 | [out/template.pdf](out/template.pdf) | Lesson page template: zones, nets and drawing marks |
 | [out/P1-power.pdf](out/P1-power.pdf) | Power page P1: 3 × AA, resettable fuse, feeds H2/H3 (draft; [teacher notes](docs/lessons/P1.md)) |
 | [out/L01-led-polarity.pdf](out/L01-led-polarity.pdf) | Lesson L01: LEDs only work one way (draft; [teacher notes](docs/lessons/L01.md)) |
@@ -42,6 +43,7 @@ This writes the PDFs to `out/` and PNG previews to `docs/img/`. Previews need `p
 - `papercircuits/provisional.py`: the `[T0]` and `[P]` tags for choices that wait on an open decision.
 - `papercircuits/lesson.py`: what every lesson page shares: the You need and Build it columns, schematic panel and workbook boxes.
 - `papercircuits/drc.py`: the clearance check every page runs before it's saved.
+- `papercircuits/testsheet.py`: what the T-series test sheets share: result columns, steps and tables.
 - `papercircuits/sheets/`: one module per sheet. Add new sheets to `SHEETS` in `build.py`.
 
 ## Printing

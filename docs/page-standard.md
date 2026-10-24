@@ -13,7 +13,7 @@ The numbers in this document are also in [`papercircuits/standard.py`](../paperc
 | Item | Rule |
 |---|---|
 | Size | A4 portrait, 210 × 297 mm |
-| Build pages | 160–200 gsm card, copper on the front only |
+| Build pages | 160–200 gsm card, copper on the front only. **[T1]** compares other papers. |
 | Overlays | Vellum or tracing paper, about 90–110 gsm, no copper |
 | Printing | At 100 % ("actual size"), never "fit to page". Every page has a 100 mm scale bar in the footer to check this. |
 | Ink | Every page must read correctly on a black-and-white printer. Colour is only a tint. |
@@ -75,7 +75,7 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 - **Lanes:** each strip is printed as a lane, a band of the tape's width with a light tint and a dashed outline. Lay the tape over the lane.
 - **One continuous strip per run.** Turn corners by folding along the printed diagonal crease. Most copper tape has non-conductive glue, so two overlapping pieces don't reliably connect.
 - **One strip per node.** Every lead on a node lands on the same strip. Where a node has three or more connections, route the strip past each lead rather than branching, because a T-junction is an overlap joint.
-- **Joints:** where a joint can't be avoided, it is marked `J` and soldered. **[T0]** decides whether any unsoldered overlap is acceptable.
+- **Joints:** where a joint can't be avoided, it is marked `J` and soldered. **[T0]** decides whether any unsoldered overlap is acceptable, and **[T1]** tests whether rubbing pencil into the glue makes overlaps conduct.
 - **Clearance:** at least 3 mm, edge to edge, between different nets. Switch pairs (§6) are the only exception.
 - **Checked on every build.** Each lane is its own node, so the generator measures every pair of lanes on a page and fails the build if any are closer than 3 mm. A sheet declares its switch pairs (2 mm) and insulated crossings (0 mm) as the only allowed exceptions.
 - **Pencil is not wire.** A pencil track (§5) is a resistor. Keep pencil out of every gap between nets: a smudge across a gap is a leak.
@@ -94,7 +94,7 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
   - M2: flat leads under a copper patch
   - M3: spiral leads under a copper patch
   - M4: soldered
-- **Pencil tracks** are hatched bands with a solid outline and a tick every 10 mm. Shade them with a 6B pencil, pressing hard, for at least 10 passes. Hold a metal lead flat on a track with clear tape. Copper tape can't join a track, because its glue faces the pencil. T0 doesn't test lead-on-pencil contact yet.
+- **Pencil tracks** are hatched bands with a solid outline and a tick every 10 mm. Shade them with a 6B pencil, pressing hard, for at least 10 passes. Hold a metal lead flat on a track with clear tape. Plain copper tape may not join a track, because its glue faces the pencil. **[T1]** tests lead-on-pencil and tape-on-pencil joins.
 - **Cut-out pieces** such as a wiper are printed on the page with a solid cut line and a tape strip to stick on before cutting.
 - **Test points** are Ø7 mm circles on a lane, labelled `TPn`, with the lane running underneath. Every node a learner is asked to measure gets one.
 
@@ -161,6 +161,7 @@ The ID appears at the right of the header and in the footer.
 | Solid outline round a tape strip, "cut out" | A piece to cut out, such as a wiper |
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
+| Copper `[T1]` tag | Provisional: waits on the T1 pencil tests |
 
 Every page with tags says "Draft: tagged steps may change" in its header and explains the tags under its build steps. Tagged choices live in constants at the top of each sheet module, so settling a decision is a one-line change per page.
 
@@ -172,6 +173,7 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 2. **Kept or reused.** Is the workbook consumable, or a reusable class set?
 3. **Hardware.** T0 test 3 decides the hole treatment and the binding.
 4. **Overlay printing.** Inkjet on vellum can smudge, so laser may be needed.
+5. **Paper.** Which card to build on. T1 compares smooth card, heavier card, cartridge paper, coated card and 80 gsm paper.
 
 ## Changelog
 
@@ -180,3 +182,4 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 - **v0.1, revised while drafting L02:** added switch pairs and tab switches. Flap pads are now a 10 mm piece of 5 mm tape (the old 8 mm square couldn't be cut from 5 mm tape), which moved the corner switch to (196, 12) → (184, 24).
 - **v0.1, revised while drafting L03:** added pencil tracks, cut-out pieces, and the rule that pencil is not wire.
 - **v0.1, revised while drafting L04–L08:** added the electrolytic capacitor footprint and the automatic clearance check.
+- **v0.1, revised with T1:** added the T1 pencil tests, the `[T1]` tag, and paper as an open question.

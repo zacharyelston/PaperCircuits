@@ -201,7 +201,8 @@ def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
 
 def pencil_track(sh, x0, y0, x1, y1, tick=10.0, last_number=None):
     """A band to shade with a soft pencil: solid outline, light hatching, and a tick every
-    `tick` mm under it, numbered in mm from 0 at x0 up to `last_number`."""
+    `tick` mm under it, numbered in mm from 0 at x0 up to `last_number`. tick=None
+    leaves the ruler off."""
     step = 2.0
     c = x0 + y0 + step
     while c < x1 + y1:
@@ -210,6 +211,8 @@ def pencil_track(sh, x0, y0, x1, y1, tick=10.0, last_number=None):
             sh.line(xa, c - xa, xb, c - xb, width=0.15, color=GUIDE)
         c += step
     sh.rect(x0, y0, x1, y1, stroke=INK, width=0.35)
+    if tick is None:
+        return
     last = x1 - x0 if last_number is None else last_number
     i = 0.0
     while x0 + i <= x1 + 0.01:

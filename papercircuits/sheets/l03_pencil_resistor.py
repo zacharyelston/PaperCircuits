@@ -16,12 +16,15 @@ from .. import lesson
 from .. import schematic as sch
 from .. import standard as S
 from ..draw import COPPER, INK, MUTED, Sheet, style
-from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0
+from ..provisional import HEADER_STATUS, HOLE_STEP, POWER, T0, T1, TAG_NOTE_WITH_T1
 
 PAGE_ID = "L03"
 
 # Waiting on the T0 contact tests. T0 doesn't test a lead held on pencil; see the notes.
 LEAD_STEP = f"Hold R1's bottom lead and both LED1 leads flat with a patch of copper tape. {T0}"
+# Waiting on the T1 pencil tests (K4 is this join).
+PENCIL_STEP = (f"Lay R1's top lead flat across the end of track A and hold it down with clear tape. "
+               f"Its bottom lead goes on the lane below. Either way round works. {T1}")
 
 # Provisional with the power page (standard §7).
 RESISTOR = "220 Ω"
@@ -108,14 +111,13 @@ def _steps(sh):
         "Rub out any pencil in the gap between track A and the V+ lane. A smudge there joins them.",
         "Lay the three lanes, one piece of tape each. Fold at the creases; never cut.",
         HOLE_STEP,
-        "Lay R1's top lead flat across the end of track A and hold it down with clear tape. "
-        "Its bottom lead goes on the lane below. Either way round works.",
+        PENCIL_STEP,
         "Place LED1 as printed: long leg on the +.",
         LEAD_STEP,
         f"Cut out the wiper. Stick {WIPER_STRIP:g} mm of tape on it where marked, then turn it copper side down.",
         "Bind this page with P1 and switch BT1 on. Press the wiper across the V+ lane and track A, then slide it.",
     ], numbered=True)
-    story.append(lesson.tag_note())
+    story.append(lesson.tag_note(TAG_NOTE_WITH_T1))
     rest = sh.flow([(S.ZONE_BUILD[0], 113.0, 150.0, 184.0)], story)
     if rest:
         raise RuntimeError(f"L03 build steps overflowed by {len(rest)} items")

@@ -18,6 +18,7 @@ from papercircuits.sheets import (
     l08_capacitor,
     p1_power,
     t0_contact_tests,
+    t1_pencil_contacts,
     template,
 )
 
@@ -28,6 +29,7 @@ PREVIEWS = ROOT / "docs" / "img"
 SHEETS = {
     "template.pdf": template.build,
     "T0-contact-tests.pdf": t0_contact_tests.build,
+    "T1-pencil-contacts.pdf": t1_pencil_contacts.build,
     "P1-power.pdf": p1_power.build,
     "L01-led-polarity.pdf": l01_led_polarity.build,
     "L02-and-or.pdf": l02_and_or.build,

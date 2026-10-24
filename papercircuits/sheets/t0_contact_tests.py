@@ -6,11 +6,12 @@ Sheet 3 is test 4, switch contacts, with its own steps and results: print one on
 """
 
 from reportlab.lib.units import mm
-from reportlab.platypus import Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import Paragraph, Spacer
 
 from .. import elements as E
 from .. import standard as S
-from ..draw import COPPER, FONT, FONT_BOLD, GUIDE, INK, MUTED, Sheet, style
+from .. import testsheet as ts
+from ..draw import COPPER, GUIDE, INK, MUTED, Sheet, style
 
 PAGE_ID = "T0"
 LEFT, RIGHT = 62.0, 202.0  # tests 1 and 2 sit right of the hole treatments
@@ -39,8 +40,6 @@ PART_JOINTS = [
     ("M5", "Your method", ""),
 ]
 
-RESULT_X = (167.0, 181.0, 195.0)
-
 # Test 4: the corner switch, then three tab switches that differ only in the pair's gap.
 SWITCH_TABS = [
     ("TA", "2 mm gap, the standard", S.SWITCH_PAD_GAP),
@@ -52,18 +51,6 @@ TAB_UPPER = 80.0
 SWITCH_ROWS = ("S1 corner", "TA 2 mm", "TB 3 mm", "TC yours")
 SWITCH_COLS = (("Open", "OL?"), ("Light press", "Ω"), ("Firm press", "Ω"),
                ("Flicker?", "Y / N"), ("After 20", "Ω"), ("Day 7", "Ω"))
-
-H = style(9, bold=True, spaceBefore=5, spaceAfter=2)
-NOTE = style(7, leading=9.2, color=MUTED, spaceBefore=2)
-
-
-def _bullets(items):
-    return [Paragraph(t, style(7.5, leading=9.6, leftIndent=7, bulletIndent=0.5, bulletFontSize=7.5, spaceAfter=1.2), bulletText="•") for t in items]
-
-
-def _steps(items):
-    return [Paragraph(t, style(7.5, leading=9.6, leftIndent=9, bulletIndent=0, bulletFontName=FONT_BOLD, bulletFontSize=7.5, spaceAfter=1.5), bulletText=f"{i}.") for i, t in enumerate(items, 1)]
-
 
 def build(path):
     sh = Sheet(path, "T0 contact tests")
@@ -99,16 +86,6 @@ def _hole_tests(sh):
     E.spine(sh, connected=HOLE_TREATMENTS, strip_widths={h: w for h, (_, _, w) in HOLE_TREATMENTS.items()})
 
 
-def _result_headers(sh, y):
-    for x, name in zip(RESULT_X, ("Day 0", "Flexed", "Day 7")):
-        sh.text(x, y, name, size=6.5, bold=True, align="center")
-
-
-def _result_boxes(sh, y):
-    for x in RESULT_X:
-        sh.rect(x - 6, y - 3, x + 6, y + 3, stroke=INK, width=0.25)
-
-
 def _tape_joints(sh):
     sh.text(LEFT, 30, "1  Tape joints", size=10, bold=True)
     sh.paragraph(
@@ -118,7 +95,7 @@ def _tape_joints(sh):
         style(7, color=MUTED),
     )
     sh.runs(LEFT, 44, [("Meter zero ", True), ("_______ Ω", False), ("      Built on ", True), ("______________", False)], size=7)
-    _result_headers(sh, 44)
+    ts.result_headers(sh, 44)
 
     x_a, x_b, x_bend = 102.0, 154.0, 126.0
     y = 51.0
@@ -142,7 +119,7 @@ def _tape_joints(sh):
         sh.text(x_b, y_end - 4.6, "B", size=6, color=MUTED, align="center")
         sh.text(LEFT, y - 0.4, f"{jid}  {name}", size=7, bold=True)
         sh.text(LEFT, y + 3.2, hint, size=6.5, color=MUTED)
-        _result_boxes(sh, (y + y_end) / 2)
+        ts.result_boxes(sh, (y + y_end) / 2)
         y = y_end + 11
 
 
@@ -204,7 +181,7 @@ def _procedure(sh):
         part="2/3",
     )
     E.spine(sh)
-    h, note, bullets, steps = H, NOTE, _bullets, _steps
+    h, note, bullets, steps = ts.H, ts.NOTE, ts.bullets, ts.steps
 
     story = [Paragraph("You need", h)]
     story += bullets([
@@ -274,31 +251,18 @@ def _procedure(sh):
     E.footer(sh, f"{PAGE_ID} sheet 2 of 3")
 
 
-def _table(data, col_widths, row_height):
-    t = Table(data, colWidths=[w * mm for w in col_widths], rowHeights=row_height * mm, hAlign="LEFT")
-    t.setStyle(TableStyle([
-        ("FONT", (0, 0), (-1, -1), FONT, 7),
-        ("FONT", (0, 0), (0, -1), FONT_BOLD, 7),
-        ("TEXTCOLOR", (0, 0), (-1, -1), INK),
-        ("GRID", (0, 0), (-1, -1), 0.6, GUIDE),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    return t
-
-
 def _binder_table():
     head = style(6.5, leading=7.5, bold=True)
     short = {"H1": "bare", "H2": "eyelet", "H3": "12 mm", "H4": "solder"}
     data = [[""] + [Paragraph(f"{h}<br/>{short[h]}", head) for h in HOLE_TREATMENTS]]
     for row in ("Rings, still", "Rings, turning", "Screws, still", "Screws, turning"):
         data.append([row, "", "", "", ""])
-    return _table(data, [24, 14, 14, 14, 14], 7.5)
+    return ts.table(data, [24, 14, 14, 14, 14], 7.5)
 
 
 def _decision_table():
-    rows = ["Tape overlaps OK?", "Lead attachment", "Hole treatment", "Binding", "Switch gap", "Corner switch OK?"]
-    return _table([[r, ""] for r in rows], [33, 47], 8.5)
+    return ts.decision_table(["Tape overlaps OK?", "Lead attachment", "Hole treatment", "Binding",
+                              "Switch gap", "Corner switch OK?"])
 
 
 def _switch_tests(sh):
@@ -317,7 +281,7 @@ def _switch_tests(sh):
         _tab_station(sh, x, TAB_UPPER, tab_id, desc, gap)
 
     rest = sh.flow([(x0, 104.0, x1, 146.0)], [_switch_table()])
-    story = [Paragraph("How to test", H)] + _steps([
+    story = [Paragraph("How to test", ts.H)] + ts.steps([
         "Lay each switch's A and B lanes as separate pieces of tape. Keep the gap between them clear.",
         "S1: stick a 10 mm piece of tape on the corner flap where shown. Tabs: cut the solid lines, "
         "crease the dotted hinges and stick a 10 mm piece on each flap.",
@@ -326,15 +290,15 @@ def _switch_tests(sh):
         "<b>Flicker:</b> keep pressing and rock your finger. Write Y if the reading jumps or drops to OL.",
         "<b>After 20:</b> press and release 20 times, then take a firm reading. <b>Day 7:</b> repeat a week later.",
     ])
-    left_story, story = story, [Paragraph("Pass or fail", H)] + _bullets([
+    left_story, story = story, [Paragraph("Pass or fail", ts.H)] + ts.bullets([
         "<b>Pass:</b> open reads OL, and pressed reads under 10 Ω with no flicker.",
         "<b>Fail:</b> any reading when open, OL or flicker when pressed, or a rise by day 7.",
     ])
     story += [
         Paragraph("Why 10 Ω: lesson LEDs use 220 Ω, so 10 Ω changes their current by under 5 %. "
-                  "Flicker matters more: it shows up as a flickering LED.", NOTE),
+                  "Flicker matters more: it shows up as a flickering LED.", ts.NOTE),
         Paragraph("If TB passes as well as TA, standard v0.2 can widen switch gaps to 3 mm and drop "
-                  "the 2 mm exception. Write the result on sheet 2.", NOTE),
+                  "the 2 mm exception. Write the result on sheet 2.", ts.NOTE),
     ]
     rest += sh.flow([(x0, 150.0, 115.0, 210.0)], left_story) + sh.flow([(121.0, 150.0, x1, 210.0)], story)
     if rest:
@@ -378,4 +342,4 @@ def _switch_table():
     head = style(6.5, leading=7.5, bold=True)
     data = [[""] + [Paragraph(f"{name}<br/><font color='#666666'>{unit}</font>", head) for name, unit in SWITCH_COLS]]
     data += [[row] + [""] * len(SWITCH_COLS) for row in SWITCH_ROWS]
-    return _table(data, [27] + [23] * len(SWITCH_COLS), 8)
+    return ts.table(data, [27] + [23] * len(SWITCH_COLS), 8)
