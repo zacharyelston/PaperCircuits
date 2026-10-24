@@ -137,3 +137,46 @@ def capacitor(sh, x, y0, y1, label, value):
     sh.text(x - 4.4, cy - 1.6, "+", size=6.5, bold=True, align="center")
     sh.text(x + 4.2, cy - 0.4, label, size=6.5, bold=True)
     sh.text(x + 4.2, cy + 2.8, value, size=6, color=MUTED)
+
+
+def resistor_h(sh, x0, x1, y, label, value="", box_w=8.0):
+    """Horizontal resistor from x0 to x1."""
+    cx = (x0 + x1) / 2
+    sh.line(x0, y, cx - box_w / 2, y, width=W)
+    sh.line(cx + box_w / 2, y, x1, y, width=W)
+    sh.rect(cx - box_w / 2, y - 1.5, cx + box_w / 2, y + 1.5, stroke=INK, fill=WHITE, width=W)
+    sh.text(cx, y - 2.6, label, size=6.5, bold=True, align="center")
+    if value:
+        sh.text(cx, y + 4.6, value, size=6, color=MUTED, align="center")
+
+
+def capacitor_h(sh, x0, x1, y, label, value=""):
+    """Horizontal capacitor with no polarity, from x0 to x1."""
+    cx = (x0 + x1) / 2
+    sh.line(x0, y, cx - 0.8, y, width=W)
+    sh.line(cx + 0.8, y, x1, y, width=W)
+    for px in (cx - 0.8, cx + 0.8):
+        sh.line(px, y - 2.6, px, y + 2.6, width=0.45)
+    sh.text(cx, y - 3.6, label, size=6.5, bold=True, align="center")
+    if value:
+        sh.text(cx, y + 5.6, value, size=6, color=MUTED, align="center")
+
+
+def npn(sh, x, y, label, base="left"):
+    """NPN transistor centred at (x, y), base facing `base`. Returns the base, collector
+    and emitter terminal points; the collector leaves upward and the emitter downward."""
+    s = 1 if base == "left" else -1
+    sh.circle(x, y, 7.0, stroke=INK, fill=WHITE, width=W)
+    bar = x - s * 1.2
+    sh.line(bar, y - 2.2, bar, y + 2.2, width=0.55)
+    b, c, e = (x - s * 4.5, y), (x + s * 1.6, y - 5.5), (x + s * 1.6, y + 5.5)
+    sh.line(b[0], y, bar, y, width=W)
+    sh.polygon([(bar, y - 1.0), (c[0], y - 2.6), c], stroke=INK, width=W, closed=False)
+    sh.polygon([(bar, y + 1.0), (e[0], y + 2.6), e], stroke=INK, width=W, closed=False)
+    tip = (bar + s * 2.6, y + 2.3)
+    sh.polygon([tip, (tip[0] - s * 1.1, tip[1] - 0.15), (tip[0] - s * 0.5, tip[1] - 1.0)], stroke=None, fill=INK)
+    if s == 1:
+        sh.text(x + 4.2, y + 7.2, label, size=6.5, bold=True)
+    else:
+        sh.text(x - 4.2, y + 7.2, label, size=6.5, bold=True, align="right")
+    return b, c, e

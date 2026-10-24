@@ -57,6 +57,15 @@ TAB_HINGE_CLEAR = 2.0
 
 SCALE_BAR = 100.0
 
+# Table-top module pages (standard §10): power enters and leaves at the side edges and runs
+# round the build zone as a ring; signals go by clip lead between patch loops.
+EDGE_V_Y, EDGE_GND_Y = 135.0, 145.0
+EDGE_LEFT_X, EDGE_RIGHT_X = 6.0, 204.0
+RING_TOP, RING_BOTTOM = 46.0, 176.0
+RING_LEFT = (40.0, 45.0)    # x where V+ climbs and GND drops on the left
+RING_RIGHT = (194.0, 189.0)  # x where they come back on the right
+PATCH_LOOP = 15.0
+
 
 def hole_y(hole):
     return HOLES[hole][0]

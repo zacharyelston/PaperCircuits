@@ -312,6 +312,51 @@ def checkbox(sh, x, y, size=3.0):
     sh.rect(x, y - size + 0.4, x + size, y + 0.4, stroke=INK, width=0.3)
 
 
+def transistor(sh, cx, cy, legs, label=None):
+    """TO-92 transistor lying flat face up, with its legs bent out to where they land.
+    `legs` maps "E", "B" and "C" to (x, y). For a 2N3904 seen flat face up with the legs
+    towards you, they come out E, B, C from left to right."""
+    for x, y in legs.values():
+        sh.line(cx, cy, x, y, width=0.5, color=MUTED, cap=1)
+    w, h = 5.0, 4.2
+    sh.rect(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=1.6)
+    sh.line(cx - w / 2 + 0.7, cy - h / 2 + 1.0, cx + w / 2 - 0.7, cy - h / 2 + 1.0, width=0.25, color=MUTED)
+    for name, (x, y) in legs.items():
+        dx, dy = x - cx, y - cy
+        n = math.hypot(dx, dy) or 1.0
+        sh.text(x + dx / n * 2.8, y + dy / n * 2.8 + 1.1, name, size=6, bold=True, align="center")
+    if label:
+        sh.text(cx + w / 2 + 1.2, cy - h / 2 - 0.8, label, size=6, color=MUTED)
+
+
+def ceramic_cap(sh, cx, cy, vertical=False, lead=8.0, label=None):
+    """Disc ceramic or film capacitor: no polarity, either way round."""
+    if vertical:
+        sh.line(cx, cy - lead, cx, cy + lead, width=0.5, color=MUTED, cap=1)
+    else:
+        sh.line(cx - lead, cy, cx + lead, cy, width=0.5, color=MUTED, cap=1)
+    sh.circle(cx, cy, 5.0, stroke=MUTED, fill=WHITE, width=0.3)
+    if label:
+        if vertical:
+            sh.text(cx + 3.6, cy + 1, label, size=6, color=MUTED)
+        else:
+            sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
+
+
+def patch_loop(sh, x, y, label, side="right"):
+    """Where to solder a patch loop on a lane: an upright U of bare wire a clip can grip."""
+    pts = [(x - 2.2 + 4.4 * i / 12, y - 2.8 * math.sin(math.pi * i / 12)) for i in range(13)]
+    sh.polygon(pts, stroke=INK, width=0.5, closed=False)
+    for fx in (x - 2.2, x + 2.2):
+        sh.circle(fx, y, 1.0, stroke=None, fill=INK)
+    if side == "right":
+        sh.text(x + 4.2, y + 1.1, label, size=6.5, bold=True)
+    elif side == "left":
+        sh.text(x - 4.2, y + 1.1, label, size=6.5, bold=True, align="right")
+    else:
+        sh.text(x, y - 4.6, label, size=6.5, bold=True, align="center")
+
+
 def diode(sh, cx, cy, lead=8.0, label=None, cathode="right"):
     """Small-signal diode (1N4148 size). The band marks the cathode, which points
     `cathode`: right, left, up or down."""

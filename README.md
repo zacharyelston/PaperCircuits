@@ -20,6 +20,9 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [out/L06-diodes.pdf](out/L06-diodes.pdf) | Lesson L06: diodes are one-way valves (draft; [teacher notes](docs/lessons/L06.md)) |
 | [out/L07-dividers.pdf](out/L07-dividers.pdf) | Lesson L07: share the voltage, voltage dividers (draft; [teacher notes](docs/lessons/L07.md)) |
 | [out/L08-capacitor.pdf](out/L08-capacitor.pdf) | Lesson L08: store some charge, a capacitor fades an LED (draft; [teacher notes](docs/lessons/L08.md)) |
+| [out/M1-oscillator.pdf](out/M1-oscillator.pdf) | Paper synth M1: oscillator, the tone (draft; [project notes](docs/projects/paper-synth.md)) |
+| [out/M2-keyboard.pdf](out/M2-keyboard.pdf) | Paper synth M2: stylus keyboard, one octave of C major (draft) |
+| [out/M7-output.pdf](out/M7-output.pdf) | Paper synth M7: mixer and line output to a real amp (draft) |
 
 ## On the bench
 
@@ -32,6 +35,8 @@ The lesson page template (L00) built in copper tape, with a 100 Ω resistor sold
 1. **Loops and current:** L01 LEDs only work one way · L02 two switches, two ways · L03 draw a resistor · L04 resistors set the current · L05 two ways to add a resistor
 2. **Parts with a job:** L06 diodes · L07 voltage dividers · L08 capacitors
 3. **Control and systems** (not drafted yet): transistors, pages working together on BUS A and BUS B, and a real circuit board
+
+**Projects:** the **paper synth** is a table-top group build. Pages lie side by side, power runs between them on a short cable, and clip leads patch the sound. M1 oscillator, M2 keyboard and M7 output are drafted; see the [project notes](docs/projects/paper-synth.md).
 
 Build P1 first: every lesson takes its power from P1 through the binder.
 
