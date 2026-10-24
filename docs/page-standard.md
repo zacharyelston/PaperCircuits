@@ -13,7 +13,7 @@ The numbers in this document are also in [`papercircuits/standard.py`](../paperc
 | Item | Rule |
 |---|---|
 | Size | A4 portrait, 210 × 297 mm |
-| Build pages | 160–200 gsm card, copper on the front only. **[T1]** compares other papers. |
+| Build pages | 160–200 gsm card, copper on the front only. **[T1]** compares other papers, and **[T2]** tests a second layer on the back (§4). |
 | Overlays | Vellum or tracing paper, about 90–110 gsm, no copper |
 | Printing | At 100 % ("actual size"), never "fit to page". Every page has a 100 mm scale bar in the footer to check this. |
 | Ink | Every page must read correctly on a black-and-white printer. Colour is only a tint. |
@@ -80,6 +80,7 @@ Test sheets (T series) may use the build, schematic and workbook zones freely. T
 - **Checked on every build.** Each lane is its own node, so the generator measures every pair of lanes on a page and fails the build if any are closer than 3 mm. A sheet declares its switch pairs (2 mm) and insulated crossings (0 mm) as the only allowed exceptions.
 - **Pencil is not wire.** A pencil track (§5) is a resistor. Keep pencil out of every gap between nets: a smudge across a gap is a leak.
 - **Crossings:** marked `X`. Lay a 10 × 10 mm insulating patch (paper or clear tape) before the upper strip.
+- **Back layer [T2]:** not part of the standard yet. The [T2 two-sided tests](../out/T2-two-sided.pdf) check whether a second copper layer on the back works: how far duplex printing shifts the back, which via joins front to back (a slit the tape threads through, a soldered wire, or an eyelet), whether 12 mm tape folded over an edge carries a net round the page, and whether stacked pages short back to front. A back page is printed mirrored, so its marks use the front's coordinates and land behind their partners when the sheet is flipped on its long edge.
 
 ## 5. Parts and test points
 
@@ -164,6 +165,11 @@ The ID appears at the right of the header and in the footer.
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
 | Copper `[T1]` tag | Provisional: waits on the T1 pencil tests |
+| Crosshair in a circle, labelled `Rn` | Registration mark: pin through it to check how the back lines up. The back's copy has a 1 mm scale. |
+| Short black bar across a lane end | Slit via: cut here and thread the tape through to the other side |
+| Dot in a dashed circle | Wire via: push a leg through, bend it flat on both sides and solder |
+| Open circle, dashed ring | Eyelet via: pierce and set an eyelet; the dashed ring is the flange |
+| Dashed line near the top edge, "edge wrap" | Fold wide tape over the edge down to this line, on both sides |
 
 Every page with tags says "Draft: tagged steps may change" in its header and explains the tags under its build steps. Tagged choices live in constants at the top of each sheet module, so settling a decision is a one-line change per page.
 
@@ -214,6 +220,7 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 3. **Hardware.** T0 test 3 decides the hole treatment and the binding.
 4. **Overlay printing.** Inkjet on vellum can smudge, so laser may be needed.
 5. **Paper.** Which card to build on. T1 compares smooth card, heavier card, cartridge paper, coated card and 80 gsm paper.
+6. **Two-sided pages.** If T2 passes, a back layer gives routes that cross without an insulating patch, and tape wrapped over the page edges gives rails: V+ over the top edge and GND over the bottom, reachable from either side and through a clipped stack. T2 also decides whether stacked two-sided pages need an interleaf.
 
 ## Changelog
 
@@ -224,3 +231,4 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 - **v0.1, revised while drafting L04–L08:** added the electrolytic capacitor footprint and the automatic clearance check.
 - **v0.1, revised with T1:** added the T1 pencil tests, the `[T1]` tag, and paper as an open question.
 - **v0.1, revised for the paper synth:** added table-top projects (§10): edge connectors, the power ring, patch loops and M-page zones.
+- **v0.1, revised with T2:** added the T2 two-sided tests, the via, registration and edge-wrap marks, and two-sided pages as an open question.
