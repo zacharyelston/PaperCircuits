@@ -233,6 +233,40 @@ def wiper_card(sh, x0, y0, x1, y1, strip_len, label="Wiper"):
     sh.text(cx, y1 + 3.6, "cut out", size=6, color=MUTED, align="center")
 
 
+def registration_mark(sh, x, y, label, scale=False):
+    """A crosshair for checking two-sided printing. On the back, scale=True adds 1 mm ticks
+    along both arms, so a pin pushed through the front mark shows the offset in mm."""
+    arm = 4.5 if scale else 3.0
+    sh.circle(x, y, 4.0, stroke=INK, width=0.25)
+    sh.line(x - arm, y, x + arm, y, width=0.15)
+    sh.line(x, y - arm, x, y + arm, width=0.15)
+    if scale:
+        for i in (-4, -3, -2, -1, 1, 2, 3, 4):
+            t = 1.1 if i % 2 == 0 else 0.6
+            sh.line(x + i, y - t, x + i, y + t, width=0.12)
+            sh.line(x - t, y + i, x + t, y + i, width=0.12)
+    sh.text(x, y + 7.5, label, size=6, bold=True, align="center")
+
+
+VIA_KINDS = ("slit", "wire", "eyelet", "mark")
+
+
+def via(sh, x, y, kind):
+    """Where a horizontal lane passes to the other side of the page. "slit": cut here and
+    thread the tape through. "wire": push a bare wire through and solder both sides.
+    "eyelet": set a small eyelet through both lanes. "mark": your own method."""
+    if kind == "slit":
+        sh.rect(x - 0.4, y - 3.5, x + 0.4, y + 3.5, stroke=None, fill=INK)
+    elif kind == "wire":
+        sh.circle(x, y, 4.0, stroke=INK, width=0.25, dash=(0.6, 0.6))
+        sh.circle(x, y, 1.2, stroke=None, fill=INK)
+    elif kind == "eyelet":
+        sh.circle(x, y, 7.0, stroke=GUIDE, width=0.2, dash=(0.8, 0.8))
+        sh.circle(x, y, 3.5, stroke=INK, fill=WHITE, width=0.3)
+    else:
+        sh.circle(x, y, 3.0, stroke=INK, width=0.3)
+
+
 # Part footprints, actual size.
 
 def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):

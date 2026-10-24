@@ -1,6 +1,7 @@
 """A4 canvas in the page standard's coordinates: mm, origin top-left, y down."""
 
 import os
+from contextlib import contextmanager
 
 import reportlab
 from reportlab import rl_config
@@ -68,9 +69,24 @@ class Sheet:
         self.page_no = 1
         self.lanes = []
         self.allowed = {}
+        self.mirrored = False
 
     def pt(self, x, y):
+        """Page points for a position in standard mm. On a mirrored (back) page, x is flipped,
+        so anything drawn at the front's coordinates lands behind it once the sheet is
+        printed double-sided and flipped on its long edge."""
+        if self.mirrored:
+            x = S.PAGE_W - x
         return x * mm, (S.PAGE_H - y) * mm
+
+    @contextmanager
+    def unmirrored(self):
+        """Draw page furniture such as headers the normal way round on a back page."""
+        was, self.mirrored = self.mirrored, False
+        try:
+            yield
+        finally:
+            self.mirrored = was
 
     def _pen(self, stroke, fill, width, dash):
         c = self.c
@@ -98,6 +114,9 @@ class Sheet:
         self.c.drawPath(path, stroke=int(stroke is not None), fill=int(fill is not None))
 
     def rect(self, x0, y0, x1, y1, stroke=INK, fill=None, width=0.25, dash=None, radius=0):
+        if self.mirrored:
+            with self.unmirrored():
+                return self.rect(S.PAGE_W - x1, y0, S.PAGE_W - x0, y1, stroke, fill, width, dash, radius)
         self._pen(stroke, fill, width, dash)
         x, y = self.pt(x0, y1)
         w, h = (x1 - x0) * mm, (y1 - y0) * mm
@@ -112,7 +131,10 @@ class Sheet:
         self.c.circle(*self.pt(cx, cy), d / 2 * mm, stroke=int(stroke is not None), fill=int(fill is not None))
 
     def text(self, x, y, s, size=7, bold=False, color=INK, align="left"):
-        """y is the baseline."""
+        """y is the baseline. On a back page, left and right alignment swap, so a label
+        still reads away from the thing it labels."""
+        if self.mirrored:
+            align = {"left": "right", "right": "left"}.get(align, align)
         c = self.c
         c.setFont(FONT_BOLD if bold else FONT, size)
         c.setFillColor(color)
@@ -124,6 +146,11 @@ class Sheet:
 
     def runs(self, x, y, parts, size=7, color=INK):
         """Draw (text, bold) runs one after another on a baseline; returns the end x."""
+        if self.mirrored:
+            total = sum(self.width(s, size, bold) for s, bold in parts)
+            with self.unmirrored():
+                self.runs(S.PAGE_W - x - total, y, parts, size, color)
+            return x + total
         for s, bold in parts:
             self.text(x, y, s, size=size, bold=bold, color=color)
             x += self.width(s, size, bold)
@@ -132,6 +159,8 @@ class Sheet:
     def paragraph(self, x, y, width, markup, para_style):
         """Draw wrapped text with its top at y; returns its height in mm."""
         p = Paragraph(markup, para_style)
+        if self.mirrored:
+            x = S.PAGE_W - x - width
         _, h = p.wrapOn(self.c, width * mm, S.PAGE_H * mm)
         p.drawOn(self.c, x * mm, (S.PAGE_H - y) * mm - h)
         return h / mm
@@ -139,6 +168,8 @@ class Sheet:
     def flow(self, columns, story):
         """Pour flowables into (x0, y0, x1, y1) columns in order; returns what didn't fit."""
         for x0, y0, x1, y1 in columns:
+            if self.mirrored:
+                x0, x1 = S.PAGE_W - x1, S.PAGE_W - x0
             frame = Frame(
                 x0 * mm, (S.PAGE_H - y1) * mm, (x1 - x0) * mm, (y1 - y0) * mm,
                 leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0, showBoundary=0,
@@ -160,10 +191,12 @@ class Sheet:
                      f"apart, need {limit:g}" for i, j, d, limit in found]
             raise RuntimeError(f"{self.title}, page {self.page_no}: copper too close\n  " + "\n  ".join(lines))
 
-    def next_page(self):
+    def next_page(self, mirrored=False):
+        """Start a new page. mirrored=True makes it the back of the page before it."""
         self.check_lanes()
         self.lanes, self.allowed = [], {}
         self.page_no += 1
+        self.mirrored = mirrored
         self.c.showPage()
 
     def save(self):

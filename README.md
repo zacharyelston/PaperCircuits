@@ -10,6 +10,7 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [docs/test-log.md](docs/test-log.md) | Bench results from the T-series tests, which decide the provisional tags |
 | [out/T0-contact-tests.pdf](out/T0-contact-tests.pdf) | Contact tests to run before fixing the standard |
 | [out/T1-pencil-contacts.pdf](out/T1-pencil-contacts.pdf) | Pencil tests: pencil-treated tape glue, joining tape to pencil, and comparing papers |
+| [out/T2-two-sided.pdf](out/T2-two-sided.pdf) | Two-sided tests: duplex registration, vias, edge wraps, and stacking shorts (pages 1 and 2 print double-sided) |
 | [out/template.pdf](out/template.pdf) | Lesson page template: zones, nets and drawing marks |
 | [out/P1-power.pdf](out/P1-power.pdf) | Power page P1: 3 × AA, resettable fuse, feeds H2/H3 (draft; [teacher notes](docs/lessons/P1.md)) |
 | [out/L01-led-polarity.pdf](out/L01-led-polarity.pdf) | Lesson L01: LEDs only work one way (draft; [teacher notes](docs/lessons/L01.md)) |
@@ -66,3 +67,5 @@ The last check compares fingerprints in `docs/img/previews.sha256` rather than i
 ## Printing
 
 Print at 100 % ("actual size"), never "fit to page". Every page has a 100 mm bar in the footer; check it with a ruler.
+
+T2 is the one exception to single-sided printing: print its pages 1 and 2 double-sided, flipping on the long edge, then check the registration marks before laying any tape.
