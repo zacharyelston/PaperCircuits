@@ -1,0 +1,33 @@
+name: Build pages
+
+# Rebuilds every page on each PR and on main. The build runs the copper clearance
+# check, and the job fails if the committed PDFs or previews are out of date.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Build every page and check the previews
+        run: uv run --locked build.py --check
+
+      - name: Fail if the committed PDFs are out of date
+        run: |
+          new=$(git ls-files --others --exclude-standard out/)
+          if ! git diff --quiet -- out/ || [ -n "$new" ]; then
+            echo "::error::The committed PDFs don't match what the code builds. Run 'uv run build.py', then commit out/ and docs/img/."
+            git status --short -- out/
+            exit 1
+          fi
+          echo "Committed PDFs match the build."
