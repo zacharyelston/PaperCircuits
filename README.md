@@ -21,6 +21,12 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [out/L07-dividers.pdf](out/L07-dividers.pdf) | Lesson L07: share the voltage, voltage dividers (draft; [teacher notes](docs/lessons/L07.md)) |
 | [out/L08-capacitor.pdf](out/L08-capacitor.pdf) | Lesson L08: store some charge, a capacitor fades an LED (draft; [teacher notes](docs/lessons/L08.md)) |
 
+## On the bench
+
+<img src="docs/img/bench-l00-soldered.jpg" width="480" alt="The printed lesson page template with its drawing marks built in copper tape: a lane, a folded corner, a joint, a crossing, the spine net strips and the corner switch pads. A blue resistor is soldered across the resistor gap, and a multimeter on its 200 ohm range reads 99.2.">
+
+The lesson page template (L00) built in copper tape, with a 100 Ω resistor soldered across its 10 mm gap. The meter reads 99.2 Ω, so the solder joints add almost nothing. Bench results go in the [test log](docs/test-log.md).
+
 ## Chapters
 
 1. **Loops and current:** L01 LEDs only work one way · L02 two switches, two ways · L03 draw a resistor · L04 resistors set the current · L05 two ways to add a resistor
