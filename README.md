@@ -5,6 +5,7 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | File | What it is |
 |---|---|
 | [docs/page-standard.md](docs/page-standard.md) | The page standard every sheet follows (v0.1 draft) |
+| [docs/test-log.md](docs/test-log.md) | Bench results from the T-series tests, which decide the provisional tags |
 | [out/T0-contact-tests.pdf](out/T0-contact-tests.pdf) | Contact tests to run before fixing the standard |
 | [out/T1-pencil-contacts.pdf](out/T1-pencil-contacts.pdf) | Pencil tests: pencil-treated tape glue, joining tape to pencil, and comparing papers |
 | [out/template.pdf](out/template.pdf) | Lesson page template: zones, nets and drawing marks |

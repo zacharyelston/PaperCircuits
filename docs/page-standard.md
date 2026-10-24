@@ -2,7 +2,7 @@
 
 Every page in the workbook follows this standard: lessons, power pages, module pages, overlays and test sheets. That way any page can be bound with any other and share power and signals through the binder.
 
-Items marked **[T0]** are provisional. The [T0 contact tests](../out/T0-contact-tests.pdf) decide them, and v0.2 of this standard records the results.
+Items marked **[T0]** are provisional. The [T0 contact tests](../out/T0-contact-tests.pdf) decide them, and v0.2 of this standard records the results. Bench results so far are in the [test log](test-log.md).
 
 The numbers in this document are also in [`papercircuits/standard.py`](../papercircuits/standard.py), which draws every page. If you change one, change the other.
 

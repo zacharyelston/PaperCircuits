@@ -2,7 +2,8 @@
 
 Can pencil make copper tape's glue conduct? Two tests, each with a control:
 1. Tape overlaps: the upper piece's glue is scratched, rubbed with pencil, or both,
-   against a plain overlap (the T0 J2 control) and a continuous reference lane.
+   against a plain overlap (the T0 J2 control) and a continuous reference lane. O6 puts
+   two glue faces together, so current has to cross both.
 2. Tape on pencil: copper joined to a shaded track by plain tape, treated glue, a folded
    copper tab, or L03's bare wire under clear tape.
 
@@ -27,7 +28,8 @@ OVERLAPS = [
     ("O3", "Pencil rubbed", "6B rubbed into the glue", True),
     ("O4", "Scratched + pencil", "scratch, then rub 6B in", True),
     ("O5", "Scratched + HB", "harder tip, less graphite", True),
-    ("O6", "Your version", "", True),
+    ("O6", "Sticky to sticky", "both glue faces rubbed with 6B", True),
+    ("O7", "Your version", "", True),
 ]
 OVERLAP_A, OVERLAP_B, OVERLAP_J = 80.0, 152.0, 116.0
 
@@ -68,8 +70,8 @@ def _fixtures(sh):
     E.spine(sh)
     _overlaps(sh)
     _joins(sh)
-    sh.rect(LEFT, 226, RIGHT, 281, stroke=GUIDE, width=0.25, radius=1.2)
-    sh.text(LEFT + 2, 230, "Notes", size=6.5, bold=True, color=MUTED)
+    sh.rect(LEFT, 237, RIGHT, 281, stroke=GUIDE, width=0.25, radius=1.2)
+    sh.text(LEFT + 2, 241, "Notes", size=6.5, bold=True, color=MUTED)
     E.footer(sh, f"{PAGE_ID} sheet 1 of 2")
 
 
@@ -102,14 +104,14 @@ def _overlaps(sh):
 
 
 def _joins(sh):
-    sh.text(LEFT, 133, "2  Tape on pencil", size=10, bold=True)
-    sh.paragraph(LEFT, 135, 136,
+    sh.text(LEFT, 144, "2  Tape on pencil", size=10, bold=True)
+    sh.paragraph(LEFT, 146, 136,
                  "Shade each track with 6B, then join copper to both ends as labelled. Measure A to B, "
                  "then the bare pencil between the two small circles. Readings are in kΩ.",
                  style(7, color=MUTED))
-    ts.result_headers(sh, 146.5, ("A to B", "Pencil", "Day 7"))
+    ts.result_headers(sh, 157.5, ("A to B", "Pencil", "Day 7"))
     for i, (code, name, hint) in enumerate(JOINS):
-        y = 154.0 + 15 * i
+        y = 165.0 + 15 * i
         E.pencil_track(sh, TRACK[0], y - TRACK_W / 2, TRACK[1], y + TRACK_W / 2, tick=None)
         if code == "K4":
             lanes = (WIRE_LANE_A, WIRE_LANE_B)
@@ -151,6 +153,8 @@ def _procedure(sh):
         "<b>scratched</b> means a criss-cross scored with a fingernail; <b>pencil</b> means rubbing the "
         "tip back and forth until the glue looks grey.",
         "Lay it over the left-hand piece by 10 mm, from J to B, and burnish the overlap hard with a fingernail.",
+        "<b>O6, sticky to sticky:</b> fold the left-hand piece's last 10 mm back over itself so its glue faces "
+        "up. Rub 6B into that glue and into the right-hand piece's glue, then lay the right-hand piece on top.",
         "Brush loose graphite off the paper. A smudge beside a lane is a leak.",
         "Measure A to B on the 200 Ω range. <b>Flexed</b> and <b>Day 7</b> work as on T0.",
     ])
@@ -165,7 +169,7 @@ def _procedure(sh):
         "<b>Day 7:</b> measure A to B again.",
     ])
     right += [Paragraph("Pass or fail", ts.H)] + ts.bullets([
-        "<b>Overlaps:</b> pass if within 1 Ω of O0 and steady. If O3 to O5 pass where O1 fails, "
+        "<b>Overlaps:</b> pass if within 1 Ω of O0 and steady. If O3 to O6 pass where O1 fails, "
         "pencil-treated overlaps could replace solder.",
         "<b>On pencil:</b> a good join makes A to B only a little more than the pencil-only reading. "
         "Several times more, OL, or a wandering reading means a poor contact.",
