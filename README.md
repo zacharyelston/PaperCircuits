@@ -1,5 +1,7 @@
 # PaperCircuits
 
+![Four lesson pages: L01 LEDs only work one way, L02 two switches two ways, L03 draw a resistor, and L08 store some charge. Each shows copper tape lanes, part outlines, a circuit diagram and workbook boxes.](docs/img/hero.png)
+
 Printable A4 paper-circuit workbook pages. Circuits are built from copper tape and real through-hole parts, and pages bind into a shared power-and-signal backplane through the binder holes.
 
 | File | What it is |
@@ -33,7 +35,7 @@ Build P1 first: every lesson takes its power from P1 through the binder.
 uv run build.py
 ```
 
-This writes the PDFs to `out/` and PNG previews to `docs/img/`. Previews need `pdftoppm` from poppler.
+This writes the PDFs to `out/`, PNG previews to `docs/img/`, and the headline image `docs/img/hero.png` from four of those previews. Previews need `pdftoppm` from poppler.
 
 ## Code
 

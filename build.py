@@ -1,4 +1,5 @@
-"""Build every sheet into out/ and PNG previews into docs/img/.
+"""Build every sheet into out/, PNG previews into docs/img/, and the README's headline
+image from those previews.
 
 Run with: uv run build.py
 """
@@ -6,6 +7,8 @@ Run with: uv run build.py
 import shutil
 import subprocess
 from pathlib import Path
+
+from PIL import Image
 
 from papercircuits.sheets import (
     l01_led_polarity,
@@ -54,6 +57,32 @@ def main():
             subprocess.run(["pdftoppm", "-png", "-r", "90", str(path), str(prefix)], check=True)
         else:
             print("  pdftoppm not found; skipped previews")
+    hero()
+
+
+HERO_PAGES = ("L01-led-polarity", "L02-and-or", "L03-pencil-resistor", "L08-capacitor")
+
+
+def hero(width=400, gap=28, border=2):
+    """A row of lesson-page previews on a light backdrop, for the top of the README."""
+    pages = [PREVIEWS / f"{stem}-1.png" for stem in HERO_PAGES]
+    if not all(p.exists() for p in pages):
+        print("  previews missing; skipped hero.png")
+        return
+    thumbs = []
+    for p in pages:
+        im = Image.open(p).convert("RGB")
+        thumbs.append(im.resize((width, round(im.height * width / im.width)), Image.LANCZOS))
+    tall = max(t.height for t in thumbs)
+    canvas = Image.new("RGB", (gap + len(thumbs) * (width + 2 * border + gap), tall + 2 * border + 2 * gap), "#f1efe8")
+    x = gap
+    for t in thumbs:
+        canvas.paste(Image.new("RGB", (width + 2 * border, t.height + 2 * border), "#c9c6bd"), (x, gap))
+        canvas.paste(t, (x + border, gap + border))
+        x += width + 2 * border + gap
+    path = PREVIEWS / "hero.png"
+    canvas.save(path, optimize=True)
+    print("wrote", path.relative_to(ROOT))
 
 
 if __name__ == "__main__":

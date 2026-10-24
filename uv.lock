@@ -154,11 +154,15 @@ name = "papercircuits"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "pillow" },
     { name = "reportlab" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "reportlab", specifier = ">=4.0" }]
+requires-dist = [
+    { name = "pillow", specifier = ">=10" },
+    { name = "reportlab", specifier = ">=4.0" },
+]
 
 [[package]]
 name = "pillow"
