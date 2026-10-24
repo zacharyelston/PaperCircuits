@@ -138,7 +138,7 @@ Every switch is a paper flap with a copper pad that folds onto a **switch pair**
 | `Tn` | Test sheet |
 | `Lnn` | Lesson page |
 | `Pn` | Power page |
-| `Mn` | Module page for system lessons (uses BUS A/B) |
+| `Mn` | Module page for table-top projects (§10) |
 | `…-O` | Overlay for a page, e.g. `L04-O` |
 
 The ID appears at the right of the header and in the footer.
@@ -157,6 +157,8 @@ The ID appears at the right of the header and in the footer.
 | Body with a striped edge, both legs from one end | Electrolytic capacitor: the stripe marks the − leg |
 | Solid line round a flap, dotted hinge | Tab switch: cut the solid line, crease the dotted one |
 | Thin dashed box across a switch pair | Where the flap pad lands |
+| U-shaped loop, labelled | Patch loop: solder a bare wire loop upright here (§10.2) |
+| Two pads at a side edge, V+ over GND | Edge connector: solder the cable to the next page here (§10.1) |
 | Grey hatched band, solid outline, ticks | Pencil track: shade with a 6B pencil |
 | Solid outline round a tape strip, "cut out" | A piece to cut out, such as a wiper |
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
@@ -167,7 +169,45 @@ Every page with tags says "Draft: tagged steps may change" in its header and exp
 
 Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 
-## 10. Open questions
+## 10. Table-top projects (M pages)
+
+Module pages (M series) don't stack in the binder. They lie side by side on a table, with the signal flowing left to right, so a group can build one page each and join them into one instrument. The paper synth (M1 oscillator, M2 keyboard, M7 output) is the first project.
+
+### 10.1 Power between pages
+
+- **Edge connector:** each M page has two pads on each side edge, V+ at y = 135 and GND at y = 145, 10 mm apart.
+  - The left pads run from x = 6, in the spine between the H2 and H3 keep-outs.
+  - The right pads end at x = 204.
+- **Power ring:** V+ runs from the left V+ pad up and along the top of the build zone (y = 46), then down to the right V+ pad. GND runs from the left GND pad down and along the bottom (y = 176), then up to the right GND pad. Every circuit sits inside the ring, taking V+ from the top and GND from the bottom, and power passes through to the next page.
+- **Joining pages:** solder a short 2-core cable (red and black, or two wires split off a ribbon) from one page's right pads to the next page's left pads. Red and black clip leads on patch loops (§10.2) work too.
+- **From P1:** clip the first page's left pads to P1's V+ (H2) and GND (H3) strips.
+- **Holes:** M pages are still punched for storage, but H1 to H4 are NC, because power arrives at the edges. BUS A and BUS B stay binder-only for now.
+
+### 10.2 Patch points
+
+- **Patch loops:** a patch loop is a 15 mm piece of bare wire, such as a resistor's cut-off leg, bent into a U and soldered upright onto a lane. Crocodile clips grip the loop, so a patch point can sit anywhere on the page. **[T0]** decides whether a copper tape patch could hold one instead of solder.
+- **Labels:** every patch loop is labelled `IN`, `OUT`, `PITCH`, `V+` or `GND`.
+- **Patch leads:** crocodile clip leads, red for V+, black for GND, any other colour for signals. Never patch an `OUT` straight to V+ or GND.
+
+### 10.3 Signals and sound
+
+- **Levels:** signals on the table swing between GND and V+.
+- **Output:** sound leaves the table only through an output page (M7), mixed, AC-coupled and cut to about line level for a 3.5 mm plug.
+- **Safety:** plug into a powered speaker's or an amp's line (AUX) input only, with its volume turned down first. Never headphones or a bare speaker.
+
+### 10.4 Zones (M pages)
+
+| Zone | x (mm) | y (mm) | Contents |
+|---|---|---|---|
+| Spine | 0–30 | 0–297 | Holes (NC) and the left edge connector |
+| Header | 30–170 | 6–22 | As on lesson pages |
+| Parts | 46–170 | 26–42 | You need, above the ring |
+| Ring | 40–194 | 43.5–178.5 | The power ring, with the circuit inside it |
+| Schematic | 34–98 | 203–282 | As on lesson pages |
+| Steps | 102–202 | 203–282 | Build it and Play it. M pages have no workbook boxes. |
+| Footer | 30–202 | 284–291 | As on lesson pages |
+
+## 11. Open questions
 
 1. **Audience age.** Decides coin cell vs AA, whether soldering is allowed, and how deep the theory goes.
 2. **Kept or reused.** Is the workbook consumable, or a reusable class set?
@@ -183,3 +223,4 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 - **v0.1, revised while drafting L03:** added pencil tracks, cut-out pieces, and the rule that pencil is not wire.
 - **v0.1, revised while drafting L04–L08:** added the electrolytic capacitor footprint and the automatic clearance check.
 - **v0.1, revised with T1:** added the T1 pencil tests, the `[T1]` tag, and paper as an open question.
+- **v0.1, revised for the paper synth:** added table-top projects (§10): edge connectors, the power ring, patch loops and M-page zones.

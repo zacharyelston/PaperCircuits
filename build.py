@@ -22,6 +22,9 @@ from papercircuits.sheets import (
     l06_diodes,
     l07_dividers,
     l08_capacitor,
+    m1_oscillator,
+    m2_keyboard,
+    m7_output,
     p1_power,
     t0_contact_tests,
     t1_pencil_contacts,
@@ -46,6 +49,9 @@ SHEETS = {
     "L06-diodes.pdf": l06_diodes.build,
     "L07-dividers.pdf": l07_dividers.build,
     "L08-capacitor.pdf": l08_capacitor.build,
+    "M1-oscillator.pdf": m1_oscillator.build,
+    "M2-keyboard.pdf": m2_keyboard.build,
+    "M7-output.pdf": m7_output.build,
 }
 
 
