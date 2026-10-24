@@ -43,6 +43,14 @@ uv run build.py
 
 This writes the PDFs to `out/`, PNG previews to `docs/img/`, and the headline image `docs/img/hero.png` from four of those previews. Previews need `pdftoppm` from poppler.
 
+Commit `out/` and `docs/img/` along with the code. Every pull request runs the same build on GitHub Actions. The check fails if:
+
+- two copper lanes on a page are closer than the standard allows
+- the committed PDFs don't match what the code builds
+- a preview wasn't re-rendered after its PDF changed
+
+The last check compares fingerprints in `docs/img/previews.sha256` rather than images, because poppler renders slightly differently on each platform.
+
 ## Code
 
 - `papercircuits/standard.py`: every number from the standard. It must agree with the spec.
