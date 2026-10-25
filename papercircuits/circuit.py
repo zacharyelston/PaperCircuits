@@ -1,9 +1,13 @@
 """The circuit layer: what a page is, electrically.
 
 A page lists its parts once, with real values and the nets their pins join. Everything
-else reads from that list: the "You need" lines, the labels on footprints and schematic
-symbols, any calculation a page or its notes quote, and the placement check, which makes
-sure the copper joins what the circuit says it joins.
+else reads from that list: the values and counts in the "You need" lines, the labels on
+footprints and schematic symbols, any calculation a page or its notes quote, and the
+placement check, which makes sure the copper joins what the circuit says it joins.
+
+Polarised parts name their pins (anode and cathode; plus and minus; E, B and C), and the
+check holds each named pin to its own net. A pencil part is a 6B track: its "track" net
+is the pencil itself, and its wiper joins it to the "wiper" net's lane.
 """
 
 from dataclasses import dataclass, field
@@ -65,8 +69,53 @@ def LED(ref, anode, cathode, note=""):
 
 
 def SW(ref, a, b, note=""):
-    """A switch joining nets a and b while it's closed."""
+    """A switch joining nets a and b while it's closed: a corner flap or a tab."""
     return Part(ref, "switch", None, "", {"1": a, "2": b}, note)
+
+
+def D(ref, anode, cathode, note=""):
+    """A diode: current flows from the anode's net to the cathode's."""
+    return Part(ref, "diode", None, "", {"anode": anode, "cathode": cathode}, note, polar=True)
+
+
+def CE(ref, farads, plus, minus, note=""):
+    """An electrolytic capacitor: its + leg on `plus`, its − leg on `minus`."""
+    return Part(ref, "electrolytic", farads, "F", {"plus": plus, "minus": minus}, note, polar=True)
+
+
+def Q(ref, model, e, b, c):
+    """An NPN transistor such as a 2N3904, by its emitter, base and collector nets."""
+    return Part(ref, "transistor", None, "", {"E": e, "B": b, "C": c}, model, polar=True)
+
+
+def LDR(ref, a, b, note=""):
+    """A light-dependent resistor between nets a and b, either way round."""
+    return Part(ref, "ldr", None, "", {"1": a, "2": b}, note)
+
+
+def F(ref, a, b, note=""):
+    """A resettable fuse between nets a and b, either way round."""
+    return Part(ref, "fuse", None, "", {"1": a, "2": b}, note)
+
+
+def BAT(ref, plus, minus, note=""):
+    """A battery holder whose red wire goes to `plus` and black to `minus`."""
+    return Part(ref, "battery", None, "", {"plus": plus, "minus": minus}, note, polar=True)
+
+
+def PENCIL(ref, track, wiper, note=""):
+    """A pencil track: the `track` net is the pencil, and a wiper joins it to `wiper`'s lane."""
+    return Part(ref, "pencil", None, "", {"track": track, "wiper": wiper}, note, polar=True)
+
+
+def WIRE(ref, a, b, note=""):
+    """A bare wire link between nets a and b."""
+    return Part(ref, "wire", None, "", {"1": a, "2": b}, note)
+
+
+# Parts a learner buys or picks out, so every one must appear in "You need". Switches,
+# pencil and bare wire are made from the page, the pencil and offcuts.
+BOUGHT = ("resistor", "capacitor", "electrolytic", "led", "diode", "transistor", "ldr", "fuse", "battery")
 
 
 class Circuit:
@@ -86,21 +135,9 @@ class Circuit:
                 seen.setdefault(net, None)
         return list(seen)
 
-    def need(self):
-        """The parts as "You need" lines: resistors grouped by value on one line, then each
-        group of capacitors with the same value and note."""
-        lines = []
-        resistors = _groups(p for p in self.parts.values() if p.kind == "resistor")
-        if resistors:
-            lines.append(" · ".join(f"{', '.join(refs)} {text}" for (text, _), refs in resistors))
-        for (text, note), refs in _groups(p for p in self.parts.values() if p.kind == "capacitor"):
-            lines.append(f"{', '.join(refs)}: {text}, {note}" if note else f"{', '.join(refs)}: {text}")
-        return lines
-
-
-def _groups(parts):
-    """Parts with the same printed value and note, in the order they first appear."""
-    groups = {}
-    for p in parts:
-        groups.setdefault((p.text, p.note), []).append(p.ref)
-    return list(groups.items())
+    def group(self, ref):
+        """The refs of every part that's interchangeable with `ref`: same kind, value and
+        note. "You need" counts and lists parts by group, so a part whose value changes
+        drops out of its old line."""
+        p = self.parts[ref]
+        return [q.ref for q in self.parts.values() if (q.kind, q.value, q.note) == (p.kind, p.value, p.note)]

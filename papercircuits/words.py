@@ -9,20 +9,30 @@ Lines that wrap without a blank line join into one item. A section of "- key: te
 items can be read as fields, for text the page places itself, such as a workbook box's
 prompts. In any text:
 
-- {name} is filled in when the page is built: a value the page passes in (such as
-  {lanes}, counted from the copper), a part's value from the circuit ({R1}, or
-  {R1.bands} for its colour code), a shared snippet from sheets/shared.md (such as
-  {lead_step}), or a provisional tag: {T0}, {T1} or {P}
+- {name} is filled in when the page is built, from the first of these that has it:
+  - a value the page passes in, such as {lanes}, counted from the copper
+  - the circuit: {R1} is R1's value (or its note, for a part with no value),
+    {R1.bands} its colour code, and {R1.count} and {R1.refs} count and list every
+    part interchangeable with R1, so "{R1.count} resistors, {R1}" stays true
+  - a number from the standard, such as {flap_pad}
+  - a shared snippet from sheets/shared.md, such as {lead_step}
+  - a provisional tag: {T0}, {T1} or {P}
 - **bold** prints bold
+
+Every part a learner buys must be named in "You need" through the circuit, by {R1} or
+any of its forms; Placement.check() is given Words.refs("You need") and fails the build
+if one is missing.
 """
 
 import re
 from functools import cache
 from pathlib import Path
 
+from . import standard as S
 from .provisional import POWER, T0, T1
 
 TAGS = {"T0": T0, "T1": T1, "P": POWER}
+STANDARD = {"flap_pad": f"{S.FLAP_PAD_LEN:g}"}
 SHARED = Path(__file__).parent / "sheets" / "shared.md"
 NUMBERS = ("no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve")
 
@@ -65,6 +75,17 @@ class Words:
         """A section of "key: text" items, as a dict."""
         return dict(item.split(": ", 1) for item in self.items(name, **values))
 
+    def refs(self, name):
+        """Every part a section names through the circuit: {R1} names R1; {R1.count} and
+        {R1.refs} name R1's whole group."""
+        named = set()
+        for block in self._sections.get(name, []):
+            for key in _FIELD.findall(block):
+                ref, _, attr = key.partition(".")
+                if self.circuit is not None and ref in self.circuit.parts:
+                    named.update(self.circuit.group(ref) if attr in ("count", "refs") else [ref])
+        return named
+
 
 def _parse(text):
     title, subtitle, sections = "", [], {}
@@ -99,7 +120,13 @@ def _fill(text, values, circuit=None):
         if key in values:
             return str(values[key])
         if circuit is not None and ref in circuit.parts:
+            if attr == "count":
+                return str(len(circuit.group(ref)))
+            if attr == "refs":
+                return ", ".join(circuit.group(ref))
             return str(getattr(circuit[ref], attr or "text"))
+        if key in STANDARD:
+            return STANDARD[key]
         if key in _shared():
             return _fill(_shared()[key], values, circuit)
         if key in TAGS:

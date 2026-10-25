@@ -56,12 +56,12 @@ def build(path):
     _parts(lay)
     lesson.need_and_steps(
         sh, PAGE_ID, WORDS.items("You need"),
-        WORDS.items("Build it", lanes=number(lay.laid), flap_pad=f"{S.FLAP_PAD_LEN:g}"),
+        WORDS.items("Build it", lanes=number(lay.laid)),
         (54.0, 137.0, 104.0, 196.0), (110.0, 137.0, 202.0, 196.0))
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
-    lay.check()
+    lay.check(listed=WORDS.refs("You need"))
     sh.save()
 
 
@@ -87,7 +87,7 @@ def _lanes(lay):
 
 def _parts(lay):
     for net, r, led, tp, bx in BRANCHES:
-        lay.resistor(r, bx, R_CY, vertical=True, lead=12, show_value=True)
+        lay.resistor(r, bx, R_CY, vertical=True, lead=12, label="value")
         anode = "up" if CIRCUIT[led].pins["anode"] == net else "down"
         lay.led(led, bx, LED_CY, anode=anode, lead_anode=13, lead_cathode=11)
         lay.test_point(net, bx, TP_NODE_Y, tp)

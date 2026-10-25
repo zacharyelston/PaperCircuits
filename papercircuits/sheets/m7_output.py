@@ -23,15 +23,14 @@ from ..provisional import HEADER_STATUS
 from ..words import Words, number
 
 PAGE_ID = "M7"
-WORDS = Words.beside(__file__)
-
 CIRCUIT = Circuit(
     R("R1", 22e3, "IN1", "MIX"),
     R("R2", 22e3, "IN2", "MIX"),
     R("R3", 22e3, "IN3", "MIX"),
-    C("C1", 1e-6, "MIX", "OUT", note="no polarity (film or ceramic)"),
+    C("C1", 1e-6, "MIX", "OUT"),
     R("R4", 4.7e3, "OUT", "GND"),
 )
+WORDS = Words.beside(__file__, CIRCUIT)
 
 INPUTS = (("IN1", "R1", 68.0), ("IN2", "R2", 92.0), ("IN3", "R3", 116.0))
 IN_X = (56.0, 94.5)
@@ -49,13 +48,13 @@ def build(path):
     lay = Placement(sh, CIRCUIT)
     _copper(lay)
     _safety(sh)
-    need = CIRCUIT.need() + WORDS.items("You need", loops=len(lay.loops))
+    need = WORDS.items("You need", loops=len(lay.loops))
     module.need(sh, PAGE_ID, need[:3], need[3:])
     module.caption(sh, WORDS.text("Caption"))
     _schematic(sh, lay)
     module.steps(sh, PAGE_ID, WORDS.items("Build it", lanes=number(lay.laid)), WORDS.items("Play it"))
     E.footer(sh, PAGE_ID)
-    lay.check()
+    lay.check(listed=WORDS.refs("You need"))
     sh.save()
 
 

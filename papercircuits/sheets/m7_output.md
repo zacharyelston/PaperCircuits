@@ -4,6 +4,8 @@ Mix up to three signals and send them to a real amp.
 
 ## You need
 
+- {R1.refs} {R1} · {R4.refs} {R4}
+- {C1.refs}: {C1}, no polarity (film or ceramic)
 - Bare wire for {loops} patch loops
 - A 3.5 mm plug-to-clip lead
 - A powered speaker or amp with a line input
