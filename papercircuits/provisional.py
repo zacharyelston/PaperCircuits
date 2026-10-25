@@ -9,6 +9,7 @@ _TAG = '<font color="#b87333"><b>[{}]</b></font>'
 T0 = _TAG.format("T0")    # waits on the T0 contact tests
 POWER = _TAG.format("P")  # waits on the power decision, standard §7
 T1 = _TAG.format("T1")    # waits on the T1 pencil tests
+T3 = _TAG.format("T3")    # waits on the first T3 copper oxide wafer
 
 TAG_NOTE = (
     f"{T0} and {POWER} mark choices that may change: {T0} after the contact tests, "
