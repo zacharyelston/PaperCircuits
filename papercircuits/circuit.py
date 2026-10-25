@@ -14,11 +14,12 @@ from dataclasses import dataclass, field
 
 COLOUR_CODE = ("black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "grey", "white")
 _PREFIXES = ((1e6, "M"), (1e3, "k"), (1.0, ""), (1e-3, "m"), (1e-6, "µ"), (1e-9, "n"), (1e-12, "p"))
+_FARAD_PREFIXES = ((1e-6, "µ"), (1e-9, "n"), (1e-12, "p"))  # capacitors are marked 2200 µF, never 2.2 mF
 
 
 def si(value, unit):
-    """A value as the pages print it: 22e3 → "22 kΩ", 4.7e3 → "4.7 kΩ", 1e-6 → "1 µF"."""
-    for scale, prefix in _PREFIXES:
+    """A value as the pages print it: 22e3 → "22 kΩ", 4.7e3 → "4.7 kΩ", 2200e-6 → "2200 µF"."""
+    for scale, prefix in _FARAD_PREFIXES if unit == "F" else _PREFIXES:
         if abs(value) >= scale * 0.999:
             return f"{round(value / scale, 3):g} {prefix}{unit}"
     return f"{value:g} {unit}"
