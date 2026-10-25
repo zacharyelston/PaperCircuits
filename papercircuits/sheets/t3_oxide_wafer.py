@@ -21,7 +21,7 @@ from .. import elements as E
 from .. import standard as S
 from .. import testsheet as ts
 from ..draw import FAINT, FONT_BOLD, GUIDE, INK, MUTED, Sheet, style
-from ..provisional import HEADER_STATUS, T3
+from ..provisional import HEADER_STATUS
 from ..words import Words
 
 PAGE_ID = "T3"
@@ -61,7 +61,6 @@ LEAD = 24.0                              # how far each lead runs off the die
 
 # What the words fill in, besides the words layer's own tags.
 VALUES = {
-    "T3": T3,
     "foil": FOIL, "plate_w": PLATE_W, "heat_min": HEAT_MIN, "cool_min": COOL_MIN,
     "fair": f"{FAIR:g}", "weak": f"{WEAK:g}", "short_v": f"{SHORT_V:g}",
     "wafer": f"{WAFER:g}", "die": f"{DIE:g}",
@@ -76,25 +75,8 @@ def _fields(name):
     return WORDS.fields(name, **VALUES)
 
 
-def _row(text):
-    """A row's words, "name · hint", as (name, hint)."""
-    name, _, hint = text.partition(" · ")
-    return name, hint
-
-
-def _plain(texts):
-    return [Paragraph(t, style(7.5, leading=9.6)) for t in texts]
-
-
-def _section(name, kind, notes=0, heading=None):
-    """A procedure heading, then the words' section `name`: its items as `kind`, and its
-    last `notes` paragraphs as notes. The heading is the section's name, or, where that
-    can't be (it carries a tag), the section's first paragraph: pass heading=True."""
-    items = _items(name)
-    if heading:
-        name, *items = items
-    body, after = items[:len(items) - notes], items[len(items) - notes:]
-    return [Paragraph(name, ts.H)] + kind(body) + [Paragraph(t, ts.NOTE) for t in after]
+def _section(name, kind, notes=0, heading=False):
+    return ts.section(WORDS, name, kind, notes, heading, **VALUES)
 
 
 def build(path):
@@ -273,8 +255,8 @@ def _wafer_map(sh, sheet):
 def _bin_table():
     words = _fields("Bin table")
     data = [_items("Bin table columns")]
-    data += [[f"{code}  {name}", rule, "", ""] for code, (name, rule) in ((c, _row(words[c])) for c in BINS)]
-    data += [[*_row(words["pass"]), "", ""]]
+    data += [[f"{code}  {name}", rule, "", ""] for code, (name, rule) in ((c, ts.row(words[c])) for c in BINS)]
+    data += [[*ts.row(words["pass"]), "", ""]]
     t = ts.table(data, [21, 33, 16, 16], 5.6)
     t.setStyle([("FONT", (0, 0), (-1, 0), FONT_BOLD, 7)])
     return t
@@ -312,7 +294,7 @@ def _procedure(sh):
     sheet = _fields("Sheet 3")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="3/3", status=HEADER_STATUS)
     E.spine(sh)
-    left = _section("Why it works", _plain)
+    left = _section("Why it works", ts.plain)
     left += _section("You need", ts.bullets)
     left += _section("Safety", ts.bullets)
     left += _section("1 · Prepare the wafer", ts.steps)

@@ -34,27 +34,6 @@ TAB_X = (60.0, 108.0, 156.0)
 TAB_UPPER = 80.0
 
 
-def _row(text):
-    """A test row's words, "name · hint", as (name, hint). The hint may be left out."""
-    name, _, hint = text.partition(" · ")
-    return name, hint
-
-
-def _section(name, kind, notes=0, heading=None):
-    """A procedure heading, then the words' section `name`: its items as `kind`, and its
-    last `notes` paragraphs as notes. The heading is the section's name, or, where that
-    can't be (it repeats), the section's first paragraph: pass heading=True."""
-    items = WORDS.items(name)
-    if heading:
-        name, *items = items
-    body, after = items[:len(items) - notes], items[len(items) - notes:]
-    return [Paragraph(name, ts.H)] + kind(body) + [Paragraph(t, ts.NOTE) for t in after]
-
-
-def _plain(texts):
-    return [Paragraph(t, style(7.5, leading=9.6)) for t in texts]
-
-
 def build(path):
     sh = Sheet(path, WORDS.text("PDF title"))
     _fixtures(sh)
@@ -79,7 +58,7 @@ def _hole_tests(sh):
     """Test 3 fixtures: one treatment per hole, each with a test point to probe against the post."""
     words = WORDS.fields("Hole fixtures")
     for hole_id, width in HOLE_TAPE.items():
-        name, how = _row(words[hole_id])
+        name, how = ts.row(words[hole_id])
         y = S.hole_y(hole_id)
         E.lane(sh, [(S.NET_STRIP_START_X, y), (46, y)], width=width)
         E.test_point(sh, 44, y, f"TP-{hole_id}")
@@ -98,7 +77,7 @@ def _tape_joints(sh):
     x_a, x_b, x_bend = 102.0, 154.0, 126.0
     y = 51.0
     for jid, shape in TAPE_JOINTS:
-        name, hint = _row(words[jid])
+        name, hint = ts.row(words[jid])
         y_end = y + 11 if shape in ("folded", "cut") else y
         if y_end != y:
             pts = [(x_a - 2, y), (x_bend, y), (x_bend, y_end), (x_b + 2, y_end)]
@@ -135,7 +114,7 @@ def _part_joints(sh):
     for label, ry in rows:
         sh.text(LEFT, ry + 1.1, label, size=6.5, bold=True)
     for i, mid_id in enumerate(PART_JOINTS):
-        name, how = _row(words[mid_id])
+        name, how = ts.row(words[mid_id])
         x0 = 77.0 + i * col_w
         cx = x0 + col_w / 2
         sh.text(cx, 160.5, mid_id, size=7.5, bold=True, align="center")
@@ -177,16 +156,16 @@ def _procedure(sh):
     E.spine(sh)
     bullets, steps = ts.bullets, ts.steps
 
-    story = _section("You need", bullets)
-    story += _section("Before you start", steps)
-    story += _section("1 · Tape joints", steps)
-    story += _section("2 · Part joints", steps, notes=1)
+    story = ts.section(WORDS, "You need", bullets)
+    story += ts.section(WORDS, "Before you start", steps)
+    story += ts.section(WORDS, "1 · Tape joints", steps)
+    story += ts.section(WORDS, "2 · Part joints", steps, notes=1)
 
-    left_story, story = story, _section("3 · Binder contacts", steps)
+    left_story, story = story, ts.section(WORDS, "3 · Binder contacts", steps)
     story += [Spacer(1, 2 * mm), _binder_table()]
-    story += _section("4 · Switch contacts", _plain)
-    story += _section("Pass or fail", bullets, notes=1)
-    story += _section("Results for standard v0.2", _decision_table)
+    story += ts.section(WORDS, "4 · Switch contacts", ts.plain)
+    story += ts.section(WORDS, "Pass or fail", bullets, notes=1)
+    story += ts.section(WORDS, "Results for standard v0.2", _decision_table)
 
     left = (S.ZONE_BUILD[0], 27.0, 115.0, 282.0)
     right = (121.0, 27.0, S.ZONE_BUILD[2], 282.0)
@@ -221,8 +200,8 @@ def _switch_tests(sh):
         _tab_station(sh, x, TAB_UPPER, tab_id, words[tab_id], gap)
 
     rest = sh.flow([(x0, 104.0, x1, 146.0)], [_switch_table()])
-    left_story = _section("How to test", ts.steps)
-    story = _section("Switch pass or fail", ts.bullets, notes=2, heading=True)
+    left_story = ts.section(WORDS, "How to test", ts.steps)
+    story = ts.section(WORDS, "Switch pass or fail", ts.bullets, notes=2, heading=True)
     rest += sh.flow([(x0, 150.0, 115.0, 210.0)], left_story) + sh.flow([(121.0, 150.0, x1, 210.0)], story)
     if rest:
         raise RuntimeError(f"T0 sheet 3 overflowed by {len(rest)} items")

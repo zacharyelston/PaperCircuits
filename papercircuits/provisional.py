@@ -21,4 +21,3 @@ TAG_NOTE_WITH_T1 = (
 )
 HEADER_STATUS = "Draft: tagged steps may change"
 
-HOLE_STEP = f"Punch the holes and set eyelets in H2 and H3. {T0}"

@@ -126,6 +126,8 @@ class Circuit:
             raise ValueError("two parts share a ref")
 
     def __getitem__(self, ref):
+        if ref not in self.parts:
+            raise KeyError(f"no part {ref} in the circuit (it has {', '.join(self.parts)})")
         return self.parts[ref]
 
     @property

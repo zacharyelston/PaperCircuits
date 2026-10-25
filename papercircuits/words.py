@@ -14,14 +14,17 @@ prompts. In any text:
   - the circuit: {R1} is R1's value (or its note, for a part with no value),
     {R1.bands} its colour code, and {R1.count} and {R1.refs} count and list every
     part interchangeable with R1, so "{R1.count} resistors, {R1}" stays true
-  - a number from the standard, such as {flap_pad}
+  - a number from the standard, such as {flap_pad} or {version}
   - a shared snippet from sheets/shared.md, such as {lead_step}
-  - a provisional tag: {T0}, {T1} or {P}
+  - a provisional tag: {T0}, {T1}, {T3} or {P}
 - **bold** prints bold
 
 Every part a learner buys must be named in "You need" through the circuit, by {R1} or
 any of its forms; Placement.check() is given Words.refs("You need") and fails the build
 if one is missing.
+
+The title and subtitle are filled in the same way, except for values a page passes in.
+A section name may appear only once per file.
 """
 
 import re
@@ -29,10 +32,10 @@ from functools import cache
 from pathlib import Path
 
 from . import standard as S
-from .provisional import POWER, T0, T1
+from .provisional import POWER, T0, T1, T3
 
-TAGS = {"T0": T0, "T1": T1, "P": POWER}
-STANDARD = {"flap_pad": f"{S.FLAP_PAD_LEN:g}"}
+TAGS = {"T0": T0, "T1": T1, "T3": T3, "P": POWER}
+STANDARD = {"flap_pad": f"{S.FLAP_PAD_LEN:g}", "version": S.VERSION}
 SHARED = Path(__file__).parent / "sheets" / "shared.md"
 NUMBERS = ("no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve")
 
@@ -49,8 +52,9 @@ def number(n):
 class Words:
     def __init__(self, path, circuit=None):
         self.path, self.circuit = Path(path), circuit
-        self.title, subtitle, self._sections = _parse(self.path.read_text())
-        self.subtitle = " ".join(subtitle)
+        title, subtitle, self._sections = _parse(self.path.read_text(), self.path.name)
+        self.title = self._fill(title, "the title", {})
+        self.subtitle = self._fill(" ".join(subtitle), "the subtitle", {})
 
     @classmethod
     def beside(cls, module_file, circuit=None):
@@ -61,10 +65,14 @@ class Words:
         """A section's items or paragraphs, filled in."""
         if name not in self._sections:
             raise KeyError(f"{self.path.name} has no section '## {name}'")
+        return [self._fill(block, f"## {name}", values) for block in self._sections[name]]
+
+    def _fill(self, text, where, values):
         try:
-            return [_fill(block, values, self.circuit) for block in self._sections[name]]
-        except KeyError as e:
-            raise KeyError(f"{self.path.name}, ## {name}: nothing to fill {{{e.args[0]}}} with") from None
+            return _fill(text, values, self.circuit)
+        except (KeyError, AttributeError) as e:
+            key = e.args[0] if isinstance(e, KeyError) else e.name
+            raise KeyError(f"{self.path.name}, {where}: nothing to fill {{{key}}} with") from None
 
     def text(self, name, **values):
         """A section that is one paragraph."""
@@ -72,8 +80,9 @@ class Words:
         return only
 
     def fields(self, name, **values):
-        """A section of "key: text" items, as a dict."""
-        return dict(item.split(": ", 1) for item in self.items(name, **values))
+        """A section of "key: text" items, as a dict. Asking for a key it doesn't have
+        names the file and section."""
+        return _Fields(f"{self.path.name}, ## {name}", (item.split(": ", 1) for item in self.items(name, **values)))
 
     def refs(self, name):
         """Every part a section names through the circuit: {R1} names R1; {R1.count} and
@@ -87,14 +96,26 @@ class Words:
         return named
 
 
-def _parse(text):
+class _Fields(dict):
+    def __init__(self, where, items):
+        super().__init__(items)
+        self.where = where
+
+    def __missing__(self, key):
+        raise KeyError(f"{self.where} has no field '{key}'")
+
+
+def _parse(text, name="shared.md"):
     title, subtitle, sections = "", [], {}
     target, block = subtitle, None
     for line in text.splitlines():
         if line.startswith("# "):
             title = line[2:]
         elif line.startswith("## "):
-            target = sections.setdefault(line[3:].strip(), [])
+            section = line[3:].strip()
+            if section in sections:
+                raise ValueError(f"{name} has '## {section}' twice")
+            target = sections[section] = []
             block = None
         elif not line.strip():
             block = None

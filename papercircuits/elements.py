@@ -442,6 +442,7 @@ def ldr(sh, cx, cy, lead=11.0, label=None):
         sh.text(cx + r + 1, cy + 1, label, size=6, color=MUTED)
     return _leads(cx, cy, 0, 1, lead, r / 2)
 
+
 def patch_loop(sh, x, y, label, side="right"):
     """Where to solder a patch loop on a lane: an upright U of bare wire a clip can grip.
     Returns the segment between its two feet."""

@@ -46,17 +46,6 @@ SHORT_VIA = (BACK_PAD_TURN_X, 204.0)
 TP_X = 196.0
 
 
-def _row(text):
-    """A test row's words, "name · hint", as (name, hint). The hint may be left out."""
-    name, _, hint = text.partition(" · ")
-    return name, hint
-
-
-def _section(name, kind):
-    """A procedure heading, then the words' section of the same name as `kind`."""
-    return [Paragraph(name, ts.H)] + kind(WORDS.items(name))
-
-
 def build(path):
     sh = Sheet(path, WORDS.text("PDF title"))
     _front(sh)
@@ -95,7 +84,7 @@ def _front(sh):
     vias = WORDS.fields("Via fixtures")
     sh.text(34, 50, vias["title"], size=10, bold=True)
     for i, (code, kind) in enumerate(VIAS):
-        name, hint = _row(vias[code])
+        name, hint = ts.row(vias[code])
         y = VIA_Y0 + VIA_PITCH * i
         if kind is None:
             E.lane(sh, [(VIA_A - 4, y), (VIA_B + 4, y)])
@@ -150,21 +139,21 @@ def _procedure(sh):
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="3/3")
     E.spine(sh)
     h, note = ts.H, ts.NOTE
-    left = _section("You need", ts.bullets)
+    left = ts.section(WORDS, "You need", ts.bullets)
     *reg_steps, reg_note = WORDS.items("1 · Registration")
     left += [Paragraph("1 · Registration", h)] + ts.steps(reg_steps)
     left += [ts.table([[""] + WORDS.items("Registration table")] + [[m[0], "", ""] for m in REG_MARKS],
                       [20, 30, 30], 6.5)]
     left += [Paragraph(reg_note, note)]
-    left += _section("2 · Vias", ts.steps)
+    left += ts.section(WORDS, "2 · Vias", ts.steps)
     left += [ts.table([[""] + WORDS.items("Via table")] + [[v[0], "", "", ""] for v in VIAS], [20, 20, 20, 20], 6.5)]
 
-    right = _section("3 · Edge wraps", ts.steps)
+    right = ts.section(WORDS, "3 · Edge wraps", ts.steps)
     right += [ts.table([[r, ""] for r in WORDS.items("Edge wrap table")], [50, 30], 6.5)]
-    right += _section("4 · Stacking shorts", ts.steps)
+    right += ts.section(WORDS, "4 · Stacking shorts", ts.steps)
     right += [ts.table([[r, ""] for r in WORDS.items("Stacking table")], [50, 30], 6.5)]
-    right += _section("Pass or fail", ts.bullets)
-    right += _section("Results for the standard",
+    right += ts.section(WORDS, "Pass or fail", ts.bullets)
+    right += ts.section(WORDS, "Results for the standard",
                       lambda questions: [ts.decision_table(questions, widths=(38, 42), row_height=7.5)])
     rest = sh.flow([(S.ZONE_BUILD[0], 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, S.ZONE_BUILD[2], 282.0)], right)
     if rest:

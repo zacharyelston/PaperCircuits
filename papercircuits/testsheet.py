@@ -12,6 +12,28 @@ H = style(9, bold=True, spaceBefore=5, spaceAfter=2)
 NOTE = style(7, leading=9.2, color=MUTED, spaceBefore=2)
 
 
+def row(text):
+    """A test row's words, "name · hint", as (name, hint). The hint may be left out."""
+    name, _, hint = text.partition(" · ")
+    return name, hint
+
+
+def plain(texts):
+    return [Paragraph(t, style(7.5, leading=9.6)) for t in texts]
+
+
+def section(words, name, kind, notes=0, heading=False, **values):
+    """A procedure heading, then `words`' section `name`: its items as `kind` (bullets,
+    steps or plain), and its last `notes` paragraphs as notes. The heading is the
+    section's name, or, with heading=True, its first paragraph, for a heading that can't
+    be a section name because it repeats or carries a tag."""
+    items = words.items(name, **values)
+    if heading:
+        name, *items = items
+    body, after = items[:len(items) - notes], items[len(items) - notes:]
+    return [Paragraph(name, H)] + kind(body) + [Paragraph(t, NOTE) for t in after]
+
+
 def bullets(items):
     return [Paragraph(t, style(7.5, leading=9.6, leftIndent=7, bulletIndent=0.5, bulletFontSize=7.5, spaceAfter=1.2), bulletText="•") for t in items]
 

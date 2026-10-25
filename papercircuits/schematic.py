@@ -42,7 +42,6 @@ def resistor(sh, x, y0, y1, label, value):
     sh.text(x + 3, cy + 2.8, value, size=6, color=MUTED)
 
 
-
 def ldr(sh, x, y0, y1, label, value):
     """Vertical light-dependent resistor: a resistor with two arrows of light coming in
     from the left."""
@@ -52,6 +51,7 @@ def ldr(sh, x, y0, y1, label, value):
         x1, y1a = x - 2.2, cy + dy
         sh.line(x1 - 2.0, y1a - 2.0, x1, y1a, width=0.25)
         sh.polygon([(x1, y1a), (x1 - 0.9, y1a - 0.2), (x1 - 0.2, y1a - 0.9)], stroke=None, fill=INK)
+
 
 def led(sh, x, y0, y1, label, anode_top=True):
     """Vertical LED from y0 to y1. Current flows from anode to cathode, the way the triangle points."""

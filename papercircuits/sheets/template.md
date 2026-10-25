@@ -1,7 +1,5 @@
 # Lesson page template
 
-## Subtitle
-
 Zones, backplane nets and drawing marks from page standard v{version}. Nothing to build.
 
 ## Labels

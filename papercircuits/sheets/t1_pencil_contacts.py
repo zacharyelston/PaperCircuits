@@ -40,17 +40,6 @@ WIRE_LANE_A, WIRE_LANE_B = (74.0, 92.0), (140.0, 158.0)
 PROBE_X = (LANE_A[1] + 2, LANE_B[0] - 2)
 
 
-def _row(text):
-    """A test row's words, "name · hint", as (name, hint). The hint may be left out."""
-    name, _, hint = text.partition(" · ")
-    return name, hint
-
-
-def _section(name, kind):
-    """A procedure heading, then the words' section of the same name as `kind`."""
-    return [Paragraph(name, ts.H)] + kind(WORDS.items(name))
-
-
 def build(path):
     sh = Sheet(path, WORDS.text("PDF title"))
     _fixtures(sh)
@@ -70,7 +59,7 @@ def _fixtures(sh):
 
 
 def _row_label(sh, y, code, text):
-    name, hint = _row(text)
+    name, hint = ts.row(text)
     sh.text(LEFT, y - 0.4, f"{code}  {name}", size=7, bold=True)
     if hint:
         sh.text(LEFT, y + 3.2, hint, size=6.5, color=MUTED)
@@ -125,17 +114,17 @@ def _procedure(sh):
     sheet = WORDS.fields("Sheet 2")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="2/2")
     E.spine(sh)
-    left = _section("You need", ts.bullets)
-    left += _section("Before you start", ts.steps)
-    left += _section("1 · Tape overlaps", ts.steps)
+    left = ts.section(WORDS, "You need", ts.bullets)
+    left += ts.section(WORDS, "Before you start", ts.steps)
+    left += ts.section(WORDS, "1 · Tape overlaps", ts.steps)
 
-    right = _section("2 · Tape on pencil", ts.steps)
-    right += _section("Pass or fail", ts.bullets)
+    right = ts.section(WORDS, "2 · Tape on pencil", ts.steps)
+    right += ts.section(WORDS, "Pass or fail", ts.bullets)
     intro, *papers, note = WORDS.items("Trying different papers")
     left += [Paragraph("Trying different papers", ts.H), Paragraph(intro, style(7.5, leading=9.6))]
     left += ts.bullets(papers)
     left += [Paragraph(note, ts.NOTE)]
-    right += _section("Results for standard v0.2",
+    right += ts.section(WORDS, "Results for standard v0.2",
                       lambda questions: [ts.decision_table(questions, widths=(38, 42))])
 
     rest = sh.flow([(LEFT, 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, RIGHT, 282.0)], right)

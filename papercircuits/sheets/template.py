@@ -1,8 +1,7 @@
 """L00: the lesson-page template. Shows every zone, the backplane nets, the fold switch
 and the drawing marks. Nothing on it is meant to be built.
 
-Its words are in template.md. The subtitle sits in a section rather than under the title
-because it carries the standard's version, and only sections are filled in."""
+Its words are in template.md."""
 
 from .. import elements as E
 from .. import standard as S
@@ -15,7 +14,7 @@ WORDS = Words.beside(__file__)
 
 def build(path):
     sh = Sheet(path, " ".join(WORDS.title.split()))
-    E.header(sh, PAGE_ID, WORDS.title, WORDS.text("Subtitle", version=S.VERSION))
+    E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle)
     labels = WORDS.fields("Labels")
 
     for hole_id in S.HOLES:
