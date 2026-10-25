@@ -62,7 +62,7 @@ def build(path):
     module.caption(sh, "Patch PITCH to a controller such as M2's keyboard, and OUT to an IN on M7.")
     _schematic(sh)
     module.steps(sh, PAGE_ID, [
-        "Lay the power ring, then the seven lanes inside it, one piece of tape each. Fold at the creases.",
+        "Lay the power ring, then the six lanes inside it, one piece of tape each. Fold at the creases.",
         "Where two lanes cross, lay the lower one, stick the insulating patch over it, then lay the upper one.",
         "Place R1 to R4, C1 and C2 across their gaps, either way round. Place LED1 as printed: long leg on the +.",
         "Lay Q1 and Q2 flat face up and bend each leg to its letter: E, B and C.",

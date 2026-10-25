@@ -23,6 +23,10 @@ Printable A4 paper-circuit workbook pages. Circuits are built from copper tape a
 | [out/L08-capacitor.pdf](out/L08-capacitor.pdf) | Lesson L08: store some charge, a capacitor fades an LED (draft; [teacher notes](docs/lessons/L08.md)) |
 | [out/M1-oscillator.pdf](out/M1-oscillator.pdf) | Paper synth M1: oscillator, the tone (draft; [project notes](docs/projects/paper-synth.md)) |
 | [out/M2-keyboard.pdf](out/M2-keyboard.pdf) | Paper synth M2: stylus keyboard, one octave of C major (draft) |
+| [out/M3-pencil-ribbon.pdf](out/M3-pencil-ribbon.pdf) | Paper synth M3: pencil ribbon, a slide for gliding notes (draft) |
+| [out/M4-light-pitch.pdf](out/M4-light-pitch.pdf) | Paper synth M4: light pitch, play by shading a light sensor (draft) |
+| [out/M5-pulse.pdf](out/M5-pulse.pdf) | Paper synth M5: pulse, a slow oscillator that chops the note into a beat (draft) |
+| [out/M6-tone.pdf](out/M6-tone.pdf) | Paper synth M6: tone, a pencil-and-capacitor filter that softens the sound (draft) |
 | [out/M7-output.pdf](out/M7-output.pdf) | Paper synth M7: mixer and line output to a real amp (draft) |
 
 ## On the bench
@@ -37,7 +41,7 @@ The lesson page template (L00) built in copper tape, with a 100 Ω resistor sold
 2. **Parts with a job:** L06 diodes · L07 voltage dividers · L08 capacitors
 3. **Control and systems** (not drafted yet): transistors, pages working together on BUS A and BUS B, and a real circuit board
 
-**Projects:** the **paper synth** is a table-top group build. Pages lie side by side, power runs between them on a short cable, and clip leads patch the sound. M1 oscillator, M2 keyboard and M7 output are drafted; see the [project notes](docs/projects/paper-synth.md).
+**Projects:** the **paper synth** is a table-top group build. Pages lie side by side, power runs between them on a short cable, and clip leads patch the sound. All seven pages are drafted: M1 oscillator; M2 keyboard, M3 pencil ribbon and M4 light pitch to play it; M5 pulse and M6 tone to shape it; and M7 output. See the [project notes](docs/projects/paper-synth.md).
 
 Build P1 first: every lesson takes its power from P1 through the binder.
 

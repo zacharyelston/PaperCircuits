@@ -3,15 +3,25 @@
 Pages:
 - [M1 Oscillator](../../out/M1-oscillator.pdf)
 - [M2 Keyboard](../../out/M2-keyboard.pdf)
+- [M3 Pencil ribbon](../../out/M3-pencil-ribbon.pdf)
+- [M4 Light pitch](../../out/M4-light-pitch.pdf)
+- [M5 Pulse](../../out/M5-pulse.pdf)
+- [M6 Tone](../../out/M6-tone.pdf)
 - [M7 Output](../../out/M7-output.pdf)
 
 Status: draft, not yet built. Needs [P1](../lessons/P1.md) for power.
 
 ## The idea
 
-Each person builds one module page. The pages lie side by side on a table, power runs along the row from page to page, and clip leads patch the signals between them. M1 makes the tone, M2 plays it, and M7 sends it to a real amp or powered speaker. Nothing on the paper drives a speaker itself.
+Each person builds one module page. The pages lie side by side on a table, power runs along the row from page to page, and clip leads patch the signals between them. M1 makes the tone and M7 sends it to a real amp or powered speaker. Nothing on the paper drives a speaker itself. In between:
 
-This is the first table-top project in the [page standard](../page-standard.md) (§10). Pages to add later: M3 pencil ribbon, M4 light pitch, M5 pulse and M6 tone.
+- **Controllers** play M1: M2's keyboard, M3's pencil ribbon, or M4's light sensor.
+- **M5 pulse** chops the note into a beat.
+- **M6 tone** softens the sound.
+
+A group of three can play with M1, M2 and M7; a class can build all seven.
+
+This is the first table-top project in the [page standard](../page-standard.md) (§10).
 
 ## Setting up the table
 
@@ -24,6 +34,16 @@ This is the first table-top project in the [page standard](../page-standard.md) 
    - Patch M1's OUT to M7's IN1.
    - Clip M7's OUT to the 3.5 mm plug's tip and ring, and M7's GND to its sleeve.
 4. **Plug in.** Turn the amp right down, plug into its line or AUX input, switch P1's BT1 on, touch a key, and bring the volume up slowly.
+
+### The full table
+
+Lay the pages in signal order: P1, a controller (M2, M3 or M4), M5, M1, M6, M7. Join the power along the row as above. Then patch:
+
+- the controller to one of M5's GATE loops (M2's stylus lead, or M3's or M4's PITCH loop)
+- M5's other GATE loop to M1's PITCH
+- M1's OUT to M6's IN, and M6's OUT to M7's IN1
+
+Leave out any page you haven't built: patch around it. Without M5, the controller goes straight to M1's PITCH. Without M6, M1's OUT goes straight to M7.
 
 ## M1 · How the oscillator works
 
@@ -60,6 +80,35 @@ The ladder runs from V+ through R1 to high C, then key by key to low C. Each key
 - **Fixing one note:** swap the resistor to its right for the next value up or down. A tuner app on a phone shows the frequency.
 - **If you only have E12 values:** use R1 12 kΩ, then 1.5k, 3.3k, 3.9k, 4.7k, 2.2k, 5.6k and 5.6k. They're a little further off, so tune by ear.
 
+## M3 · The ribbon
+
+- **How it plays:** R1 (13 kΩ) joins V+ to the ribbon's right end. The wiper joins the PITCH lane to the ribbon wherever it's pressed, so the pencil between the wiper and R1 adds to R_pitch. Sliding left glides the note down, with no steps.
+- **Range:** the top note is M2's high C, about 521 Hz. A heavy 6B ribbon, 124 × 20 mm, adds a few tens of kΩ, so the left end lands somewhere around 150 to 250 Hz.
+- **Frets:** pencil varies too much to print note positions. Finding C4 to C5 with a tuner and marking them in pen is part of the page.
+- **If the left end goes silent:** that end is above about 100 kΩ and Q2 on M1 stops switching. Shade it darker.
+
+## M4 · Light and range
+
+- **The sensor:** LDR1 reads a few kΩ under a lamp, 10 to 20 kΩ in room light, and up to a megohm in the dark.
+- **Its partners:** R1 (68 kΩ) in parallel caps the total, so a full shadow still plays a low note. R2 (10 kΩ) in series sets the top note.
+- **On paper:** about 540 Hz under a lamp, 390 Hz in room light, and 160 Hz in shadow.
+- **The tube:** rolled round LDR1, the cut-out tube shuts out light from the sides, so the sensor answers to where it points, not to people walking past.
+- **Without R1:** a full shadow fades the note to silence, a little like a theremin's volume hand.
+
+## M5 · Beat and gate
+
+- **The beat:** M5 is M1's circuit slowed down, with 10 µF capacitors instead of 100 nF. The note lasts about a quarter of a second (R3 with C2), the rest about a sixth (R4 with C1): roughly two beats a second.
+- **The gate:** while M5's Q2 is off, R5 turns Q3 on, and Q3 holds GATE at GND. Patched to M1's PITCH, that takes away the base current M1's Q2 needs, so M1 goes quiet. While M5's Q2 is on, Q3 lets go, the note plays, and LED1 lights.
+- **Why it's safe:** Q3 only sinks the controller's current. M2, M3 and M4 all keep at least 10 kΩ between V+ and PITCH (standard §10.3), so that's under 0.5 mA.
+- **LED1 in the rests:** it may glow faintly, because R5's small current flows through it.
+- **Changing the beat:** 22 µF for both capacitors halves the speed. Swapping R3 and R4 gives short notes and long rests.
+
+## M6 · The filter
+
+- **What it does:** the pencil between the wiper and the OUT end is a resistor, and C1 (47 nF) goes from OUT to GND. Together they're a low-pass filter. A square wave's sharp edges are its high harmonics; the filter rounds them off, so the buzz fades.
+- **The corner:** about 1 / (2π × R × C). M7's input (about 27 kΩ) sits in parallel with the pencil, so with the wiper near OUT the corner is a few kHz and the sound barely changes. At the far end of a heavy track it drops below 200 Hz.
+- **Quieter too:** the pencil and M7's input also divide the signal, so the softest setting is noticeably quieter. Turn the amp up a little.
+
 ## M7 · Output levels
 
 - **Level:** a 0–4.5 V square wave through R1 (22 kΩ) into R4 (4.7 kΩ) arrives at OUT as about 0.8 V peak to peak, close to consumer line level.
@@ -83,9 +132,14 @@ The ladder runs from V+ through R1 to high C, then key by key to low C. Each key
 | Crackles as you play | A loose clip or a dry contact: press the stylus firmly, check the patch loops |
 | One key is silent | A ladder resistor isn't touching its lane, so every key to its left goes quiet too |
 | Hum when plugged in | The amp's mains earth. Try a battery-powered speaker. |
+| M3 or M6 does nothing | The wiper is upside down (copper must face the page), or R1's lead or the bare wire isn't pressed onto the pencil |
+| M4's note hardly changes | Too little light to start with. Play under a lamp, or use the tube and point it at one. |
+| M5's LED1 blinks but the note doesn't | Neither GATE loop is patched to M1's PITCH, or the controller is still clipped to M1 directly |
+| M5's LED1 stays dark | C1 or C2 in backwards, or a base lane not touching its resistor |
 
 ## Provisional
 
 - **[T0] Lead attachment and patch loops without solder:** the pages say to solder. A copper tape patch is the fallback T0 will judge.
+- **[T1] Joins onto pencil:** M3 lays R1's lead on the ribbon, and M6 lays a bare wire on its track, both held with clear tape. That's T1's K4.
 - **Not built yet:** the values above are calculated, not measured. Log real frequencies in the [test log](../test-log.md).
-- **Transistors:** M1 is the first page with transistors. It works best after a transistor-switch lesson, which is planned for chapter 3 but not drafted.
+- **Transistors:** M1 and M5 are the first pages with transistors. It works best after a transistor-switch lesson, which is planned for chapter 3 but not drafted.

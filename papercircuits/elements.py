@@ -377,6 +377,43 @@ def ceramic_cap(sh, cx, cy, vertical=False, lead=8.0, label=None):
             sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
 
 
+
+def radial_cap(sh, x_plus, x_minus, y, label=None, body=(5.0, 11.0)):
+    """Small radial electrolytic capacitor, such as 10 µF 16 V (5 × 11 mm), lying on its
+    side with its body pointing up the page. Both legs leave its bottom end; bend the +
+    leg out to x_plus and the − leg to x_minus, along y. The − stripe runs down the
+    body's side nearer the − leg."""
+    bw, bl = body
+    cx = (x_plus + x_minus) / 2
+    s = 1 if x_minus > x_plus else -1
+    by1 = y - 2.0
+    by0 = by1 - bl
+    for leg_x, end_x in ((cx - s, x_plus), (cx + s, x_minus)):
+        sh.polygon([(leg_x, by1), (leg_x, y), (end_x, y)], stroke=MUTED, width=0.5, closed=False)
+    sh.rect(cx - bw / 2, by0, cx + bw / 2, by1, stroke=MUTED, fill=WHITE, width=0.3, radius=1.2)
+    sx0, sx1 = sorted((cx + s * (bw / 2 - 1.5), cx + s * (bw / 2 - 0.3)))
+    sh.rect(sx0, by0 + 0.8, sx1, by1 - 0.4, stroke=None, fill=FAINT)
+    for sign, mark in ((-s, "+"), (s, "−")):
+        sh.text(cx + sign * (bw / 2 + 1.6), by1 - 0.6, mark, size=7, bold=True, align="center")
+    if label:
+        sh.text(cx, by0 - 1.4, label, size=6, color=MUTED, align="center")
+
+
+def ldr(sh, cx, cy, lead=11.0, label=None):
+    """Light-dependent resistor: a 5 mm disc lying face up, its two legs bent flat in
+    opposite directions to reach `lead` mm above and below its centre. Either way round."""
+    sh.line(cx, cy - lead, cx, cy + lead, width=0.6, color=MUTED, cap=1)
+    r = 2.6
+    sh.circle(cx, cy, r, stroke=MUTED, fill=WHITE, width=0.3)
+    pts = []
+    for i in range(7):
+        y = cy - 1.5 + i * 0.5
+        row = [(cx - 1.5, y), (cx + 1.5, y)]
+        pts += row if i % 2 == 0 else row[::-1]
+    sh.polygon(pts, stroke=MUTED, width=0.25, closed=False)
+    if label:
+        sh.text(cx + r + 1, cy + 1, label, size=6, color=MUTED)
+
 def patch_loop(sh, x, y, label, side="right"):
     """Where to solder a patch loop on a lane: an upright U of bare wire a clip can grip."""
     pts = [(x - 2.2 + 4.4 * i / 12, y - 2.8 * math.sin(math.pi * i / 12)) for i in range(13)]

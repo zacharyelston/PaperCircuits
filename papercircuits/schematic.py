@@ -42,6 +42,17 @@ def resistor(sh, x, y0, y1, label, value):
     sh.text(x + 3, cy + 2.8, value, size=6, color=MUTED)
 
 
+
+def ldr(sh, x, y0, y1, label, value):
+    """Vertical light-dependent resistor: a resistor with two arrows of light coming in
+    from the left."""
+    resistor(sh, x, y0, y1, label, value)
+    cy = (y0 + y1) / 2
+    for dy in (-2.4, 0.6):
+        x1, y1a = x - 2.2, cy + dy
+        sh.line(x1 - 2.0, y1a - 2.0, x1, y1a, width=0.25)
+        sh.polygon([(x1, y1a), (x1 - 0.9, y1a - 0.2), (x1 - 0.2, y1a - 0.9)], stroke=None, fill=INK)
+
 def led(sh, x, y0, y1, label, anode_top=True):
     """Vertical LED from y0 to y1. Current flows from anode to cathode, the way the triangle points."""
     cy = (y0 + y1) / 2
@@ -101,10 +112,14 @@ def fuse(sh, x0, x1, y, label, value):
     sh.text(cx, y + 7.6, value, size=6, color=MUTED, align="center")
 
 
-def rheostat(sh, x, y0, y1, wiper_y, wiper_x, label, value):
+def rheostat(sh, x, y0, y1, wiper_y, wiper_x, label, value, open_end="top"):
     """Vertical resistor box from y0 to y1 with a wiper arrow coming in from the left at
-    wiper_y. The top end is left open: only the wiper and the bottom end connect."""
-    sh.line(x, y0 - 3, x, y0, width=W)
+    wiper_y. The `open_end` ("top" or "bottom") is left as a stub: only the wiper and the
+    other end connect."""
+    if open_end == "top":
+        sh.line(x, y0 - 3, x, y0, width=W)
+    else:
+        sh.line(x, y1, x, y1 + 3, width=W)
     sh.rect(x - 1.5, y0, x + 1.5, y1, stroke=INK, fill=WHITE, width=W)
     sh.line(wiper_x, wiper_y, x - 3.2, wiper_y, width=W)
     sh.polygon([(x - 1.6, wiper_y), (x - 3.4, wiper_y - 0.9), (x - 3.4, wiper_y + 0.9)], stroke=None, fill=INK)
@@ -126,15 +141,21 @@ def diode(sh, x, y0, y1, label, cathode_bottom=True):
     sh.text(x + 3.4, cy + 1, label, size=6.5, bold=True)
 
 
-def capacitor(sh, x, y0, y1, label, value):
-    """Vertical polarised capacitor from y0 (+) to y1 (−): a thin plate over a solid one."""
+def capacitor(sh, x, y0, y1, label, value, polarised=True):
+    """Vertical capacitor from y0 to y1. Polarised, + at y0: a thin plate over a solid one.
+    Otherwise two thin plates."""
     cy = (y0 + y1) / 2
     gap, half = 1.6, 3.0
     sh.line(x, y0, x, cy - gap / 2, width=W)
-    sh.line(x, cy + gap / 2 + 0.9, x, y1, width=W)
-    sh.line(x - half, cy - gap / 2, x + half, cy - gap / 2, width=W)
-    sh.rect(x - half, cy + gap / 2, x + half, cy + gap / 2 + 0.9, stroke=None, fill=INK)
-    sh.text(x - 4.4, cy - 1.6, "+", size=6.5, bold=True, align="center")
+    if polarised:
+        sh.line(x, cy + gap / 2 + 0.9, x, y1, width=W)
+        sh.line(x - half, cy - gap / 2, x + half, cy - gap / 2, width=W)
+        sh.rect(x - half, cy + gap / 2, x + half, cy + gap / 2 + 0.9, stroke=None, fill=INK)
+        sh.text(x - 4.4, cy - 1.6, "+", size=6.5, bold=True, align="center")
+    else:
+        sh.line(x, cy + gap / 2, x, y1, width=W)
+        for py in (cy - gap / 2, cy + gap / 2):
+            sh.line(x - half, py, x + half, py, width=W)
     sh.text(x + 4.2, cy - 0.4, label, size=6.5, bold=True)
     sh.text(x + 4.2, cy + 2.8, value, size=6, color=MUTED)
 
@@ -150,13 +171,21 @@ def resistor_h(sh, x0, x1, y, label, value="", box_w=8.0):
         sh.text(cx, y + 4.6, value, size=6, color=MUTED, align="center")
 
 
-def capacitor_h(sh, x0, x1, y, label, value=""):
-    """Horizontal capacitor with no polarity, from x0 to x1."""
+def capacitor_h(sh, x0, x1, y, label, value="", plus=None):
+    """Horizontal capacitor from x0 to x1, with no polarity. With `plus` ("left" or
+    "right") it's polarised: a thin + plate and a solid − one."""
     cx = (x0 + x1) / 2
     sh.line(x0, y, cx - 0.8, y, width=W)
     sh.line(cx + 0.8, y, x1, y, width=W)
-    for px in (cx - 0.8, cx + 0.8):
-        sh.line(px, y - 2.6, px, y + 2.6, width=0.45)
+    if plus is None:
+        for px in (cx - 0.8, cx + 0.8):
+            sh.line(px, y - 2.6, px, y + 2.6, width=0.45)
+    else:
+        s = -1 if plus == "left" else 1
+        sh.line(cx + s * 0.8, y - 2.6, cx + s * 0.8, y + 2.6, width=0.45)
+        rx0, rx1 = sorted((cx - s * 0.8, cx - s * 1.7))
+        sh.rect(rx0, y - 2.6, rx1, y + 2.6, stroke=None, fill=INK)
+        sh.text(cx + s * 2.6, y - 1.2, "+", size=6.5, bold=True, align="center")
     sh.text(cx, y - 3.6, label, size=6.5, bold=True, align="center")
     if value:
         sh.text(cx, y + 5.6, value, size=6, color=MUTED, align="center")
