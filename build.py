@@ -1,5 +1,5 @@
-"""Build every sheet into out/, PNG previews into docs/img/, and the README's headline
-image from those previews.
+"""Build every sheet into out/, PNG previews into docs/img/, and the README's two
+pictures from those previews: the headline image and the synth table.
 
 Run with: uv run build.py
 CI runs:  uv run build.py --check   (PDFs only, then checks the previews aren't stale)
@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from papercircuits.sheets import (
     l01_led_polarity,
@@ -85,6 +85,7 @@ def main(argv):
     if render:
         write_fingerprints()
     hero()
+    synth_table()
     return 0
 
 
@@ -117,28 +118,58 @@ def check_previews():
 
 
 HERO_PAGES = ("L01-led-polarity", "L02-and-or", "L03-pencil-resistor", "L08-capacitor")
+# The paper synth laid out on the table in signal order: controller, beat, tone, filter, output.
+SYNTH_PAGES = ("M2-keyboard", "M5-pulse", "M1-oscillator", "M6-tone", "M7-output")
 
 
-def hero(width=400, gap=28, border=2):
-    """A row of lesson-page previews on a light backdrop, for the top of the README."""
-    pages = [PREVIEWS / f"{stem}-1.png" for stem in HERO_PAGES]
+def _page_row(stems, name, width, gap, border):
+    """A row of page previews on a light backdrop. Returns the canvas and each page's frame
+    (x0, x1), or None if a preview is missing."""
+    pages = [PREVIEWS / f"{stem}-1.png" for stem in stems]
     if not all(p.exists() for p in pages):
-        print("  previews missing; skipped hero.png")
-        return
+        print(f"  previews missing; skipped {name}")
+        return None, []
     thumbs = []
     for p in pages:
         im = Image.open(p).convert("RGB")
         thumbs.append(im.resize((width, round(im.height * width / im.width)), Image.LANCZOS))
     tall = max(t.height for t in thumbs)
     canvas = Image.new("RGB", (gap + len(thumbs) * (width + 2 * border + gap), tall + 2 * border + 2 * gap), "#f1efe8")
+    frames = []
     x = gap
     for t in thumbs:
         canvas.paste(Image.new("RGB", (width + 2 * border, t.height + 2 * border), "#c9c6bd"), (x, gap))
         canvas.paste(t, (x + border, gap + border))
+        frames.append((x, x + width + 2 * border))
         x += width + 2 * border + gap
-    path = PREVIEWS / "hero.png"
+    return canvas, frames
+
+
+def _save(canvas, name):
+    path = PREVIEWS / name
     canvas.save(path, optimize=True)
     print("wrote", path.relative_to(ROOT))
+
+
+def hero(width=400, gap=28, border=2):
+    """Four lesson pages, for the top of the README."""
+    canvas, _ = _page_row(HERO_PAGES, "hero.png", width, gap, border)
+    if canvas:
+        _save(canvas, "hero.png")
+
+
+def synth_table(width=300, gap=56, border=2):
+    """The synth's pages side by side, with an arrow for the sound in each gap."""
+    canvas, frames = _page_row(SYNTH_PAGES, "synth-table.png", width, gap, border)
+    if not canvas:
+        return
+    draw = ImageDraw.Draw(canvas)
+    y = canvas.height // 2
+    for (_, right), (left, _) in zip(frames, frames[1:]):
+        x0, x1 = right + 10, left - 10
+        draw.line([(x0, y), (x1 - 14, y)], fill="#b87333", width=6)
+        draw.polygon([(x1, y), (x1 - 18, y - 12), (x1 - 18, y + 12)], fill="#b87333")
+    _save(canvas, "synth-table.png")
 
 
 if __name__ == "__main__":

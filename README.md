@@ -2,48 +2,102 @@
 
 ![Four lesson pages: L01 LEDs only work one way, L02 two switches two ways, L03 draw a resistor, and L08 store some charge. Each shows copper tape lanes, part outlines, a circuit diagram and workbook boxes.](docs/img/hero.png)
 
-Printable A4 paper-circuit workbook pages. Circuits are built from copper tape and real through-hole parts, and pages bind into a shared power-and-signal backplane through the binder holes.
+A printable A4 paper-circuit workbook. Circuits are built from copper tape and real through-hole parts, one idea per page. It starts with one LED on one page and ends with a whole group building a synthesizer together.
 
-| File | What it is |
+## From one page to a group build
+
+```mermaid
+flowchart LR
+  ready["<b>Get ready</b><br/>P1 power page"]
+  ch1["<b>Chapter 1</b><br/>Loops and current<br/>L01 to L05"]
+  ch2["<b>Chapter 2</b><br/>Parts with a job<br/>L06 to L08"]
+  ch3["<b>Chapter 3</b><br/>Control and systems<br/>planned"]
+  synth["<b>Group project</b><br/>The paper synth<br/>M1 to M7"]
+  ready --> ch1 --> ch2 --> synth
+  ch2 --> ch3
+  ch3 -.-> synth
+```
+
+1. **One page, one idea.** Each lesson is a single page you build alone: lay the tape, place the parts, then predict, measure and explain. Lessons live in a binder, and every one takes its power from P1 through the binder holes.
+2. **Ideas that carry forward.** Each lesson leaves you with something the later pages reuse: a pencil line as a resistor, resistors in a row, a capacitor that takes time to charge.
+3. **Pages that work together.** In the group project each person builds one page. The pages come out of the binder, lie side by side on a table, and join into one instrument.
+
+## 1 · Get ready
+
+Build the power page first. Every lesson plugs into it through the binder.
+
+| Page | What it is |
 |---|---|
-| [docs/page-standard.md](docs/page-standard.md) | The page standard every sheet follows (v0.1 draft) |
-| [docs/test-log.md](docs/test-log.md) | Bench results from the T-series tests, which decide the provisional tags |
-| [out/T0-contact-tests.pdf](out/T0-contact-tests.pdf) | Contact tests to run before fixing the standard |
-| [out/T1-pencil-contacts.pdf](out/T1-pencil-contacts.pdf) | Pencil tests: pencil-treated tape glue, joining tape to pencil, and comparing papers |
-| [out/T2-two-sided.pdf](out/T2-two-sided.pdf) | Two-sided tests: duplex registration, vias, edge wraps, and stacking shorts (pages 1 and 2 print double-sided) |
-| [out/template.pdf](out/template.pdf) | Lesson page template: zones, nets and drawing marks |
-| [out/P1-power.pdf](out/P1-power.pdf) | Power page P1: 3 × AA, resettable fuse, feeds H2/H3 (draft; [teacher notes](docs/lessons/P1.md)) |
-| [out/L01-led-polarity.pdf](out/L01-led-polarity.pdf) | Lesson L01: LEDs only work one way (draft; [teacher notes](docs/lessons/L01.md)) |
-| [out/L02-and-or.pdf](out/L02-and-or.pdf) | Lesson L02: two switches, two ways, AND and OR (draft; [teacher notes](docs/lessons/L02.md)) |
-| [out/L03-pencil-resistor.pdf](out/L03-pencil-resistor.pdf) | Lesson L03: draw a resistor, a pencil-track dimmer (draft; [teacher notes](docs/lessons/L03.md)) |
-| [out/L04-resistors.pdf](out/L04-resistors.pdf) | Lesson L04: resistors set the current, with the colour code (draft; [teacher notes](docs/lessons/L04.md)) |
-| [out/L05-series-parallel.pdf](out/L05-series-parallel.pdf) | Lesson L05: two ways to add a resistor, series and parallel (draft; [teacher notes](docs/lessons/L05.md)) |
-| [out/L06-diodes.pdf](out/L06-diodes.pdf) | Lesson L06: diodes are one-way valves (draft; [teacher notes](docs/lessons/L06.md)) |
-| [out/L07-dividers.pdf](out/L07-dividers.pdf) | Lesson L07: share the voltage, voltage dividers (draft; [teacher notes](docs/lessons/L07.md)) |
-| [out/L08-capacitor.pdf](out/L08-capacitor.pdf) | Lesson L08: store some charge, a capacitor fades an LED (draft; [teacher notes](docs/lessons/L08.md)) |
-| [out/M1-oscillator.pdf](out/M1-oscillator.pdf) | Paper synth M1: oscillator, the tone (draft; [project notes](docs/projects/paper-synth.md)) |
-| [out/M2-keyboard.pdf](out/M2-keyboard.pdf) | Paper synth M2: stylus keyboard, one octave of C major (draft) |
-| [out/M3-pencil-ribbon.pdf](out/M3-pencil-ribbon.pdf) | Paper synth M3: pencil ribbon, a slide for gliding notes (draft) |
-| [out/M4-light-pitch.pdf](out/M4-light-pitch.pdf) | Paper synth M4: light pitch, play by shading a light sensor (draft) |
-| [out/M5-pulse.pdf](out/M5-pulse.pdf) | Paper synth M5: pulse, a slow oscillator that chops the note into a beat (draft) |
-| [out/M6-tone.pdf](out/M6-tone.pdf) | Paper synth M6: tone, a pencil-and-capacitor filter that softens the sound (draft) |
-| [out/M7-output.pdf](out/M7-output.pdf) | Paper synth M7: mixer and line output to a real amp (draft) |
+| [P1 Power](out/P1-power.pdf) | 3 × AA, a switch and a resettable fuse, feeding V+ and GND to every page in the binder ([teacher notes](docs/lessons/P1.md)) |
+| [L00 Template](out/template.pdf) | The blank lesson page: zones, shared nets and every drawing mark, to practise laying tape |
 
-## On the bench
+## 2 · The lessons
+
+Each lesson page has the same parts: a build zone, a circuit diagram, and Predict, Measure and Explain boxes. Every lesson has [teacher notes](docs/lessons/).
+
+### Chapter 1 · Loops and current
+
+| Lesson | You build | You find out |
+|---|---|---|
+| [L01 LEDs only work one way](out/L01-led-polarity.pdf) | Two LEDs on one switch, one printed backwards | Current needs a complete loop, and an LED only lets it go one way |
+| [L02 Two switches, two ways](out/L02-and-or.pdf) | Two switch pairs, one in a row and one side by side | AND and OR: the first step towards logic |
+| [L03 Draw a resistor](out/L03-pencil-resistor.pdf) | A 6B pencil track with a sliding wiper that dims an LED | A pencil line is a resistor; longer means more resistance |
+| [L04 Resistors set the current](out/L04-resistors.pdf) | Three LEDs behind 220 Ω, 1 kΩ and 4.7 kΩ | Bigger resistance, less current, and how to read the colour code |
+| [L05 Two ways to add a resistor](out/L05-series-parallel.pdf) | Five equal resistors: one alone, two in a row, two side by side | Resistors in a row add up; side by side, they halve |
+
+### Chapter 2 · Parts with a job
+
+| Lesson | You build | You find out |
+|---|---|---|
+| [L06 Diodes are one-way valves](out/L06-diodes.pdf) | A diode in each loop, one reversed | A diode costs about 0.7 V, and the voltages round a loop add up to the supply |
+| [L07 Share the voltage](out/L07-dividers.pdf) | Three pairs of resistors in a row | Two resistors split the supply in proportion to their size |
+| [L08 Store some charge](out/L08-capacitor.pdf) | A big capacitor that keeps an LED lit after the power goes | A capacitor stores charge and lets an LED fade out slowly |
+
+### Chapter 3 · Control and systems (planned)
+
+Transistors as switches, pages working together over the binder's BUS A and BUS B, and a move to a real circuit board. Not drafted yet.
+
+## 3 · The group project: a paper synth
+
+![Five synth pages side by side on a table, joined by arrows showing the sound's path: M2 keyboard, M5 pulse, M1 oscillator, M6 tone and M7 output.](docs/img/synth-table.png)
+
+Each person builds one module page. The pages lie side by side, power runs along the row on short cables, and clip leads carry the sound from page to page. M7 sends it off the table to a real amp or powered speaker, which is the only thing that makes it loud.
+
+The sound flows left to right: a **controller** (M2, M3 or M4) sets the note, **M5** chops it into a beat, **M1** makes the tone, **M6** softens it, and **M7** sends it out. A group of three can play with just M2, M1 and M7. Every page is a draft; the [project notes](docs/projects/paper-synth.md) cover setting up the table, the numbers behind each page, safety and common faults.
+
+| Page | Its job in the synth | Builds on |
+|---|---|---|
+| [M1 Oscillator](out/M1-oscillator.pdf) | Two transistors switch each other on and off: the tone | L08's capacitor timing, plus transistors (chapter 3) |
+| [M2 Keyboard](out/M2-keyboard.pdf) | Eight keys on a ladder of resistors; a clip lead is the stylus | L04, and L05's resistors in a row |
+| [M3 Pencil ribbon](out/M3-pencil-ribbon.pdf) | A pencil ribbon and wiper for notes that glide | L03's pencil resistor and wiper |
+| [M4 Light pitch](out/M4-light-pitch.pdf) | A light sensor you play with your hand's shadow | L05's resistors side by side, and a new part: the LDR |
+| [M5 Pulse](out/M5-pulse.pdf) | M1's circuit slowed right down, chopping the note into a beat | M1, with L08's bigger capacitors |
+| [M6 Tone](out/M6-tone.pdf) | A pencil track and a capacitor that take the buzz off the sound | L03's pencil and L08's capacitor |
+| [M7 Output](out/M7-output.pdf) | Mixes the sound and cuts it to line level for an amp | L07's divider and L08's capacitor |
+
+**Safety:** plug M7 only into a powered speaker's or an amp's line (AUX) input, with the volume turned down first. Never headphones, and never a bare speaker.
+
+## 4 · Behind the pages
+
+Every page follows one [page standard](docs/page-standard.md) (v0.1, draft). Some of its choices are still provisional, and each is tagged on the pages: **[T0]**, **[T1]** or **[P]**. The test sheets settle them, and their results go in the [test log](docs/test-log.md).
+
+| Test sheet | What it decides |
+|---|---|
+| [T0 Contact tests](out/T0-contact-tests.pdf) | Tape joints, attaching parts, binder hole contacts and switch contacts: the **[T0]** tags |
+| [T1 Pencil contacts](out/T1-pencil-contacts.pdf) | Pencil-treated tape glue, joining tape to pencil, and which paper to build on: the **[T1]** tags |
+| [T2 Two-sided tests](out/T2-two-sided.pdf) | Whether the back of the page can carry copper too: vias, edge wraps and stacking |
+
+### On the bench
 
 <img src="docs/img/bench-l00-soldered.jpg" width="480" alt="The printed lesson page template with its drawing marks built in copper tape: a lane, a folded corner, a joint, a crossing, the spine net strips and the corner switch pads. A blue resistor is soldered across the resistor gap, and a multimeter on its 200 ohm range reads 99.2.">
 
-The lesson page template (L00) built in copper tape, with a 100 Ω resistor soldered across its 10 mm gap. The meter reads 99.2 Ω, so the solder joints add almost nothing. Bench results go in the [test log](docs/test-log.md).
+The lesson page template (L00) built in copper tape, with a 100 Ω resistor soldered across its 10 mm gap. The meter reads 99.2 Ω, so the solder joints add almost nothing.
 
-## Chapters
+## Printing
 
-1. **Loops and current:** L01 LEDs only work one way · L02 two switches, two ways · L03 draw a resistor · L04 resistors set the current · L05 two ways to add a resistor
-2. **Parts with a job:** L06 diodes · L07 voltage dividers · L08 capacitors
-3. **Control and systems** (not drafted yet): transistors, pages working together on BUS A and BUS B, and a real circuit board
+Print at 100 % ("actual size"), never "fit to page". Every page has a 100 mm bar in the footer; check it with a ruler.
 
-**Projects:** the **paper synth** is a table-top group build. Pages lie side by side, power runs between them on a short cable, and clip leads patch the sound. All seven pages are drafted: M1 oscillator; M2 keyboard, M3 pencil ribbon and M4 light pitch to play it; M5 pulse and M6 tone to shape it; and M7 output. See the [project notes](docs/projects/paper-synth.md).
-
-Build P1 first: every lesson takes its power from P1 through the binder.
+T2 is the one exception to single-sided printing: print its pages 1 and 2 double-sided, flipping on the long edge, then check the registration marks before laying any tape.
 
 ## Build
 
@@ -51,7 +105,7 @@ Build P1 first: every lesson takes its power from P1 through the binder.
 uv run build.py
 ```
 
-This writes the PDFs to `out/`, PNG previews to `docs/img/`, and the headline image `docs/img/hero.png` from four of those previews. Previews need `pdftoppm` from poppler.
+This writes the PDFs to `out/` and PNG previews to `docs/img/`. From those previews it also composes the README's two pictures, `docs/img/hero.png` and `docs/img/synth-table.png`. Previews need `pdftoppm` from poppler.
 
 Commit `out/` and `docs/img/` along with the code. Every pull request runs the same build on GitHub Actions. The check fails if:
 
@@ -67,14 +121,9 @@ The last check compares fingerprints in `docs/img/previews.sha256` rather than i
 - `papercircuits/draw.py`: an A4 canvas in standard coordinates (mm, origin top-left, y down).
 - `papercircuits/elements.py`: standard elements such as the spine, tape lanes, test points and part footprints.
 - `papercircuits/schematic.py`: circuit-diagram symbols for the schematic panel.
-- `papercircuits/provisional.py`: the `[T0]` and `[P]` tags for choices that wait on an open decision.
+- `papercircuits/provisional.py`: the `[T0]`, `[T1]` and `[P]` tags for choices that wait on an open decision.
 - `papercircuits/lesson.py`: what every lesson page shares: the You need and Build it columns, schematic panel and workbook boxes.
-- `papercircuits/drc.py`: the clearance check every page runs before it's saved.
+- `papercircuits/module.py`: what every table-top module page shares: the power ring, edge connectors and layout.
 - `papercircuits/testsheet.py`: what the T-series test sheets share: result columns, steps and tables.
+- `papercircuits/drc.py`: the clearance check every page runs before it's saved.
 - `papercircuits/sheets/`: one module per sheet. Add new sheets to `SHEETS` in `build.py`.
-
-## Printing
-
-Print at 100 % ("actual size"), never "fit to page". Every page has a 100 mm bar in the footer; check it with a ruler.
-
-T2 is the one exception to single-sided printing: print its pages 1 and 2 double-sided, flipping on the long edge, then check the registration marks before laying any tape.
