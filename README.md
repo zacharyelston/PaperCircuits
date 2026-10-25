@@ -117,6 +117,14 @@ The last check compares fingerprints in `docs/img/previews.sha256` rather than i
 
 ## Code
 
+Pages are moving to three layers, one source of truth each. M7 and L01 are the first; the others will follow, each rebuilding byte for byte the same.
+
+- **Circuit** (`papercircuits/circuit.py`): the page's parts, with real values, and the nets they join. The "You need" list and the labels on footprints and schematic symbols are read from it.
+- **Placement** (`papercircuits/placement.py`): lanes belong to nets and parts are placed by ref. Its check fails the build if a lead lands on the wrong net, a net has more than one strip of copper, a patch loop is off its lane, or a part is missing from the schematic.
+- **Words** (`papercircuits/words.py`): each page's text lives in a Markdown file beside its module, such as `papercircuits/sheets/m7_output.md`. Text can use `{T0}`-style tags, values the page counts, such as `{lanes}`, and shared snippets from `papercircuits/sheets/shared.md`.
+
+The rest of the package:
+
 - `papercircuits/standard.py`: every number from the standard. It must agree with the spec.
 - `papercircuits/draw.py`: an A4 canvas in standard coordinates (mm, origin top-left, y down).
 - `papercircuits/elements.py`: standard elements such as the spine, tape lanes, test points and part footprints.
