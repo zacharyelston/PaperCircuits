@@ -24,6 +24,10 @@ from papercircuits.sheets import (
     l08_capacitor,
     m1_oscillator,
     m2_keyboard,
+    m3_pencil_ribbon,
+    m4_light_pitch,
+    m5_pulse,
+    m6_tone,
     m7_output,
     p1_power,
     t0_contact_tests,
@@ -53,6 +57,10 @@ SHEETS = {
     "L08-capacitor.pdf": l08_capacitor.build,
     "M1-oscillator.pdf": m1_oscillator.build,
     "M2-keyboard.pdf": m2_keyboard.build,
+    "M3-pencil-ribbon.pdf": m3_pencil_ribbon.build,
+    "M4-light-pitch.pdf": m4_light_pitch.build,
+    "M5-pulse.pdf": m5_pulse.build,
+    "M6-tone.pdf": m6_tone.build,
     "M7-output.pdf": m7_output.build,
 }
 

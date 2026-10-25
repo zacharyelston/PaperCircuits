@@ -161,6 +161,8 @@ The ID appears at the right of the header and in the footer.
 | U-shaped loop, labelled | Patch loop: solder a bare wire loop upright here (§10.2) |
 | Two pads at a side edge, V+ over GND | Edge connector: solder the cable to the next page here (§10.1) |
 | Grey hatched band, solid outline, ticks | Pencil track: shade with a 6B pencil |
+| Thin dashed strip across a lane and a pencil track | Where a wiper's copper strip goes when you play it |
+| Small disc with a zigzag face | Light-dependent resistor: bend its legs flat so the face looks up |
 | Solid outline round a tape strip, "cut out" | A piece to cut out, such as a wiper |
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
@@ -177,7 +179,7 @@ Text uses Bitstream Vera (bundled with reportlab), never smaller than 6 pt.
 
 ## 10. Table-top projects (M pages)
 
-Module pages (M series) don't stack in the binder. They lie side by side on a table, with the signal flowing left to right, so a group can build one page each and join them into one instrument. The paper synth (M1 oscillator, M2 keyboard, M7 output) is the first project.
+Module pages (M series) don't stack in the binder. They lie side by side on a table, with the signal flowing left to right, so a group can build one page each and join them into one instrument. The paper synth (M1 to M7) is the first project.
 
 ### 10.1 Power between pages
 
@@ -192,12 +194,14 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 ### 10.2 Patch points
 
 - **Patch loops:** a patch loop is a 15 mm piece of bare wire, such as a resistor's cut-off leg, bent into a U and soldered upright onto a lane. Crocodile clips grip the loop, so a patch point can sit anywhere on the page. **[T0]** decides whether a copper tape patch could hold one instead of solder.
-- **Labels:** every patch loop is labelled `IN`, `OUT`, `PITCH`, `V+` or `GND`.
+- **Labels:** every patch loop is labelled `IN`, `OUT`, `PITCH`, `GATE`, `V+` or `GND`.
 - **Patch leads:** crocodile clip leads, red for V+, black for GND, any other colour for signals. Never patch an `OUT` straight to V+ or GND.
 
 ### 10.3 Signals and sound
 
 - **Levels:** signals on the table swing between GND and V+.
+- **Controllers:** a page that sets an oscillator's pitch (M2, M3, M4) keeps at least 10 kΩ between V+ and `PITCH` at every setting.
+- **Gates:** a `GATE` loop is a transistor to GND that switches in time with a beat (M5). Patched to a `PITCH`, it silences the oscillator in the rests. Because of the 10 kΩ rule it never sinks more than 0.5 mA.
 - **Output:** sound leaves the table only through an output page (M7), mixed, AC-coupled and cut to about line level for a 3.5 mm plug.
 - **Safety:** plug into a powered speaker's or an amp's line (AUX) input only, with its volume turned down first. Never headphones or a bare speaker.
 
@@ -232,3 +236,4 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 - **v0.1, revised with T1:** added the T1 pencil tests, the `[T1]` tag, and paper as an open question.
 - **v0.1, revised for the paper synth:** added table-top projects (§10): edge connectors, the power ring, patch loops and M-page zones.
 - **v0.1, revised with T2:** added the T2 two-sided tests, the via, registration and edge-wrap marks, and two-sided pages as an open question.
+- **v0.1, revised with M3 to M6:** added the `GATE` label, the 10 kΩ rule for controllers, and the wiper-strip and light-sensor marks.
