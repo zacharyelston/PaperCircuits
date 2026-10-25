@@ -10,6 +10,9 @@ They land within about 1.5 % on paper; real parts drift, so tuning by ear or wit
 tuner is part of the page.
 
 Only V+ is used here. GND just passes through the ring to the next page.
+
+The page is built in three layers: CIRCUIT says what it is, _keys() and _schematic() say
+where things go, and m2_keyboard.md holds the words.
 """
 
 from .. import elements as E
@@ -17,18 +20,30 @@ from .. import lesson
 from .. import module
 from .. import schematic as sch
 from .. import standard as S
+from ..circuit import Circuit, R
 from ..draw import GUIDE, MUTED, Sheet
-from ..provisional import HEADER_STATUS, T0
+from ..placement import Placement
+from ..provisional import HEADER_STATUS
+from ..words import Words, number
 
 PAGE_ID = "M2"
 
-# Waiting on the T0 contact tests.
-LEAD_STEP = f"Solder every lead to its lane, or hold it flat with a small patch of copper tape. {T0}"
-
 NOTES = ("C", "D", "E", "F", "G", "A", "B", "C")
+# Each key's lane is its own net, named for its note: C4 on the left up to C5.
+KEYS = tuple(f"{note}{5 if i == len(NOTES) - 1 else 4}" for i, note in enumerate(NOTES))
+
 # R1 runs from V+ to the top C; R2 to R8 join neighbouring keys, right to left.
-R_TOP = "13 kΩ"
-LADDER = ("1.6 kΩ", "3.6 kΩ", "3.9 kΩ", "4.3 kΩ", "2.4 kΩ", "5.1 kΩ", "6.2 kΩ")
+CIRCUIT = Circuit(
+    R("R1", 13e3, "V+", "C5"),
+    R("R2", 1.6e3, "C5", "B4"),
+    R("R3", 3.6e3, "B4", "A4"),
+    R("R4", 3.9e3, "A4", "G4"),
+    R("R5", 4.3e3, "G4", "F4"),
+    R("R6", 2.4e3, "F4", "E4"),
+    R("R7", 5.1e3, "E4", "D4"),
+    R("R8", 6.2e3, "D4", "C4"),
+)
+WORDS = Words.beside(__file__, CIRCUIT)
 
 KEY_X = tuple(58.0 + 16 * i for i in range(8))
 KEY_TOP, KEY_BOTTOM = S.RING_TOP + S.TAPE_W / 2 + 10, 158.0
@@ -36,63 +51,53 @@ LADDER_Y = (68.0, 80.0)  # alternate rows, so leads sharing a key don't overlap
 
 
 def build(path):
-    sh = Sheet(path, "M2 Keyboard")
-    E.header(sh, PAGE_ID, "M2  Keyboard",
-             "Touch a key with the stylus lead from M1 to play a note.", status=HEADER_STATUS)
+    sh = Sheet(path, " ".join(WORDS.title.split()))
+    E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle, status=HEADER_STATUS)
     E.spine(sh)
-    module.power_ring(sh)
-    _keys(sh)
-    module.need(sh, PAGE_ID, [
-        f"R1 {R_TOP} · R2 {LADDER[0]} · R3 {LADDER[1]}",
-        f"R4 {LADDER[2]} · R5 {LADDER[3]} · R6 {LADDER[4]}",
-        f"R7 {LADDER[5]} · R8 {LADDER[6]}",
-    ], [
-        "A clip lead from M1's PITCH: the stylus",
-        "Copper tape and solder",
-        "2-core cable to join the pages",
-    ])
-    module.caption(sh, "Touch anywhere on a key. Low C on the left, high C on the right. Only V+ is used; GND passes through.")
-    _schematic(sh)
-    module.steps(sh, PAGE_ID, [
-        "Lay the power ring and the eight key lanes, one piece of tape each.",
-        "Place R1 from the top rail to the high C on the right. Place R2 to R8 between the keys, "
-        "right to left, as labelled. Either way round.",
-        LEAD_STEP,
-        "Join the edge connectors to the pages either side with 2-core cable, or with red and black clip leads.",
-    ], [
-        "Clip one end of a lead to M1's PITCH loop. Hold the other clip by its cover and touch its jaws to a key.",
-        "Check each note with a tuner app on a phone. A note that's off can be tuned by swapping the "
-        "resistor to its right for the next value up or down.",
-    ])
+    lay = Placement(sh, CIRCUIT)
+    lay.ring()
+    _keys(lay)
+    need = WORDS.items("You need")
+    module.need(sh, PAGE_ID, need[:3], need[3:])
+    module.caption(sh, WORDS.text("Caption"))
+    _schematic(sh, lay)
+    module.steps(sh, PAGE_ID, WORDS.items("Build it", lanes=number(lay.laid)), WORDS.items("Play it"))
     E.footer(sh, PAGE_ID)
+    lay.check(listed=WORDS.refs("You need"))
     sh.save()
 
 
-def _keys(sh):
-    for i, (x, note) in enumerate(zip(KEY_X, NOTES)):
+def _keys(lay):
+    sh = lay.sh
+    for x, key in zip(KEY_X, KEYS):
         sh.rect(x - 7.5, KEY_TOP - 4, x + 7.5, KEY_BOTTOM + 10, stroke=GUIDE, width=0.3, radius=1.5)
-        E.lane(sh, [(x, KEY_TOP), (x, KEY_BOTTOM)])
-        octave = "5" if i == len(NOTES) - 1 else "4"
-        sh.text(x, KEY_BOTTOM + 7, f"{note}{octave}", size=7.5, bold=True, align="center")
+        lay.lane(key, [(x, KEY_TOP), (x, KEY_BOTTOM)])
+        sh.text(x, KEY_BOTTOM + 7, key, size=7.5, bold=True, align="center")
     r_cy = (S.RING_TOP + S.TAPE_W / 2 + KEY_TOP) / 2
-    E.resistor(sh, KEY_X[-1], r_cy, vertical=True, lead=12, label=f"R1 {R_TOP}")
-    for i, value in enumerate(LADDER):
+    # R1's label is its ref and value with no "·" between them, so it's written here, where
+    # the footprint puts a label: just right of the 2.4 mm body.
+    lay.resistor("R1", KEY_X[-1], r_cy, vertical=True, lead=12, label=None)
+    r1 = CIRCUIT["R1"]
+    sh.text(KEY_X[-1] + 2.4 / 2 + 1, r_cy + 1, f"{r1.ref} {r1.text}", size=6, color=MUTED)
+    for i in range(len(KEYS) - 1):
         right, left = KEY_X[-1 - i], KEY_X[-2 - i]
-        E.resistor(sh, (left + right) / 2, LADDER_Y[i % 2], vertical=False, lead=10, label=f"R{i + 2}")
+        lay.resistor(f"R{i + 2}", (left + right) / 2, LADDER_Y[i % 2], vertical=False, lead=10)
 
 
-def _schematic(sh):
+def _schematic(sh, lay):
     lesson.schematic_panel(sh)
+    labels = WORDS.fields("Labels")
     top, ladder_y, key_y = 216.0, 244.0, 252.0
     xs = [40.0 + 7.5 * i for i in range(8)]
     sch.terminal(sh, 40, top, "V+", label_y=top - 3.4)
     sch.wire(sh, [(40.8, top), (xs[-1], top)])
+    r1 = lay.symbol("R1")
     sch.resistor(sh, xs[-1], top, ladder_y, "", "")
-    sh.text(xs[-1] - 2.6, (top + ladder_y) / 2 - 0.4, "R1", size=6.5, bold=True, align="right")
-    sh.text(xs[-1] - 2.6, (top + ladder_y) / 2 + 2.8, R_TOP, size=6, color=MUTED, align="right")
+    sh.text(xs[-1] - 2.6, (top + ladder_y) / 2 - 0.4, r1.ref, size=6.5, bold=True, align="right")
+    sh.text(xs[-1] - 2.6, (top + ladder_y) / 2 + 2.8, r1.text, size=6, color=MUTED, align="right")
     for i in range(7):
         right, left = xs[-1 - i], xs[-2 - i]
-        sch.resistor_h(sh, left, right, ladder_y, f"R{i + 2}", box_w=4.2)
+        sch.resistor_h(sh, left, right, ladder_y, lay.symbol(f"R{i + 2}").ref, box_w=4.2)
     for i, (x, note) in enumerate(zip(xs, NOTES)):
         sch.junction(sh, x, ladder_y)
         sch.wire(sh, [(x, ladder_y), (x, key_y - 0.9)])
@@ -100,6 +105,6 @@ def _schematic(sh):
         sh.text(x, key_y + 5, note, size=6.5, bold=True, align="center")
     sch.terminal(sh, 66, 270, "", 0)
     sh.line(66, 269.2, xs[2], key_y + 0.9, width=0.3, color=MUTED, dash=(1, 0.8))
-    sh.text(68, 271.2, "PITCH on M1", size=6.5, bold=True)
-    sh.text(56, 266, "stylus", size=6, color=MUTED, align="right")
-    lesson.schematic_note(sh, "Each key further left adds a resistor: a lower note.")
+    sh.text(68, 271.2, labels["pitch"], size=6.5, bold=True)
+    sh.text(56, 266, labels["stylus"], size=6, color=MUTED, align="right")
+    lesson.schematic_note(sh, WORDS.text("Schematic note"))
