@@ -167,6 +167,7 @@ The ID appears at the right of the header and in the footer.
 | Copper `[T0]` tag | Provisional: waits on the T0 contact tests |
 | Copper `[P]` tag | Provisional: waits on the power decision (§7) |
 | Copper `[T1]` tag | Provisional: waits on the T1 pencil tests |
+| Copper `[T3]` tag | Provisional: waits on the first T3 copper oxide wafer ([exploration](explorations/paper-semiconductors.md)) |
 | Crosshair in a circle, labelled `Rn` | Registration mark: pin through it to check how the back lines up. The back's copy has a 1 mm scale. |
 | Short black bar across a lane end | Slit via: cut here and thread the tape through to the other side |
 | Dot in a dashed circle | Wire via: push a leg through, bend it flat on both sides and solder |
@@ -237,3 +238,4 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 - **v0.1, revised for the paper synth:** added table-top projects (§10): edge connectors, the power ring, patch loops and M-page zones.
 - **v0.1, revised with T2:** added the T2 two-sided tests, the via, registration and edge-wrap marks, and two-sided pages as an open question.
 - **v0.1, revised with M3 to M6:** added the `GATE` label, the 10 kΩ rule for controllers, and the wiper-strip and light-sensor marks.
+- **v0.1, revised with T3:** added the `[T3]` tag for the copper oxide wafer, an exploration of homemade diodes. It changes no rule.

@@ -33,6 +33,7 @@ from papercircuits.sheets import (
     t0_contact_tests,
     t1_pencil_contacts,
     t2_two_sided,
+    t3_oxide_wafer,
     template,
 )
 
@@ -46,6 +47,7 @@ SHEETS = {
     "T0-contact-tests.pdf": t0_contact_tests.build,
     "T1-pencil-contacts.pdf": t1_pencil_contacts.build,
     "T2-two-sided.pdf": t2_two_sided.build,
+    "T3-oxide-wafer.pdf": t3_oxide_wafer.build,
     "P1-power.pdf": p1_power.build,
     "L01-led-polarity.pdf": l01_led_polarity.build,
     "L02-and-or.pdf": l02_and_or.build,
