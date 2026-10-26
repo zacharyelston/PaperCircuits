@@ -89,7 +89,7 @@ Every page follows one [page standard](docs/page-standard.md) (v0.1, draft). Som
 | [T3 Copper oxide wafer](out/T3-oxide-wafer.pdf) | Whether a heated copper sheet can be cut into working diodes, and how many work: the **[T3]** tags |
 | [T4 Book interconnects](out/T4-book-interconnects.pdf) | For V2: how copper wraps from one side to the other, and how links between pages survive the book opening and closing |
 | [T5 Dual-sided power format](out/T5-dual-sided-format.pdf) | For V2: wrapped V+ and GND rails powering a load on each face without misusing a signal bus |
-| [T6 Two-sided synth buses](out/T6-two-sided-synth-buses.pdf) | Adapts M3 and M6 so BUS A carries pitch control on side A and BUS B carries audio on side B |
+| [T6 Multi-page synth buses](out/T6-two-sided-synth-buses.pdf) | Three duplex cards adapt M3, M1 and M6 so BUS A pitch and BUS B audio cross real page boundaries |
 
 ### V2: a two-layer book (in progress)
 
