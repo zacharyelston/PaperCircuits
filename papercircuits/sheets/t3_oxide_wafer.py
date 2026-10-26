@@ -8,6 +8,11 @@ The physics, sources and hazards are in docs/explorations/paper-semiconductors.m
 
 Sheet 1 is the wafer frame, the packages and the bin trays: print on card.
 Sheets 2 and 3 are the results and the procedure: print on plain paper.
+
+The words are in t3_oxide_wafer.md. A section that prints its own heading is named after
+it; a row's words are "name · hint", keyed by its code. The recipe numbers and bin limits
+below are filled into the words, and so is the T3 tag: the words layer's own tags don't
+include it yet.
 """
 
 from reportlab.platypus import Paragraph
@@ -16,9 +21,11 @@ from .. import elements as E
 from .. import standard as S
 from .. import testsheet as ts
 from ..draw import FAINT, FONT_BOLD, GUIDE, INK, MUTED, Sheet, style
-from ..provisional import HEADER_STATUS, T1, T3
+from ..provisional import HEADER_STATUS
+from ..words import Words
 
 PAGE_ID = "T3"
+WORDS = Words.beside(__file__)
 LEFT, RIGHT = S.ZONE_BUILD[0], S.ZONE_BUILD[2]
 
 # Recipe and bin limits the first wafer will settle [T3].
@@ -30,14 +37,7 @@ SHORT_V = 0.05        # V: both readings under this is a short
 FAIR, WEAK = 3, 1.5   # Rev ÷ Fwd at least this for bins 2 and 3
 # Fwd puts the red probe on T: Grondahl's easy direction ran from the top contact into the
 # copper. Nobody has checked it with pencil graphite instead of his lead.
-BINS = [
-    ("1", "Good", "Rev OL, Fwd reads"),
-    ("2", "Fair", f"Rev ≥ {FAIR:g} × Fwd"),
-    ("3", "Weak", f"Rev {WEAK:g}–{FAIR:g} × Fwd"),
-    ("R", "Resistor", f"Rev < {WEAK:g} × Fwd"),
-    ("S", "Short", f"both < {SHORT_V:g} V"),
-    ("O", "Open", "both OL"),
-]
+BINS = ("1", "2", "3", "R", "S", "O")
 
 # The wafer: a 90 mm square cut into a 6 × 6 grid of 15 mm dies. Its corners are clipped
 # along the corner cells' diagonals, so 32 whole dies remain: 16 in the centre, 16 round the edge.
@@ -59,16 +59,28 @@ PACKAGE_X = (47.0, 89.0, 131.0, 173.0)  # landings' left edges
 PACKAGE_Y = 190.0                        # landings' top edge
 LEAD = 24.0                              # how far each lead runs off the die
 
-TRAYS = [
-    ("Bin 1", "good"),
-    ("Bin 2", "fair"),
-    ("Bin 3", "weak"),
-    ("Reject", "R, S and O"),
-]
+# What the words fill in, besides the words layer's own tags.
+VALUES = {
+    "foil": FOIL, "plate_w": PLATE_W, "heat_min": HEAT_MIN, "cool_min": COOL_MIN,
+    "fair": f"{FAIR:g}", "weak": f"{WEAK:g}", "short_v": f"{SHORT_V:g}",
+    "wafer": f"{WAFER:g}", "die": f"{DIE:g}",
+}
+
+
+def _items(name):
+    return WORDS.items(name, **VALUES)
+
+
+def _fields(name):
+    return WORDS.fields(name, **VALUES)
+
+
+def _section(name, kind, notes=0, heading=False):
+    return ts.section(WORDS, name, kind, notes, heading, **VALUES)
 
 
 def build(path):
-    sh = Sheet(path, "T3 copper oxide wafer")
+    sh = Sheet(path, WORDS.text("PDF title"))
     _fixtures(sh)
     sh.next_page()
     _results(sh)
@@ -109,23 +121,19 @@ def _clipped_outline(x0, y0, size, cut):
 # Sheet 1: the frame, packages and trays
 
 def _fixtures(sh):
-    E.header(sh, PAGE_ID, "T3  Copper oxide wafer",
-             "Grow diodes on one sheet of copper, cut them apart and test every one. Print on card.",
-             part="1/3")
+    E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle, part="1/3")
     E.spine(sh)
     _wafer(sh)
     _die_key(sh)
     _packages(sh)
     _trays(sh)
-    E.footer(sh, f"{PAGE_ID} sheet 1 of 3")
+    E.footer(sh, f"{PAGE_ID} {_fields('Sheet 1')['footer']}")
 
 
 def _wafer(sh):
-    sh.text(LEFT, 30, "1  Wafer", size=10, bold=True)
-    sh.paragraph(LEFT, 32, 168,
-                 "After oxidising, lay the wafer on the frame. Rule the streets from tick to tick in fine "
-                 "permanent marker and number the dies. After dicing, put each die back on its number.",
-                 style(7, color=MUTED))
+    words = _fields("Fixtures")
+    sh.text(LEFT, 30, words["wafer"], size=10, bold=True)
+    sh.paragraph(LEFT, 32, 168, words["wafer_intro"], style(7, color=MUTED))
     x0, y0 = WAFER_X, WAFER_Y
     x1, y1 = x0 + WAFER, y0 + WAFER
     for k in range(1, GRID):
@@ -144,35 +152,27 @@ def _wafer(sh):
         cx, cy = x0 + (c + 0.5) * DIE, y0 + (r + 0.5) * DIE
         cx += 3 if c == 0 else -3
         cy += 4 if r == 0 else -2
-        sh.text(cx, cy, "name" if (r, c) == (0, 0) else "scrap", size=6, color=MUTED, align="center")
-    sh.text(x0 + WAFER / 2, y1 + 7.5, f"{WAFER:g} mm square, {DIE:g} mm dies, corners clipped",
-            size=6, color=MUTED, align="center")
+        sh.text(cx, cy, words["name"] if (r, c) == (0, 0) else words["scrap"], size=6, color=MUTED, align="center")
+    sh.text(x0 + WAFER / 2, y1 + 7.5, words["wafer_size"], size=6, color=MUTED, align="center")
 
 
 def _die_key(sh):
     x, y, k = 150.0, 55.0, 2.0
-    sh.text(142, 50, "One die, 2× size", size=7, bold=True)
+    title, *key = _items("Die key")
+    sh.text(142, 50, title, size=7, bold=True)
     sh.rect(x, y, x + DIE * k, y + DIE * k, stroke=GUIDE, width=0.3, dash=(1.5, 1))
     _die_marks(sh, x, y, scale=k, dot_stroke=INK)
     sh.text(x + 2.4, y + 7.2, "17", size=7, bold=True, color=MUTED)
     sh.text(x + T_DOT[0] * k, y + T_DOT[1] * k + 1.3, "T", size=8, bold=True, align="center")
     sh.text(x + (S_OPEN[0] + S_OPEN[2]) * k / 2, y + (S_OPEN[1] + S_OPEN[3]) * k / 2 + 1.3, "S",
             size=8, bold=True, align="center")
-    sh.paragraph(142, 90, 60,
-                 "<b>T</b>  top contact: a 5 mm dot of 6B pencil, pressed hard.<br/>"
-                 "<b>S</b>  scrape this corner back to bare copper.<br/>"
-                 "<b>17</b>  the die's number, in fine marker.<br/>"
-                 "<b>Dashed lines</b> are streets: cut along them.<br/>"
-                 "The clipped corners aren't dies. Write your wafer's name in the top-left one.",
-                 style(6.5, leading=8.4, color=INK))
+    sh.paragraph(142, 90, 60, "<br/>".join(key), style(6.5, leading=8.4, color=INK))
 
 
 def _packages(sh):
-    sh.text(LEFT, 151, "2  Packages", size=10, bold=True)
-    sh.paragraph(LEFT, 153, 168,
-                 "Put your best dies in packages. Stick a die face up in a landing, then lay each lead from its "
-                 "test point onto the die so its tip covers S or the dot. Sheet 3, step 6, says how.",
-                 style(7, color=MUTED))
+    words = _fields("Fixtures")
+    sh.text(LEFT, 151, words["packages"], size=10, bold=True)
+    sh.paragraph(LEFT, 153, 168, words["packages_intro"], style(7, color=MUTED))
     for name, px in zip(PACKAGES, PACKAGE_X):
         py = PACKAGE_Y
         sx, tx = px + (S_OPEN[0] + S_OPEN[2]) / 2, px + T_DOT[0]
@@ -186,11 +186,12 @@ def _packages(sh):
 
 
 def _trays(sh):
-    sh.text(LEFT, 238, "3  Bin trays", size=10, bold=True)
+    sh.text(LEFT, 238, _fields("Fixtures")["trays"], size=10, bold=True)
+    trays = _fields("Bin trays")
     x0, gap = LEFT + 3, 4.0  # x0 keeps the first tray clear of H4's label
-    w = (RIGHT - x0 - gap * (len(TRAYS) - 1)) / len(TRAYS)
+    w = (RIGHT - x0 - gap * (len(trays) - 1)) / len(trays)
     top, bottom = 241.0, 281.0
-    for i, (name, hint) in enumerate(TRAYS):
+    for i, (name, hint) in enumerate(trays.items()):
         x = x0 + i * (w + gap)
         sh.rect(x, top, x + w, bottom, stroke=INK, width=0.35, radius=1.2)
         sh.runs(x + 2, top + 4.2, [(name, True), (f"  {hint}", False)], size=7)
@@ -203,32 +204,32 @@ def _trays(sh):
 # Sheet 2: the wafer map and results
 
 def _results(sh):
-    E.header(sh, PAGE_ID, "T3  Wafer map and results",
-             "Readings on the diode range, in volts. OL means over range.", part="2/3",
-             status=HEADER_STATUS)
+    sheet = _fields("Sheet 2")
+    E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="2/3", status=HEADER_STATUS)
     E.spine(sh)
-    sh.runs(LEFT, 30, [("Wafer ", True), ("________", False), ("    Meter ", True), ("________________", False),
-                       ("    Open circuit ", True), ("______ V", False), ("    Test current ", True),
-                       ("______ mA", False)], size=7)
-    sh.runs(LEFT, 36, [("Plate ", True), ("______ W", False), ("    Heat ", True), ("______ min", False),
-                       ("    Cool ", True), ("______ min", False), ("    Foil ", True), ("______ mm", False),
-                       ("    Date ", True), ("__________", False)], size=7)
+    sh.runs(LEFT, 30, _record("Wafer record", ("________", "________________", "______ V", "______ mA")), size=7)
+    sh.runs(LEFT, 36, _record("Recipe record", ("______ W", "______ min", "______ min", "______ mm", "__________")),
+            size=7)
     # Tables first: they draw with whatever dash the canvas was last given.
-    side = [Paragraph(f"Bins {T3}", ts.H), _bin_table(), Paragraph("Yield", ts.H), _yield_table()]
+    side = [Paragraph(sheet["bins"], ts.H), _bin_table(), Paragraph(sheet["yield"], ts.H), _yield_table()]
     rest = sh.flow([(116.0, 42.0, RIGHT, 142.0)], side)
     half = len(DIES) // 2
     rest += sh.flow([(LEFT, 151.0, LEFT + 79, 262.0)], [_die_table(range(1, half + 1))])
     rest += sh.flow([(RIGHT - 79, 151.0, RIGHT, 262.0)], [_die_table(range(half + 1, len(DIES) + 1))])
     if rest:
         raise RuntimeError(f"T3 sheet 2 overflowed by {len(rest)} items")
-    _wafer_map(sh)
-    _title_with_hint(sh, 147.5, "Every die",
-                     f"<b>Fwd:</b> red on T, black on S {T3}. <b>Rev:</b> red on S, black on T.")
-    sh.paragraph(LEFT, 267, 168,
-                 "If a die reads lower with red on S, it conducts the other way: bin it on the larger reading "
-                 "÷ the smaller, and circle its number.",
-                 ts.NOTE)
-    E.footer(sh, f"{PAGE_ID} sheet 2 of 3")
+    _wafer_map(sh, sheet)
+    _title_with_hint(sh, 147.5, sheet["every_die"], sheet["every_die_hint"])
+    sh.paragraph(LEFT, 267, 168, sheet["reversed"], ts.NOTE)
+    E.footer(sh, f"{PAGE_ID} {sheet['footer']}")
+
+
+def _record(name, blanks):
+    """A line of labels to fill in, each in bold with its blank after it."""
+    runs = []
+    for i, (label, blank) in enumerate(zip(_items(name), blanks)):
+        runs += [(("    " if i else "") + label + " ", True), (blank, False)]
+    return runs
 
 
 def _title_with_hint(sh, y, title, hint):
@@ -237,9 +238,9 @@ def _title_with_hint(sh, y, title, hint):
     sh.paragraph(LEFT + sh.width(title, 9, bold=True) + 3, y - 2.6, 140, hint, style(7, color=MUTED))
 
 
-def _wafer_map(sh):
+def _wafer_map(sh, sheet):
     x0, y0, cell = 36.0, 47.0, 12.0
-    _title_with_hint(sh, 43.5, "Wafer map", "write each die's bin: sort / final")
+    _title_with_hint(sh, 43.5, sheet["map"], sheet["map_hint"])
     size = cell * GRID
     for k in range(1, GRID):
         sh.line(x0 + k * cell, y0, x0 + k * cell, y0 + size, width=0.25, color=GUIDE)
@@ -248,34 +249,33 @@ def _wafer_map(sh):
     sh.rect(x0 + cell, y0 + cell, x0 + size - cell, y0 + size - cell, stroke=INK, width=0.5, dash=(2, 1))
     for n, (r, c) in enumerate(DIES, 1):
         sh.text(x0 + c * cell + 1, y0 + r * cell + 3.2, str(n), size=6, color=MUTED)
-    sh.text(x0 + size / 2, y0 + size + 4.5, "dashed: the centre 16", size=6, color=MUTED, align="center")
+    sh.text(x0 + size / 2, y0 + size + 4.5, sheet["centre"], size=6, color=MUTED, align="center")
 
 
 def _bin_table():
-    data = [["Bin", "Rule", "Sort", "Final"]]
-    data += [[f"{code}  {name}", rule, "", ""] for code, name, rule in BINS]
-    data += [["Pass", "bins 1, 2 and 3", "", ""]]
+    words = _fields("Bin table")
+    data = [_items("Bin table columns")]
+    data += [[f"{code}  {name}", rule, "", ""] for code, (name, rule) in ((c, ts.row(words[c])) for c in BINS)]
+    data += [[*ts.row(words["pass"]), "", ""]]
     t = ts.table(data, [21, 33, 16, 16], 5.6)
     t.setStyle([("FONT", (0, 0), (-1, 0), FONT_BOLD, 7)])
     return t
 
 
 def _yield_table():
-    data = [["Stage", "In", "Pass", "Yield"],
-            ["Wafer sort", str(len(DIES)), "", ""],
-            ["Final test", "", "", ""],
-            ["Packages", "", "", ""],
-            ["Overall", str(len(DIES)), "", ""],
-            ["Centre 16, sort", str(sum(_is_centre(*d) for d in DIES)), "", ""],
-            ["Edge 16, sort", str(sum(not _is_centre(*d) for d in DIES)), "", ""]]
+    counts = {"sort": str(len(DIES)), "overall": str(len(DIES)),
+              "centre": str(sum(_is_centre(*d) for d in DIES)), "edge": str(sum(not _is_centre(*d) for d in DIES))}
+    data = [_items("Yield table columns")]
+    data += [[stage, counts.get(key, ""), "", ""] for key, stage in _fields("Yield table").items()]
     t = ts.table(data, [34, 17, 17, 18], 5.6)
     t.setStyle([("FONT", (0, 0), (-1, 0), FONT_BOLD, 7)])
     return t
 
 
 def _die_table(numbers):
-    data = [["", "Wafer sort", "", "", "Final test", "", ""],
-            ["Die", "Fwd", "Rev", "Bin", "Fwd", "Rev", "Bin"]]
+    stages = _fields("Die table")
+    die, *readings = _items("Die table columns")
+    data = [["", stages["sort"], "", "", stages["final"], "", ""], [die, *readings, *readings]]
     data += [[str(n), "", "", "", "", "", ""] for n in numbers]
     t = ts.table(data, [9, 13, 13, 9, 13, 13, 9], 6.0)
     t.setStyle([
@@ -291,85 +291,23 @@ def _die_table(numbers):
 # Sheet 3: the procedure
 
 def _procedure(sh):
-    E.header(sh, PAGE_ID, "T3  Running the wafer test",
-             "Print on plain paper. An adult runs every hot-plate step.", part="3/3", status=HEADER_STATUS)
+    sheet = _fields("Sheet 3")
+    E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="3/3", status=HEADER_STATUS)
     E.spine(sh)
-    h = ts.H
-    left = [Paragraph("Why it works", h),
-            Paragraph("Copper(I) oxide is a semiconductor. Where it meets the copper underneath, there's a "
-                      "barrier that lets current through far more easily one way than the other: a diode. "
-                      "The pencil dot only has to reach the oxide. How well each die works depends on how its "
-                      "oxide grew, so dies from one wafer differ, just as real chips do.",
-                      style(7.5, leading=9.6))]
-    left += [Paragraph("You need", h)] + ts.bullets([
-        f"A 90 mm square of bare, uncoated copper foil, {FOIL} thick {T3}, and a spare scrap",
-        f"A single-coil electric hot plate, {PLATE_W} W or more {T3}, on a heatproof board",
-        "Tongs, and safety glasses for everyone near the plate",
-        "Washing-up liquid, a kitchen scouring pad and kitchen roll",
-        "Old scissors, a ruler, a fine permanent marker, a craft knife or fine sandpaper, and a 6B pencil",
-        "A multimeter with a diode range, and a 1N4148 diode (L06's D1) to check it",
-    ])
-    left += [Paragraph("Safety", h)] + ts.bullets([
-        "<b>An adult runs the hot plate</b> and moves the copper with tongs. Keep everyone else an arm's "
-        "length away, and open a window or run an extractor.",
-        "<b>Heat only clean, bare copper.</b> Never copper tape, coated foil, brass, zinc or galvanised metal: "
-        "glue and coatings smoke, and zinc fumes make people ill.",
-        "<b>Goggles on while it cools:</b> black flakes jump off. Hot copper looks like cold copper.",
-        "<b>No acids, lye or lead.</b> Wipe flakes up with damp kitchen roll, and wash hands afterwards.",
-        "Cut foil is sharp. Craft knives are for adults.",
-    ])
-    left += [Paragraph("1 · Prepare the wafer", h)] + ts.steps([
-        "Cut the square. Clip each corner off along a diagonal from 15 mm along one edge to 15 mm along the other.",
-        "Scrub both sides with washing-up liquid and the scouring pad until bright. Rinse, dry, and hold it "
-        "by its edges from now on.",
-    ])
-    left += [Paragraph(f"2 · Oxidise {T3}", h)] + ts.steps([
-        "<b>Adult:</b> lay the wafer flat in the middle of the cold plate and turn it to full.",
-        f"It turns orange, purple and red, then black. Keep it at full heat for {HEAT_MIN} min after the "
-        "coil starts to glow.",
-        f"Switch off and leave it on the plate for {COOL_MIN} min. The black layer flakes off as it shrinks. "
-        "Moving it too soon keeps the black on.",
-        "Rinse it under the tap, rubbing gently with fingertips only, and pat it dry. The red-orange layer "
-        "left is copper(I) oxide. Don't bend it.",
-    ])
+    left = _section("Why it works", ts.plain)
+    left += _section("You need", ts.bullets)
+    left += _section("Safety", ts.bullets)
+    left += _section("1 · Prepare the wafer", ts.steps)
+    left += _section("2 · Oxidise", ts.steps, heading=True)
 
-    right = [Paragraph("3 · Mark the dies", h)] + ts.steps([
-        "Lay the wafer on sheet 1's frame. Rule the streets from tick to tick in fine marker. Never use "
-        "pencil: graphite would join the dies.",
-        "Write the wafer's name in its top-left corner, and each die's number in its own top-left corner.",
-        "<b>S:</b> scrape each die's top-right corner back to shiny copper, about 4 mm square.",
-        "<b>T:</b> draw a 5 mm dot of 6B where sheet 1 shows it, pressing hard. Keep it clear of S and the streets.",
-    ])
-    right += [Paragraph("4 · Wafer sort", h)] + ts.steps([
-        "Check the meter on the 1N4148: about 0.6 V one way, OL the other.",
-        f"On the diode range, measure every die. <b>Fwd:</b> red on T, black on S {T3}. "
-        "<b>Rev:</b> red on S, black on T. Keep the light and the probe pressure the same throughout.",
-        "Bin each die by the table on sheet 2, and write its bin on the wafer map.",
-    ])
-    right += [Paragraph("5 · Dice and final test", h)] + ts.steps([
-        "Cut along the streets with old scissors, rows first. Put each die back on its number on sheet 1.",
-        "Test every die again, re-bin it, and move it to its bin tray.",
-        "Count the bins and fill in the yields. A stage's <b>In</b> is the number that passed the stage before it.",
-    ])
-    right += [Paragraph("6 · Package, if you like", h)] + ts.steps([
-        "Stick a Bin 1 die face up in a D landing with glue stick.",
-        f"Lay each lead from its test point onto the die, its tip over S or the dot. Rub 6B into the "
-        f"tip's glue first, or solder the S lead. {T1}",
-        "Measure Fwd and Rev between the T and S test points.",
-    ])
-    right += [Paragraph("Pass or fail", h)] + ts.bullets([
-        "A die passes in bins 1, 2 or 3. Bin 1 is the goal: it blocks the meter completely in reverse.",
-        "No die rectifies? Check the meter on the 1N4148 again, then try a sharpened 6B pencil point pressed "
-        "on a die in place of its dot.",
-        "Compare the centre 16 with the edge 16. A difference means the plate heats unevenly.",
-    ])
-    right += [Paragraph("Results", h),
-              ts.decision_table(["Did any die rectify?", "Fwd is red on T?", "Sort yield, final yield",
-                                 "Centre or edge better?", "Bin limits to keep"], widths=(38, 43), row_height=7)]
-    right += [Paragraph(f"{T3} marks recipe numbers and bin limits that the first wafer will settle. "
-                        f"{T1} waits on the pencil tests. Background, sources and hazards: "
-                        "docs/explorations/paper-semiconductors.md.", ts.NOTE)]
+    right = _section("3 · Mark the dies", ts.steps)
+    right += _section("4 · Wafer sort", ts.steps)
+    right += _section("5 · Dice and final test", ts.steps)
+    right += _section("6 · Package, if you like", ts.steps)
+    right += _section("Pass or fail", ts.bullets)
+    right += _section("Results", lambda questions: [ts.decision_table(questions, widths=(38, 43), row_height=7)],
+                      notes=1)
     rest = sh.flow([(LEFT, 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, RIGHT, 282.0)], right)
     if rest:
         raise RuntimeError(f"T3 sheet 3 overflowed by {len(rest)} items")
-    E.footer(sh, f"{PAGE_ID} sheet 3 of 3")
+    E.footer(sh, f"{PAGE_ID} {sheet['footer']}")

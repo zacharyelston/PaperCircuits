@@ -3,6 +3,7 @@
 import math
 
 from . import standard as S
+from .circuit import COLOUR_CODE
 from .draw import COPPER, COPPER_TINT, FAINT, GUIDE, INK, MUTED, WHITE
 
 
@@ -170,7 +171,8 @@ def workbook_box(sh, rect, title, prompt):
 
 def fold_switch(sh, stubs=True):
     """Fold line and flap pad. The page half-pads are the ends of the two switch lanes;
-    `stubs` draws short ones for pages that don't route those lanes."""
+    `stubs` draws short ones for pages that don't route those lanes. Returns the two
+    points the flap pad presses on, one on each lane."""
     (fx0, fy0), (fx1, fy1) = S.SWITCH_FOLD
     sh.line(fx0, fy0, fx1, fy1, width=0.3, color=INK, dash=(2, 1.2))
     cx, cy = S.SWITCH_CENTER
@@ -181,12 +183,14 @@ def fold_switch(sh, stubs=True):
     if stubs:
         a, b = (lane(sh, [(x, S.SWITCH_LANE_TOP), (x, S.SWITCH_LANE_TOP + 10)]) for x in S.SWITCH_LANE_X)
         sh.allow(a, b, S.SWITCH_PAD_GAP)
+    return [((x, cy), (x, cy)) for x in S.SWITCH_LANE_X]
 
 
 def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
     """Tab switch over a horizontal switch pair whose upper lane is centred on upper_y and
     whose lower lane is `pitch` below it. The flap is cut above the pair and hinges down
-    onto it; its pad lands across both lanes as a vertical strip."""
+    onto it; its pad lands across both lanes as a vertical strip. Returns the two points
+    the pad presses on, one on each lane."""
     hinge = upper_y - S.TAPE_W / 2 - S.TAB_HINGE_CLEAR
     x0, x1, top = x - S.TAB_W / 2, x + S.TAB_W / 2, hinge - S.TAB_H
     sh.polygon([(x0, hinge), (x0, top), (x1, top), (x1, hinge)], stroke=INK, width=0.35, closed=False)
@@ -197,6 +201,7 @@ def tab_switch(sh, x, upper_y, label, pitch=S.PAIR_PITCH):
     sh.rect(x - hw, pad_cy - hl, x + hw, pad_cy + hl, stroke=COPPER, fill=COPPER_TINT, dash=(1.2, 0.8))
     sh.rect(x - hw, mid - hl, x + hw, mid + hl, stroke=INK, width=0.2, dash=(0.5, 0.7))
     sh.text(x, top - 1.5, label, size=7.5, bold=True, align="center")
+    return [((x, y), (x, y)) for y in (upper_y, upper_y + pitch)]
 
 
 def pencil_track(sh, x0, y0, x1, y1, tick=10.0, last_number=None):
@@ -270,7 +275,8 @@ def via(sh, x, y, kind):
 # Part footprints, actual size.
 
 def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):
-    """1/4 W resistor: 6.3 × 2.4 mm body, leads reaching `lead` mm from the centre."""
+    """1/4 W resistor: 6.3 × 2.4 mm body, leads reaching `lead` mm from the centre.
+    Returns its two leads as segments from tip to body, top or left one first."""
     bl, bw = 6.3, 2.4
     if vertical:
         sh.line(cx, cy - lead, cx, cy + lead, width=0.6, color=MUTED, cap=1)
@@ -279,18 +285,25 @@ def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):
             sh.line(cx - bw / 2, cy + d, cx + bw / 2, cy + d, width=0.35, color=MUTED)
         if label:
             sh.text(cx + bw / 2 + 1, cy + 1, label, size=6, color=MUTED)
-    else:
-        sh.line(cx - lead, cy, cx + lead, cy, width=0.6, color=MUTED, cap=1)
-        sh.rect(cx - bl / 2, cy - bw / 2, cx + bl / 2, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=1)
-        for d in (-1.6, -0.6, 0.4):
-            sh.line(cx + d, cy - bw / 2, cx + d, cy + bw / 2, width=0.35, color=MUTED)
-        if label:
-            sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
+        return _leads(cx, cy, 0, 1, lead, bl / 2)
+    sh.line(cx - lead, cy, cx + lead, cy, width=0.6, color=MUTED, cap=1)
+    sh.rect(cx - bl / 2, cy - bw / 2, cx + bl / 2, cy + bw / 2, stroke=MUTED, fill=WHITE, width=0.3, radius=1)
+    for d in (-1.6, -0.6, 0.4):
+        sh.line(cx + d, cy - bw / 2, cx + d, cy + bw / 2, width=0.35, color=MUTED)
+    if label:
+        sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
+    return _leads(cx, cy, 1, 0, lead, bl / 2)
+
+
+def _leads(cx, cy, dx, dy, lead, body):
+    """A two-lead part's leads along (dx, dy), each from its tip to the body's edge."""
+    return [((cx - dx * lead, cy - dy * lead), (cx - dx * body, cy - dy * body)),
+            ((cx + dx * body, cy + dy * body), (cx + dx * lead, cy + dy * lead))]
 
 
 def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None):
     """5 mm LED seen from above, legs splayed flat. The anode (long leg, +) points
-    `anode`: left, right, up or down."""
+    `anode`: left, right, up or down. Returns its leads by name, each from tip to body."""
     dx, dy = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1)}[anode]
     sh.line(cx + dx * lead_anode, cy + dy * lead_anode, cx - dx * lead_cathode, cy - dy * lead_cathode,
             width=0.5, color=MUTED, cap=1)
@@ -304,6 +317,9 @@ def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None)
         sh.text(cx + dx * 4.6, cy - S.TAPE_W / 2 - 0.9, "+", size=7, bold=True, align="center")
         if label:
             sh.text(cx, cy - 4.2, label, size=6, color=MUTED, align="center")
+    r = 5.8 / 2
+    return {"anode": ((cx + dx * lead_anode, cy + dy * lead_anode), (cx + dx * r, cy + dy * r)),
+            "cathode": ((cx - dx * r, cy - dy * r), (cx - dx * lead_cathode, cy - dy * lead_cathode))}
 
 
 def ptc(sh, cx, cy, lead=12.0, label=None):
@@ -314,6 +330,7 @@ def ptc(sh, cx, cy, lead=12.0, label=None):
     sh.text(cx, cy + 1, "PTC", size=6, color=MUTED, align="center")
     if label:
         sh.text(cx, cy - bh / 2 - 1.2, label, size=6, color=MUTED, align="center")
+    return _leads(cx, cy, 1, 0, lead, bw / 2)
 
 
 def battery_holder(sh, x0, y0, cells=3, label=None):
@@ -335,10 +352,12 @@ def battery_holder(sh, x0, y0, cells=3, label=None):
 
 
 def wire_lead(sh, x_from, x_to, y, strip=8.0):
-    """Insulated wire running left from x_from; its last `strip` mm, ending at x_to, is bare."""
+    """Insulated wire running left from x_from; its last `strip` mm, ending at x_to, is bare.
+    Returns the bare end."""
     bare = x_to + strip
     sh.line(x_from, y, bare, y, width=1.4, color=MUTED, cap=1)
     sh.line(bare, y, x_to, y, width=0.5, color=INK, cap=1)
+    return ((bare, y), (x_to, y))
 
 
 def checkbox(sh, x, y, size=3.0):
@@ -349,7 +368,8 @@ def checkbox(sh, x, y, size=3.0):
 def transistor(sh, cx, cy, legs, label=None):
     """TO-92 transistor lying flat face up, with its legs bent out to where they land.
     `legs` maps "E", "B" and "C" to (x, y). For a 2N3904 seen flat face up with the legs
-    towards you, they come out E, B, C from left to right."""
+    towards you, they come out E, B, C from left to right. Returns each leg by name, from
+    where it leaves the body to its end."""
     for x, y in legs.values():
         sh.line(cx, cy, x, y, width=0.5, color=MUTED, cap=1)
     w, h = 5.0, 4.2
@@ -361,10 +381,16 @@ def transistor(sh, cx, cy, legs, label=None):
         sh.text(x + dx / n * 2.8, y + dy / n * 2.8 + 1.1, name, size=6, bold=True, align="center")
     if label:
         sh.text(cx + w / 2 + 1.2, cy - h / 2 - 0.8, label, size=6, color=MUTED)
+    out = {}
+    for name, (x, y) in legs.items():
+        n = math.hypot(x - cx, y - cy) or 1.0
+        out[name] = ((cx + (x - cx) / n * 2.5, cy + (y - cy) / n * 2.5), (x, y))
+    return out
 
 
 def ceramic_cap(sh, cx, cy, vertical=False, lead=8.0, label=None):
-    """Disc ceramic or film capacitor: no polarity, either way round."""
+    """Disc ceramic or film capacitor: no polarity, either way round. Returns its two
+    leads, as resistor() does."""
     if vertical:
         sh.line(cx, cy - lead, cx, cy + lead, width=0.5, color=MUTED, cap=1)
     else:
@@ -375,14 +401,14 @@ def ceramic_cap(sh, cx, cy, vertical=False, lead=8.0, label=None):
             sh.text(cx + 3.6, cy + 1, label, size=6, color=MUTED)
         else:
             sh.text(cx, cy - S.TAPE_W / 2 - 1.1, label, size=6, color=MUTED, align="center")
-
+    return _leads(cx, cy, 0, 1, lead, 5.0) if vertical else _leads(cx, cy, 1, 0, lead, 5.0)
 
 
 def radial_cap(sh, x_plus, x_minus, y, label=None, body=(5.0, 11.0)):
     """Small radial electrolytic capacitor, such as 10 µF 16 V (5 × 11 mm), lying on its
     side with its body pointing up the page. Both legs leave its bottom end; bend the +
     leg out to x_plus and the − leg to x_minus, along y. The − stripe runs down the
-    body's side nearer the − leg."""
+    body's side nearer the − leg. Returns the legs' ends by name: plus, minus."""
     bw, bl = body
     cx = (x_plus + x_minus) / 2
     s = 1 if x_minus > x_plus else -1
@@ -397,6 +423,7 @@ def radial_cap(sh, x_plus, x_minus, y, label=None, body=(5.0, 11.0)):
         sh.text(cx + sign * (bw / 2 + 1.6), by1 - 0.6, mark, size=7, bold=True, align="center")
     if label:
         sh.text(cx, by0 - 1.4, label, size=6, color=MUTED, align="center")
+    return {"plus": ((cx - s, y), (x_plus, y)), "minus": ((cx + s, y), (x_minus, y))}
 
 
 def ldr(sh, cx, cy, lead=11.0, label=None):
@@ -413,9 +440,12 @@ def ldr(sh, cx, cy, lead=11.0, label=None):
     sh.polygon(pts, stroke=MUTED, width=0.25, closed=False)
     if label:
         sh.text(cx + r + 1, cy + 1, label, size=6, color=MUTED)
+    return _leads(cx, cy, 0, 1, lead, r / 2)
+
 
 def patch_loop(sh, x, y, label, side="right"):
-    """Where to solder a patch loop on a lane: an upright U of bare wire a clip can grip."""
+    """Where to solder a patch loop on a lane: an upright U of bare wire a clip can grip.
+    Returns the segment between its two feet."""
     pts = [(x - 2.2 + 4.4 * i / 12, y - 2.8 * math.sin(math.pi * i / 12)) for i in range(13)]
     sh.polygon(pts, stroke=INK, width=0.5, closed=False)
     for fx in (x - 2.2, x + 2.2):
@@ -426,11 +456,12 @@ def patch_loop(sh, x, y, label, side="right"):
         sh.text(x - 4.2, y + 1.1, label, size=6.5, bold=True, align="right")
     else:
         sh.text(x, y - 4.6, label, size=6.5, bold=True, align="center")
+    return ((x - 2.2, y), (x + 2.2, y))
 
 
 def diode(sh, cx, cy, lead=8.0, label=None, cathode="right"):
     """Small-signal diode (1N4148 size). The band marks the cathode, which points
-    `cathode`: right, left, up or down."""
+    `cathode`: right, left, up or down. Returns its leads by name, as led() does."""
     bl, bw = 4.0, 1.9
     if cathode in ("right", "left"):
         sh.line(cx - lead, cy, cx + lead, cy, width=0.5, color=MUTED, cap=1)
@@ -450,13 +481,16 @@ def diode(sh, cx, cy, lead=8.0, label=None, cathode="right"):
             sh.rect(cx - bw / 2, cy - bl / 2 + 0.4, cx + bw / 2, cy - bl / 2 + 1.0, stroke=None, fill=MUTED)
         if label:
             sh.text(cx + bw / 2 + 1, cy + 1, label, size=6, color=MUTED)
+    dx, dy = {"right": (1, 0), "left": (-1, 0), "down": (0, 1), "up": (0, -1)}[cathode]
+    return {"anode": ((cx - dx * lead, cy - dy * lead), (cx - dx * bl / 2, cy - dy * bl / 2)),
+            "cathode": ((cx + dx * bl / 2, cy + dy * bl / 2), (cx + dx * lead, cy + dy * lead))}
 
 
 def electrolytic(sh, x, y_plus, y_minus, label=None):
     """Radial electrolytic capacitor lying on its side, actual size for 2200 µF 10 V
     (10 × 20 mm). Both legs leave the same end of the body, which lies to the left;
     bend the + leg up to y_plus and the − leg down to y_minus. The − stripe runs along
-    the body's lower edge, on the − leg's side."""
+    the body's lower edge, on the − leg's side. Returns the legs' ends by name: plus, minus."""
     cy = (y_plus + y_minus) / 2
     bw, bl, pitch = 10.0, 20.0, 5.0
     bx1 = x - 2
@@ -470,9 +504,7 @@ def electrolytic(sh, x, y_plus, y_minus, label=None):
     sh.text(x + 1.8, y_plus + S.TAPE_W / 2 + 3.2, "+", size=7, bold=True)
     if label:
         sh.text((bx0 + bx1) / 2, cy - 1.2, label, size=6, color=MUTED, align="center")
-
-
-COLOUR_CODE = ("black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "grey", "white")
+    return {"plus": ((x, cy - pitch / 2), (x, y_plus)), "minus": ((x, cy + pitch / 2), (x, y_minus))}
 
 
 def colour_code_key(sh, x, y, width=46.0):
