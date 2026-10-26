@@ -53,6 +53,7 @@ SHEETS = (
     SheetSpec("T1-pencil-contacts.pdf", "t1_pencil_contacts"),
     SheetSpec("T2-two-sided.pdf", "t2_two_sided"),
     SheetSpec("T3-oxide-wafer.pdf", "t3_oxide_wafer"),
+    SheetSpec("T4-book-interconnects.pdf", "t4_book_interconnects"),
     SheetSpec("P1-power.pdf", "p1_power"),
     SheetSpec("L01-led-polarity.pdf", "l01_led_polarity"),
     SheetSpec("L02-and-or.pdf", "l02_and_or"),

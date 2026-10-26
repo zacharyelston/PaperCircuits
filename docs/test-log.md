@@ -17,6 +17,18 @@ Write down readings in ohms where you can. "It works" with no number is a good s
 - **Next:** what to try next
 ```
 
+For T4's flex cycles ([V2 book interconnects](../out/T4-book-interconnects.pdf)), add a table to the entry. One row per link, readings in mV at the measured load current. Then convert the worst reading to ohms, since the V2 budget is 0.1 Ω per link:
+
+```markdown
+- **Current:** 45 mA (load voltage 4.50 V across 100 Ω)
+
+| Link | Construction | 0 | 10 | 100 | 500 | 1,000 | Worst Ω | Flicker? | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| X1, 1→2 | stranded wire along the axis | 0.9 | | | | | | | |
+```
+
+Photograph every joint before cycling and again at the end, and add the photos to `docs/img/`.
+
 ## Entries
 
 ### 2026-10-24 · Soldered resistor on copper tape

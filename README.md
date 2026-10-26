@@ -86,6 +86,12 @@ Every page follows one [page standard](docs/page-standard.md) (v0.1, draft). Som
 | [T0 Contact tests](out/T0-contact-tests.pdf) | Tape joints, attaching parts, binder hole contacts and switch contacts: the **[T0]** tags |
 | [T1 Pencil contacts](out/T1-pencil-contacts.pdf) | Pencil-treated tape glue, joining tape to pencil, and which paper to build on: the **[T1]** tags |
 | [T2 Two-sided tests](out/T2-two-sided.pdf) | Whether the back of the page can carry copper too: vias, edge wraps and stacking |
+| [T3 Copper oxide wafer](out/T3-oxide-wafer.pdf) | Whether a heated copper sheet can be cut into working diodes, and how many work: the **[T3]** tags |
+| [T4 Book interconnects](out/T4-book-interconnects.pdf) | For V2: how copper wraps from one side to the other, and how links between pages survive the book opening and closing |
+
+### V2: a two-layer book (in progress)
+
+V2 rebuilds the workbook as two-layer paper circuit boards in a ring binder whose holes carry nothing. Power and signals cross from page to page through soldered or flexible links at the spine. The plan is the [V2 epic](https://github.com/zacharyelston/PaperCircuits/issues/38). The first pieces are the [electrical architecture proposal](docs/v2/electrical-architecture.md) and the T4 bench tests. V1 pages stay as they are until V2 is proven on the bench.
 
 ### On the bench
 
