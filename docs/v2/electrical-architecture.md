@@ -1,6 +1,6 @@
 # V2 electrical architecture (proposal)
 
-Status: **proposal** for [#40](https://github.com/zacharyelston/PaperCircuits/issues/40). Numbers marked **[T4]** wait on the [T4 book interconnect tests](../../out/T4-book-interconnects.pdf) ([#39](https://github.com/zacharyelston/PaperCircuits/issues/39)); the fixed rail layout and wrap-first layer changes marked **[T5]** wait on the [T5 dual-sided format test](../../out/T5-dual-sided-format.pdf). Nothing here changes V1 pages.
+Status: **proposal** for [#40](https://github.com/zacharyelston/PaperCircuits/issues/40). Numbers marked **[T4]** wait on the [T4 book interconnect tests](../../out/T4-book-interconnects.pdf) ([#39](https://github.com/zacharyelston/PaperCircuits/issues/39)); power wraps marked **[T5]** wait on the [T5 dual-sided format test](../../out/T5-dual-sided-format.pdf), and face-specific signal buses marked **[T6]** wait on the [T6 synth bus test](../../out/T6-two-sided-synth-buses.pdf). Nothing here changes V1 pages.
 
 V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes only hold pages; they carry no current. Power and signals travel between pages through four **spine links** at fixed vertical positions.
 
@@ -8,12 +8,12 @@ V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes on
 
 | Question | Proposal | Status |
 |---|---|---|
-| Shared nets | Wrapped V+ and GND power rails; BUS A on side A and BUS B on side B | Proposed **[T5]** |
+| Shared nets | Wrapped V+ and GND power rails; BUS A on side A and BUS B on side B | Power **[T5]**; signals **[T6]** |
 | Binding | Three mechanical holes at the common 4.25 inch (107.95 mm) pitch, centred on A4 | Proposed |
-| Rail positions | V+ above H1; BUS A above H2; BUS B below H2; GND below H3 | Proposed **[T5]** |
+| Rail positions | V+ above H1; BUS A above H2; BUS B below H2; GND below H3 | Power **[T5]**; signals **[T6]** |
 | Topology | Four short links per page boundary, with every page passing all four rails on | Proposed; construction **[T4]**, format **[T5]** |
 | Where links sit | Between holes, on or close to the ring axis, not at the page edge | **[T4]** |
-| Layer changes | Wrap a safe page edge first; use a soldered wire via only as a documented exception | Proposed **[T5]** |
+| Layer changes | Wrap a safe page edge first; use a soldered wire via only as a documented exception | Proposed **[T5/T6]** |
 | Supply | 3 × AA, 4.5 V nominal, as V1 | Proposed |
 | Protection | One resettable fuse (0.1 A hold) at power entry; no series diode | Proposed |
 | Book budget | 16 pages (15 boundaries), 100 mA total, 0.25 V drop at most | Proposed; link resistance **[T4]** |
@@ -33,7 +33,7 @@ V2 uses three mechanical holes at the common 4.25 inch (107.95 mm) pitch, centre
 
 An open spread shows the **back (side B) of the left page and the front (side A) of the right page**. Those are exactly the two faces a link joins. Each page therefore carries the spine pads on both faces: side A pads take the link from the previous page, and side B pads send it on to the next.
 
-## 2. The distributed rail contract [T5]
+## 2. The distributed rail contract [T5/T6]
 
 The compact five-pin T4 block is replaced by four rails distributed over the whole page. Their fixed vertical order makes a reversed or shifted link visually obvious and gives hand-laid tape much more clearance:
 
@@ -44,7 +44,7 @@ The compact five-pin T4 block is replaced by four rails distributed over the who
 | y = 164 mm, below H2 | BUS B | 5 mm | Signal, 0 V to V+ |
 | y = 274 mm, below H3 | GND | 12 mm | Wide return rail |
 
-The rail centres are provisional until T5 is built, but their order is the format: **V+ is always at the top, GND is always at the bottom, and the buses flank the centre ring.** The wide GND rail preserves the 0.05 Ω boundary target without requiring a second return conductor.
+The power-rail centres are provisional until T5 is built and the bus centres until T6 is built, but their order is the format: **V+ is always at the top, GND is always at the bottom, and the buses flank the centre ring.** The wide GND rail preserves the 0.05 Ω boundary target without requiring a second return conductor.
 
 **Wrap-first side changes.** V+ wraps over the top edge and GND over the bottom edge. BUS A remains on side A and BUS B remains on side B; neither bus is duplicated across the opposite work area. A soldered wire through the page is the last resort: the page must document why no edge route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
 
@@ -116,7 +116,9 @@ At the provisional worst case of 1.5 A and the resistance limits above, one boun
 
 ## 8. Prototypes that close #40
 
-First, one T5 card must demonstrate the fixed power rails, face-specific buses and both power wraps with no page via. Both LEDs must work before and after the flex target, every rail must meet its resistance limit, and every unlike pair must remain open-circuit.
+First, one T5 card must demonstrate the fixed power rails and both power wraps with no bus and no page via. Both LEDs must work before and after the flex target, both rails must meet their resistance limits, and V+ must remain isolated from GND.
+
+Then T6 adapts the synth's M3 controller and M6 filter onto one double-sided card. BUS A must carry pitch control only on side A, BUS B must carry audio only on side B, and disconnecting either bus must interrupt only its stated signal path. This is the first proof that the buses communicate rather than acting as extra power rails. It contributes the incremental controller/bus/filter evidence for [#46](https://github.com/zacharyelston/PaperCircuits/issues/46); M1 and M7 remain external pages for this test.
 
 A three-page book is then run through T4's chosen flex-life cycles:
 1. A V2 power-entry page: the holder, fuse, switch and LED, with the spine pads.
