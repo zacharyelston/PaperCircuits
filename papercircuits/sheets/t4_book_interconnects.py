@@ -49,11 +49,11 @@ LINKS = (
 )
 LANE_END_X, TP_X, LABEL_X = 50.0, 44.0, 56.0
 
-# The proposed spine contract: five independent pads 8 mm apart on the ring axis between H2
-# and H3. Each pad remains free to route independently on sides A and B.
+# The proposed spine contract: five independent 5 mm pads on a 10 mm pitch between H2 and H3.
+# The clearance equals the tape width so hand-placement error cannot bridge adjacent routes.
 CONTRACT = ("C1", "C2", "C3", "C4", "C5")
 CONTRACT_RESULTS = ("gnd_1", "bus_a", "power", "bus_b", "gnd_2", "gnd_pair")
-CONTRACT_Y0, CONTRACT_PITCH = 132.5, 8.0
+CONTRACT_Y0, CONTRACT_PITCH = 128.5, 10.0
 CONTRACT_VIA_X = 30.0
 
 # Edge wraps: code, tape width, the lane from the edge in to its test point, and the test point.
@@ -129,8 +129,8 @@ def _front(sh):
 
     contract = WORDS.fields("Contract")
     label_x = LABEL_X
-    sh.text(label_x, 124, contract["title"], size=10, bold=True)
-    sh.text(label_x, 128.3, contract["hint"], size=6.5, color=MUTED)
+    sh.text(label_x, 118, contract["title"], size=10, bold=True)
+    sh.text(label_x, 122.3, contract["hint"], size=6.5, color=MUTED)
     for i, code in enumerate(CONTRACT):
         sh.text(label_x, _contract_y(i) + 1.1, f"{code}  {contract[code]}", size=7, bold=True)
 

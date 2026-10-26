@@ -43,7 +43,7 @@ V2 bench test
 ## Contract
 
 - title: 3  The spine contract
-- hint: Proposed pins, 8 mm apart. Each passes to side B through a wire via.
+- hint: Vias 10 mm apart: 5 mm tape, 5 mm clear gap. Each passes to side B.
 - C1: GND
 - C2: BUS A
 - C3: V+
@@ -90,6 +90,7 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 1. On all three cards, lay every link lane (E1 to X5) and the contract lanes (C1 to C5) on both
    sides. Keep all five contract lanes separate: do not join C1 to C5 at the contract block.
+   Keep the clear gap between adjacent lanes at least as wide as the tape itself.
 2. Make the contract block's wire vias: push a cut-off resistor leg through each via mark and
    solder it on both sides. Each via is an independent route between sides A and B.
 3. Bind the cards in order, page 1 on top.
