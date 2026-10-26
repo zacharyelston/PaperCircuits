@@ -165,7 +165,7 @@ def _procedure(sh):
     story += [Spacer(1, 2 * mm), _binder_table()]
     story += ts.section(WORDS, "4 · Switch contacts", ts.plain)
     story += ts.section(WORDS, "Pass or fail", bullets, notes=1)
-    story += ts.section(WORDS, "Results for standard v0.2", _decision_table)
+    story += ts.section(WORDS, "Results for the standard", _decision_table)
 
     left = (S.ZONE_BUILD[0], 27.0, 115.0, 282.0)
     right = (121.0, 27.0, S.ZONE_BUILD[2], 282.0)

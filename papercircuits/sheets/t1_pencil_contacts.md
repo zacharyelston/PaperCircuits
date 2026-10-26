@@ -113,7 +113,7 @@ paper you're considering and compare:
 The pencil-only reading compares how each paper takes graphite: lower is better. Overlays are a
 separate question: try printing on vellum or tracing paper too, as inkjet may smudge.
 
-## Results for standard v0.2
+## Results for the standard
 
 - Pencil overlaps OK?
 - Best overlap treatment

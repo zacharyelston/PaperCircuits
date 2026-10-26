@@ -47,11 +47,15 @@ GRID = 6
 WAFER = DIE * GRID
 CLIPPED = {(0, 0), (0, GRID - 1), (GRID - 1, 0), (GRID - 1, GRID - 1)}
 DIES = [(r, c) for r in range(GRID) for c in range(GRID) if (r, c) not in CLIPPED]
+CENTRE = sum(0 < r < GRID - 1 and 0 < c < GRID - 1 for r, c in DIES)
+EDGE = len(DIES) - CENTRE
 TICK = 3.0
 
 # Inside a die, in mm from its top-left corner: the pencil dot T and the scraped corner S.
 T_DOT, T_DOT_D = (5.5, 9.5), 5.0
-S_OPEN = (11.0, 0.0, 15.0, 4.0)
+S_SIZE = 4.0
+S_OPEN = (DIE - S_SIZE, 0.0, DIE, S_SIZE)
+KEY_SCALE = 2.0  # the die key on sheet 1 draws one die this many times its size
 
 # Packages: a die face up in a landing, with a copper-tape lead from each test point onto it.
 PACKAGES = ("D1", "D2", "D3", "D4")
@@ -63,7 +67,8 @@ LEAD = 24.0                              # how far each lead runs off the die
 VALUES = {
     "foil": FOIL, "plate_w": PLATE_W, "heat_min": HEAT_MIN, "cool_min": COOL_MIN,
     "fair": f"{FAIR:g}", "weak": f"{WEAK:g}", "short_v": f"{SHORT_V:g}",
-    "wafer": f"{WAFER:g}", "die": f"{DIE:g}",
+    "wafer": f"{WAFER:g}", "die": f"{DIE:g}", "centre": CENTRE, "edge": EDGE,
+    "dot": f"{T_DOT_D:g}", "scrape": f"{S_SIZE:g}", "key_scale": f"{KEY_SCALE:g}",
 }
 
 
@@ -87,10 +92,6 @@ def build(path):
     sh.next_page()
     _procedure(sh)
     sh.save()
-
-
-def _is_centre(r, c):
-    return 0 < r < GRID - 1 and 0 < c < GRID - 1
 
 
 def _hatch(sh, x0, y0, x1, y1, step=0.8):
@@ -157,7 +158,7 @@ def _wafer(sh):
 
 
 def _die_key(sh):
-    x, y, k = 150.0, 55.0, 2.0
+    x, y, k = 150.0, 55.0, KEY_SCALE
     title, *key = _items("Die key")
     sh.text(142, 50, title, size=7, bold=True)
     sh.rect(x, y, x + DIE * k, y + DIE * k, stroke=GUIDE, width=0.3, dash=(1.5, 1))
@@ -263,8 +264,7 @@ def _bin_table():
 
 
 def _yield_table():
-    counts = {"sort": str(len(DIES)), "overall": str(len(DIES)),
-              "centre": str(sum(_is_centre(*d) for d in DIES)), "edge": str(sum(not _is_centre(*d) for d in DIES))}
+    counts = {"sort": str(len(DIES)), "overall": str(len(DIES)), "centre": str(CENTRE), "edge": str(EDGE)}
     data = [_items("Yield table columns")]
     data += [[stage, counts.get(key, ""), "", ""] for key, stage in _fields("Yield table").items()]
     t = ts.table(data, [34, 17, 17, 18], 5.6)

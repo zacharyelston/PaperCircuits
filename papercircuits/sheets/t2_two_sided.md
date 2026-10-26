@@ -61,7 +61,7 @@ T2 two-sided tests
 2. Push a pin straight through the centre of each front mark, R1 to R4.
 3. On the back, read where each hole landed on the 1 mm scale, across and up or down.
 
-Pass: within 1.5 mm everywhere. Lanes overlap 4 mm at wire and eyelet vias.
+Pass: within 1.5 mm everywhere. Lanes overlap {via_overlap} mm at wire and eyelet vias.
 
 ## Registration table
 

@@ -140,7 +140,7 @@ def _procedure(sh):
     E.spine(sh)
     h, note = ts.H, ts.NOTE
     left = ts.section(WORDS, "You need", ts.bullets)
-    *reg_steps, reg_note = WORDS.items("1 · Registration")
+    *reg_steps, reg_note = WORDS.items("1 · Registration", via_overlap=f"{VIA_OVERLAP:g}")
     left += [Paragraph("1 · Registration", h)] + ts.steps(reg_steps)
     left += [ts.table([[""] + WORDS.items("Registration table")] + [[m[0], "", ""] for m in REG_MARKS],
                       [20, 30, 30], 6.5)]
