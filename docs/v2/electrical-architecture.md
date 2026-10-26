@@ -9,6 +9,7 @@ V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes on
 | Question | Proposal | Status |
 |---|---|---|
 | Shared nets | Five conductors: GND, BUS A, V+, BUS B, GND | Proposed |
+| Binding | Three mechanical holes at the common 4.25 inch (107.95 mm) pitch, centred on A4 | Proposed |
 | Pin order | Supply-symmetric, plus an orientation mark so BUS A and BUS B cannot be swapped | Proposed |
 | Topology | A chain of short links, one per page boundary, with every page passing all five conductors on | Proposed; construction **[T4]** |
 | Where links sit | Between holes, on or close to the ring axis, not at the page edge | **[T4]** |
@@ -26,6 +27,8 @@ A ring binder turns each page about the line through its holes, the ring axis, a
 - **At the page edge (x = 0):** that point is 12 mm from the axis. When the spread between two pages opens fully, their two edge points end up about 24 mm apart, and a link between them flexes that whole distance every time. Ring play adds about 2 mm more, because a page slides on its rings.
 
 So V2 links belong between holes, as close to the axis as the hole keep-outs allow. Edge links stay in the T4 tests as a comparison. If they fail, the standard will prohibit them.
+
+V2 uses three mechanical holes at the common 4.25 inch (107.95 mm) pitch, centred vertically on the existing A4 sheet. Their centres are y = 40.55, 148.5 and 256.45 mm. This is a V2-only change: V1 retains its ISO 838-compatible four-hole spine.
 
 An open spread shows the **back (side B) of the left page and the front (side A) of the right page**. Those are exactly the two faces a link joins. Each page therefore carries the spine pads on both faces: side A pads take the link from the previous page, and side B pads send it on to the next.
 
@@ -45,7 +48,7 @@ Each page boundary has one link of five conductors, in this order from the top o
 - **Two GND conductors.** They share the return current, halve the return resistance, and keep the book powered if one GND joint cracks. The contract footprint keeps C1 and C5 independent so every via can route freely on sides A and B. A page that uses GND joins them at a deliberate local ground junction outside the footprint; a pass-through page may keep them separate throughout.
 - **Same nets as V1.** V1 already shares V+, GND, BUS A and BUS B through its holes, so V1 lessons need no new nets, only a new way of reaching them.
 
-**Pads [T4].** Each pin is a 5 mm tape pad at a 10 mm pitch: 5 mm of copper followed by an equal-width 5 mm clear gap. The extra tolerance matters when sticky tape is cut or placed slightly oversize; adjacent lanes must not touch even when their edges wander. The five-pin block is 45 mm overall. A strip between H2 and H3 has 64 mm clear of the hole keep-outs (y 116.5 to 180.5), so the block centred on y = 148.5 leaves 9.5 mm at each end for strain relief. The x position follows the T4 results.
+**Pads [T4].** Each pin is a 5 mm tape pad at a 15 mm pitch: 5 mm of copper followed by a 10 mm clear gap, twice the tape width. This gives each hand-cut or hand-placed lane up to 5 mm of error toward either neighbour before they can touch. The five-pin block is 65 mm overall. The upper-to-centre hole bay has 91.95 mm clear of the hole keep-outs, so the block centred on y = 94.525 leaves about 13.5 mm at each end for strain relief. The x position follows the T4 results.
 
 **Pass-through.** Every V2 page carries all five conductors independently from its side A pads to its side B pads through a validated layer transition, whether it uses them or not. There is no GND end cap around the contract block. The book's power never depends on which lessons are bound in it. A page taps V+ from C3 and, when it uses GND, routes C1 and C5 to a deliberate soldered ground junction outside the footprint. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
 

@@ -43,7 +43,7 @@ V2 bench test
 ## Contract
 
 - title: 3  The spine contract
-- hint: Vias 10 mm apart: 5 mm tape, 5 mm clear gap. Each passes to side B.
+- hint: 15 mm pitch · 5 mm tape · 10 mm clear gap
 - C1: GND
 - C2: BUS A
 - C3: V+
@@ -72,7 +72,7 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 ## You need
 
-- Three cards printed double-sided (sheets 1 and 2), and a ring binder that fits them
+- Three cards printed double-sided (sheets 1 and 2), a three-hole punch and a ring binder
 - 5 mm and 12 mm copper tape, solder and a soldering iron
 - Stranded hookup wire, about 28 AWG, and a strip of ribbon cable
 - Thin card, clear tape, a needle and thread for strain relief
@@ -90,7 +90,7 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 1. On all three cards, lay every link lane (E1 to X5) and the contract lanes (C1 to C5) on both
    sides. Keep all five contract lanes separate: do not join C1 to C5 at the contract block.
-   Keep the clear gap between adjacent lanes at least as wide as the tape itself.
+   Keep the clear gap between adjacent lanes at least twice as wide as the tape itself.
 2. Make the contract block's wire vias: push a cut-off resistor leg through each via mark and
    solder it on both sides. Each via is an independent route between sides A and B.
 3. Bind the cards in order, page 1 on top.

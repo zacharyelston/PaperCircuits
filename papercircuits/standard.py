@@ -19,6 +19,15 @@ HOLES = {
     "H3": (188.5, "GND"),
     "H4": (268.5, "BUS B"),
 }
+
+# V2 keeps A4 but uses the common North American three-hole pattern. The 4.25 inch pitch is
+# centred vertically; these holes are mechanical only and never carry a circuit net.
+V2_THREE_HOLE_PITCH = 107.95
+V2_HOLES = {
+    "H1": (PAGE_H / 2 - V2_THREE_HOLE_PITCH, None),
+    "H2": (PAGE_H / 2, None),
+    "H3": (PAGE_H / 2 + V2_THREE_HOLE_PITCH, None),
+}
 NET_STRIP_START_X = 6.0  # strip starts left of the hole so the flange clamps it all round
 SPINE_W = 30.0
 BUS_B_GUTTER_X = 24.5

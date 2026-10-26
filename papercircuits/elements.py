@@ -104,10 +104,11 @@ def hole(
     label_below=False,
     mechanical=False,
     show_label=True,
+    holes=None,
 ):
     """Punch guide with eyelet flange ring and the hole's net name. A V2 page's holes are
     `mechanical`: they only bind the page, so the label says it has no net."""
-    y, net = S.HOLES[hole_id]
+    y, net = (holes or S.HOLES)[hole_id]
     x = S.HOLE_X
     sh.circle(x, y, S.EYELET_FLANGE_D, stroke=GUIDE, width=0.2, dash=(0.8, 0.8))
     sh.circle(x, y, S.HOLE_D, stroke=INK, fill=WHITE, width=0.3)
@@ -123,17 +124,27 @@ def hole(
         sh.text(x + 6.5, label_y, tag, size=6, color=MUTED)
 
 
-def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=(), mechanical=False, show_labels=True):
-    """All four holes, optionally the spine edge. `connected` lists hole ids that carry a net strip;
+def spine(
+    sh,
+    connected=(),
+    strip_widths=None,
+    edge=False,
+    labels_below=(),
+    mechanical=False,
+    show_labels=True,
+    holes=None,
+):
+    """All holes in the selected pattern, optionally the spine edge. `connected` lists hole ids that carry a net strip;
     `labels_below` moves a hole's net name under its strip (H4 when Bus B climbs the gutter).
     `mechanical` labels every hole as having no net, for V2 pages, whose holes only bind.
     Dense procedure/results pages may set `show_labels=False` while keeping the punch guides."""
     if mechanical and connected:
         raise ValueError("a mechanical spine cannot connect binder holes to electrical nets")
     strip_widths = strip_widths or {}
+    holes = holes or S.HOLES
     if edge:
         sh.line(S.SPINE_W, 26, S.SPINE_W, 280, width=0.15, color=GUIDE, dash=(0.4, 1.6))
-    for hole_id in S.HOLES:
+    for hole_id in holes:
         hole(
             sh,
             hole_id,
@@ -142,6 +153,7 @@ def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=(), mech
             label_below=hole_id in labels_below,
             mechanical=mechanical,
             show_label=show_labels,
+            holes=holes,
         )
 
 

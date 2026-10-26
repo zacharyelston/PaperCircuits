@@ -36,24 +36,24 @@ EDGE_START = 3.0
 AXIS_START = S.HOLE_X - S.TAPE_W / 2
 INBOARD_START = S.HOLE_X + 10 - S.TAPE_W / 2
 LINKS = (
-    ("E1", EDGE_START, 44.0),
-    ("E2", EDGE_START, 56.0),
-    ("E3", EDGE_START, 68.0),
-    ("I1", INBOARD_START, 80.0),
-    ("I2", INBOARD_START, 92.0),
-    ("X1", AXIS_START, 204.0),
-    ("X2", AXIS_START, 216.0),
-    ("X3", AXIS_START, 228.0),
-    ("X4", AXIS_START, 240.0),
-    ("X5", AXIS_START, 252.0),
+    ("E1", EDGE_START, 28.0),
+    ("E2", EDGE_START, 160.0),
+    ("E3", EDGE_START, 172.0),
+    ("I1", INBOARD_START, 184.0),
+    ("I2", INBOARD_START, 196.0),
+    ("X1", AXIS_START, 208.0),
+    ("X2", AXIS_START, 220.0),
+    ("X3", AXIS_START, 232.0),
+    ("X4", AXIS_START, 244.0),
+    ("X5", AXIS_START, 269.0),
 )
 LANE_END_X, TP_X, LABEL_X = 50.0, 44.0, 56.0
 
-# The proposed spine contract: five independent 5 mm pads on a 10 mm pitch between H2 and H3.
-# The clearance equals the tape width so hand-placement error cannot bridge adjacent routes.
+# The proposed spine contract: five independent 5 mm pads on a 15 mm pitch between the upper
+# and centre holes. Two tape widths of clearance tolerate hand-cut and hand-placed tape.
 CONTRACT = ("C1", "C2", "C3", "C4", "C5")
 CONTRACT_RESULTS = ("gnd_1", "bus_a", "power", "bus_b", "gnd_2", "gnd_pair")
-CONTRACT_Y0, CONTRACT_PITCH = 128.5, 10.0
+CONTRACT_Y0, CONTRACT_PITCH = 64.525, 15.0
 CONTRACT_VIA_X = 30.0
 
 # Edge wraps: code, tape width, the lane from the edge in to its test point, and the test point.
@@ -114,13 +114,13 @@ def _wrap_codes(sh):
 
 def _front(sh):
     E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle, part="1/4", status=WORDS.text("Status"))
-    E.spine(sh, mechanical=True)
+    E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     _coupons(sh)
     sh.text(S.HOLE_X + 2, 101, WORDS.fields("Labels")["axis"], size=6, color=MUTED)
 
     links = WORDS.fields("Links")
-    for title, y in ((links["edge_title"], 37), (links["axis_title"], 197)):
-        sh.text(LABEL_X, y, title, size=10, bold=True)
+    sh.text(LABEL_X, 40, links["edge_title"], size=10, bold=True)
+    sh.text(110, 208, links["axis_title"], size=10, bold=True)
     for code, _, y in LINKS:
         name, hint = ts.row(links[code])
         sh.text(LABEL_X, y - 0.4, f"{code}  {name}", size=7, bold=True)
@@ -129,8 +129,8 @@ def _front(sh):
 
     contract = WORDS.fields("Contract")
     label_x = LABEL_X
-    sh.text(label_x, 118, contract["title"], size=10, bold=True)
-    sh.text(label_x, 122.3, contract["hint"], size=6.5, color=MUTED)
+    sh.text(label_x, 52, contract["title"], size=10, bold=True)
+    sh.text(label_x, 56.3, contract["hint"], size=6.5, color=MUTED)
     for i, code in enumerate(CONTRACT):
         sh.text(label_x, _contract_y(i) + 1.1, f"{code}  {contract[code]}", size=7, bold=True)
 
@@ -138,7 +138,7 @@ def _front(sh):
     sh.text(110, 48, wraps["title"], size=10, bold=True)
     sh.paragraph(110, 51, 60, wraps["body"], style(6.5, leading=8.2, color=MUTED))
     about = WORDS.items("About")
-    sh.paragraph(116, 202, 78, "<br/><br/>".join(about), style(7, leading=8.8, color=MUTED))
+    sh.paragraph(116, 216, 78, "<br/><br/>".join(about), style(7, leading=8.8, color=MUTED))
     E.footer(sh, f"{PAGE_ID} {WORDS.fields('Sheet 1')['footer']}")
 
 
@@ -146,7 +146,7 @@ def _back(sh):
     sheet = WORDS.fields("Sheet 2")
     with sh.unmirrored():
         E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="2/4")
-    E.spine(sh, mechanical=True)
+    E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     _coupons(sh)
     for code, _, y in LINKS:
         sh.text(LABEL_X, y + 1.1, code, size=6.5, bold=True)
@@ -157,7 +157,7 @@ def _back(sh):
 def _procedure(sh):
     sheet = WORDS.fields("Sheet 3")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="3/4")
-    E.spine(sh, mechanical=True)
+    E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     left = ts.section(WORDS, "You need", ts.bullets)
     for name in ("1 · Wraps", "2 · Build the test book", "3 · Measuring a link"):
         left += ts.section(WORDS, name, ts.steps)
@@ -172,7 +172,7 @@ def _procedure(sh):
 def _results(sh):
     sheet = WORDS.fields("Sheet 4")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="4/4")
-    E.spine(sh, mechanical=True, show_labels=False)
+    E.spine(sh, mechanical=True, show_labels=False, holes=S.V2_HOLES)
     words = WORDS.fields("Results")
     h, note = ts.H, ts.NOTE
     wraps = [["", words["new"], words["handled"], words["cracks"]]] + [[w[0], "", "", ""] for w in WRAPS]

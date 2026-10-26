@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 from papercircuits import elements as E
+from papercircuits import standard as S
 
 
 class RecordingSheet:
@@ -29,6 +30,12 @@ def test_spine_can_hide_labels_on_dense_results_pages():
     sheet = RecordingSheet()
     E.spine(sheet, mechanical=True, show_labels=False)
     assert sheet.texts == []
+
+
+def test_v2_three_hole_spine_uses_three_mechanical_holes():
+    sheet = RecordingSheet()
+    E.spine(sheet, mechanical=True, holes=S.V2_HOLES)
+    assert sheet.texts == [f"H{i} · no net" for i in range(1, 4)]
 
 
 def test_mechanical_spine_rejects_electrical_hole_connections():
