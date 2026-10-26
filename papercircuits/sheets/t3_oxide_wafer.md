@@ -20,14 +20,15 @@ T3 copper oxide wafer
 - wafer_size: {wafer} mm square, {die} mm dies, corners clipped
 - packages: 2  Packages
 - packages_intro: Put your best dies in packages. Stick a die face up in a landing, then lay each
-  lead from its test point onto the die so its tip covers S or the dot. Sheet 3, step 6, says how.
+  lead from its test point onto the die so its tip covers S or the dot. Sheet 3, section 6, says
+  how.
 - trays: 3  Bin trays
 
 ## Die key
 
-One die, 2× size
+One die, {key_scale}× size
 
-- **T**  top contact: a 5 mm dot of 6B pencil, pressed hard.
+- **T**  top contact: a {dot} mm dot of 6B pencil, pressed hard.
 - **S**  scrape this corner back to bare copper.
 - **17**  the die's number, in fine marker.
 - **Dashed lines** are streets: cut along them.
@@ -51,7 +52,7 @@ One die, 2× size
 - every_die_hint: **Fwd:** red on T, black on S {T3}. **Rev:** red on S, black on T.
 - map: Wafer map
 - map_hint: write each die's bin: sort / final
-- centre: dashed: the centre 16
+- centre: dashed: the centre {centre}
 - reversed: If a die reads lower with red on S, it conducts the other way: bin it on the larger
   reading ÷ the smaller, and circle its number.
 
@@ -93,8 +94,8 @@ One die, 2× size
 - final: Final test
 - packages: Packages
 - overall: Overall
-- centre: Centre 16, sort
-- edge: Edge 16, sort
+- centre: Centre {centre}, sort
+- edge: Edge {edge}, sort
 
 ## Yield table columns
 
@@ -130,7 +131,7 @@ differ, just as real chips do.
 
 ## You need
 
-- A 90 mm square of bare, uncoated copper foil, {foil} thick {T3}, and a spare scrap
+- A {wafer} mm square of bare, uncoated copper foil, {foil} thick {T3}, and a spare scrap
 - A single-coil electric hot plate, {plate_w} W or more {T3}, on a heatproof board
 - Tongs, and safety glasses for everyone near the plate
 - Washing-up liquid, a kitchen scouring pad and kitchen roll
@@ -149,8 +150,8 @@ differ, just as real chips do.
 
 ## 1 · Prepare the wafer
 
-1. Cut the square. Clip each corner off along a diagonal from 15 mm along one edge to 15 mm along
-   the other.
+1. Cut the square. Clip each corner off along a diagonal from {die} mm along one edge to {die} mm
+   along the other.
 2. Scrub both sides with washing-up liquid and the scouring pad until bright. Rinse, dry, and hold
    it by its edges from now on.
 
@@ -171,8 +172,8 @@ differ, just as real chips do.
 1. Lay the wafer on sheet 1's frame. Rule the streets from tick to tick in fine marker. Never use
    pencil: graphite would join the dies.
 2. Write the wafer's name in its top-left corner, and each die's number in its own top-left corner.
-3. **S:** scrape each die's top-right corner back to shiny copper, about 4 mm square.
-4. **T:** draw a 5 mm dot of 6B where sheet 1 shows it, pressing hard. Keep it clear of S and the
+3. **S:** scrape each die's top-right corner back to shiny copper, about {scrape} mm square.
+4. **T:** draw a {dot} mm dot of 6B where sheet 1 shows it, pressing hard. Keep it clear of S and the
    streets.
 
 ## 4 · Wafer sort
@@ -201,7 +202,7 @@ differ, just as real chips do.
 - A die passes in bins 1, 2 or 3. Bin 1 is the goal: it blocks the meter completely in reverse.
 - No die rectifies? Check the meter on the 1N4148 again, then try a sharpened 6B pencil point
   pressed on a die in place of its dot.
-- Compare the centre 16 with the edge 16. A difference means the plate heats unevenly.
+- Compare the centre {centre} with the edge {edge}. A difference means the plate heats unevenly.
 
 ## Results
 

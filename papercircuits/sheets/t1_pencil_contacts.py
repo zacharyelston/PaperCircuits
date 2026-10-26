@@ -124,7 +124,7 @@ def _procedure(sh):
     left += [Paragraph("Trying different papers", ts.H), Paragraph(intro, style(7.5, leading=9.6))]
     left += ts.bullets(papers)
     left += [Paragraph(note, ts.NOTE)]
-    right += ts.section(WORDS, "Results for standard v0.2",
+    right += ts.section(WORDS, "Results for the standard",
                       lambda questions: [ts.decision_table(questions, widths=(38, 42))])
 
     rest = sh.flow([(LEFT, 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, RIGHT, 282.0)], right)

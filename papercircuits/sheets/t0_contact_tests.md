@@ -134,7 +134,7 @@ Build, test and record the switches on sheet 3; its steps and pass rule are ther
 Why 1 Ω: lesson circuits use resistors of 100 Ω and up, so 1 Ω changes the current by 1 % or less.
 Flicker matters more than the exact value.
 
-## Results for standard v0.2
+## Results for the standard
 
 - Tape overlaps OK?
 - Lead attachment
@@ -179,8 +179,8 @@ Flicker matters more than the exact value.
 ## How to test
 
 1. Lay each switch's A and B lanes as separate pieces of tape. Keep the gap between them clear.
-2. S1: stick a 10 mm piece of tape on the corner flap where shown. Tabs: cut the solid lines, crease
-   the dotted hinges and stick a 10 mm piece on each flap.
+2. S1: stick a {flap_pad} mm piece of tape on the corner flap where shown. Tabs: cut the solid lines,
+   crease the dotted hinges and stick a {flap_pad} mm piece on each flap.
 3. **Open:** with nothing pressed, measure A to B. It must read OL; a number means the gap is bridged.
 4. **Light and firm:** rest one finger on the flap and read the meter. Then press hard with a thumb.
 5. **Flicker:** keep pressing and rock your finger. Write Y if the reading jumps or drops to OL.

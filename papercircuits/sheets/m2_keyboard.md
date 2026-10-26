@@ -26,8 +26,9 @@ Touch anywhere on a key. Low C on the left, high C on the right. Only V+ is used
 ## Play it
 
 - Clip one end of a lead to M1's PITCH loop. Hold the other clip by its cover and touch its jaws to a key.
-- Check each note with a tuner app on a phone. A note that's off can be tuned by swapping the
-  resistor to its right for the next value up or down.
+- Check each note with a tuner app on a phone. Tune from the right, C5 first: swap the resistor
+  to a key's right (R1 for C5) for the next value up or down. Each swap also moves every key to
+  its left.
 
 ## Labels
 

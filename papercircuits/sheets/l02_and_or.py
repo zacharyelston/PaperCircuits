@@ -106,6 +106,8 @@ def _schematic(sh, lay):
 
     rail, and_y, or_a, or_b, gnd = 44.0, 218.0, 232.0, 242.0, 270.0
     and_x, or_x, join_x = 84.0, 70.0, 60.0
+    # TP1 and TP2 sit before the resistors, as on the copper: they read what the switches pass.
+    tp1_x, tp2_x = 75.0, 65.0
     sch.terminal(sh, rail, 212, "", 0)
     sh.text(rail - 2, 213.2, "V+", size=6.5, bold=True, align="right")
     sch.wire(sh, [(rail, 212.8), (rail, or_b)])
@@ -115,11 +117,11 @@ def _schematic(sh, lay):
     sch.switch(sh, rail, 55, and_y, lay.symbol("A1").ref)
     sch.switch(sh, 55, 66, and_y, lay.symbol("B1").ref)
     sch.wire(sh, [(66, and_y), (and_x, and_y)])
+    sch.junction(sh, tp1_x, and_y)
+    sch.wire(sh, [(tp1_x, and_y), (tp1_x, and_y - 4)])
+    sch.test_point(sh, tp1_x, and_y - 4.9, lay.probe("TP1"))
     r1 = lay.symbol("R1")
     sch.resistor(sh, and_x, and_y, 238, r1.ref, r1.text)
-    sch.junction(sh, and_x, 238)
-    sch.wire(sh, [(and_x, 238), (and_x + 4, 238)])
-    sch.test_point(sh, and_x + 4.9, 238, lay.probe("TP1"))
     sch.led(sh, and_x, 238, gnd, lay.symbol("LED1").ref)
 
     sch.switch(sh, rail, 56, or_a, lay.symbol("A2").ref)
@@ -127,11 +129,11 @@ def _schematic(sh, lay):
     sch.wire(sh, [(56, or_b), (join_x, or_b), (join_x, or_a)])
     sch.wire(sh, [(56, or_a), (or_x, or_a)])
     sch.junction(sh, join_x, or_a)
+    sch.junction(sh, tp2_x, or_a)
+    sch.wire(sh, [(tp2_x, or_a), (tp2_x, or_a - 4)])
+    sch.test_point(sh, tp2_x, or_a - 4.9, lay.probe("TP2"))
     r2 = lay.symbol("R2")
     sch.resistor(sh, or_x, or_a, 250, r2.ref, r2.text)
-    sch.junction(sh, or_x, 250)
-    sch.wire(sh, [(or_x, 250), (or_x - 4, 250)])
-    sch.test_point(sh, or_x - 4.9, 250, lay.probe("TP2"), side="left")
     sch.led(sh, or_x, 250, gnd, lay.symbol("LED2").ref)
 
     sch.terminal(sh, rail, gnd, "", 0)
