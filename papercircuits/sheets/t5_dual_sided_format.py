@@ -67,14 +67,15 @@ def _rails(sh, face):
     return rails
 
 
-def _load(sh, rails, *, x, top_net, top_y, resistor_y, led_y, ref):
-    """A resistor and LED from `top_net` down to the next fixed rail."""
-    bottom_y = BUS_A_Y if top_net == "V+" else GND_Y
+def _load(sh, rails, *, x, top_net, bottom_net, resistor_y, led_y, ref):
+    """A resistor and LED between two of the fixed rails."""
+    rail_y = {"V+": V_PLUS_Y, "BUS A": BUS_A_Y, "BUS B": BUS_B_Y, "GND": GND_Y}
+    top_y, bottom_y = rail_y[top_net], rail_y[bottom_net]
     first = E.lane(sh, [(x, top_y), (x, resistor_y - 12)])
     E.lane(sh, [(x, resistor_y + 12), (x, led_y - 12)])
     last = E.lane(sh, [(x, led_y + 9), (x, bottom_y)])
     sh.allow(rails[top_net], first, 0)
-    sh.allow(rails["BUS A" if top_net == "V+" else "GND"], last, 0)
+    sh.allow(rails[bottom_net], last, 0)
     E.resistor(sh, x, resistor_y, vertical=True, lead=12, label=f"{ref} · 1 kΩ")
     E.led(sh, x, led_y, anode="up", lead_anode=12, lead_cathode=9, label=f"LED{ref[-1]}")
 
@@ -83,10 +84,10 @@ def _front(sh):
     E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle, part="1/4", status=WORDS.text("Status"))
     E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     rails = _rails(sh, "A")
-    _load(sh, rails, x=120, top_net="BUS B", top_y=BUS_B_Y, resistor_y=195, led_y=235, ref="R2")
+    _load(sh, rails, x=120, top_net="V+", bottom_net="BUS A", resistor_y=62, led_y=102, ref="R1")
     words = WORDS.fields("Side A")
-    sh.text(138, 184, words["load_title"], size=9, bold=True)
-    sh.paragraph(138, 188, 58, words["load_body"], style(6.5, leading=8.2, color=MUTED))
+    sh.text(138, 58, words["load_title"], size=9, bold=True)
+    sh.paragraph(138, 62, 58, words["load_body"], style(6.5, leading=8.2, color=MUTED))
     sh.text(138, 224, words["rule_title"], size=9, bold=True)
     sh.paragraph(138, 228, 58, words["rule_body"], style(6.5, leading=8.2, color=MUTED))
     E.footer(sh, f"{PAGE_ID} {words['footer']}", label_x=170)
@@ -98,11 +99,11 @@ def _back(sh):
         E.header(sh, PAGE_ID, words["title"], words["subtitle"], part="2/4")
     E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     rails = _rails(sh, "B")
-    _load(sh, rails, x=120, top_net="V+", top_y=V_PLUS_Y, resistor_y=62, led_y=102, ref="R1")
-    sh.text(138, 58, words["load_title"], size=9, bold=True)
-    sh.paragraph(138, 62, 58, words["load_body"], style(6.5, leading=8.2, color=MUTED))
-    sh.text(138, 184, words["wrap_title"], size=9, bold=True)
-    sh.paragraph(138, 188, 58, words["wrap_body"], style(6.5, leading=8.2, color=MUTED))
+    _load(sh, rails, x=120, top_net="BUS B", bottom_net="GND", resistor_y=195, led_y=235, ref="R2")
+    sh.text(138, 184, words["load_title"], size=9, bold=True)
+    sh.paragraph(138, 188, 58, words["load_body"], style(6.5, leading=8.2, color=MUTED))
+    sh.text(138, 58, words["wrap_title"], size=9, bold=True)
+    sh.paragraph(138, 62, 58, words["wrap_body"], style(6.5, leading=8.2, color=MUTED))
     with sh.unmirrored():
         E.footer(sh, f"{PAGE_ID} {words['footer']}", label_x=170)
 

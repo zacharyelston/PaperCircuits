@@ -21,7 +21,7 @@ V2 format test
 ## Side A
 
 - load_title: Side A load
-- load_body: R2 and LED2 run from BUS B down to GND. Test 2 drives BUS B from side B, through the outer-edge wrap.
+- load_body: R1 and LED1 run from V+ down to BUS A. Test 1 returns BUS A to GND through the opposite face.
 - rule_title: Routing rule
 - rule_body: Wrap around an edge to change faces. A soldered wire via is an exception only when no safe wrap path exists.
 - footer: sheet 1 of 4 (side A)
@@ -31,7 +31,7 @@ V2 format test
 - title: T5  Dual-sided format: side B
 - subtitle: This side prints behind sheet 1. The four rails meet side A only at their edge wraps.
 - load_title: Side B load
-- load_body: R1 and LED1 run from V+ down to BUS A. Test 1 returns BUS A to GND through the opposite face.
+- load_body: R2 and LED2 run from BUS B down to GND. Test 2 drives BUS B from side A, through the outer-edge wrap.
 - wrap_title: No page vias
 - wrap_body: V+ wraps over the top, GND over the bottom, and both buses around the outer edge. Build no through-page via on this test.
 - footer: sheet 2 of 4 (side B)
@@ -66,8 +66,8 @@ V2 format test
 
 ## 3 · Add the loads
 
-1. On side B, add R1 and LED1 between V+ and BUS A. Put the LED's long anode leg toward V+.
-2. On side A, add R2 and LED2 between BUS B and GND. Put the LED's long anode leg toward BUS B.
+1. On side A, add R1 and LED1 between V+ and BUS A. Put the LED's long anode leg toward V+.
+2. On side B, add R2 and LED2 between BUS B and GND. Put the LED's long anode leg toward BUS B.
 3. Solder every component lead to its tape lane. Check that no trimmed lead reaches the other face.
 
 ## 4 · Continuity before power
@@ -79,8 +79,8 @@ V2 format test
 ## 5 · Powered proof
 
 1. Connect the fused holder red lead to V+ A and black lead to GND A.
-2. **Test 1:** clip BUS A A to GND B. LED1 on side B must light. This path uses the V+ top wrap, BUS A outer wrap and GND bottom wrap.
-3. Remove that clip. **Test 2:** clip V+ B to BUS B B. LED2 on side A must light. This path uses the V+ top wrap and BUS B outer wrap.
+2. **Test 1:** clip BUS A B to GND B. LED1 on side A must light. This path uses the BUS A outer wrap and GND bottom wrap.
+3. Remove that clip. **Test 2:** clip V+ B to BUS B A. LED2 on side B must light. This path uses the V+ top wrap, BUS B outer wrap and GND bottom wrap.
 4. Disconnect power before moving or inspecting tape.
 
 ## 6 · Flex and inspect
