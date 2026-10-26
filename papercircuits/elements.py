@@ -96,6 +96,23 @@ def test_point(sh, cx, cy, label=None, side="right", size=6.5):
             sh.text(cx, cy + r + 3.2, label, size=size, bold=True, align="center")
 
 
+def wrap_arrow(sh, x, y, direction, size=3.2):
+    """Solid arrow pointing from a printed lane toward the page edge it wraps around."""
+    vectors = {"up": (0, -1), "right": (1, 0), "down": (0, 1), "left": (-1, 0)}
+    if direction not in vectors:
+        raise ValueError(f"unknown wrap direction: {direction}")
+    dx, dy = vectors[direction]
+    px, py = -dy, dx
+    tip = (x + dx * size, y + dy * size)
+    base_x, base_y = x - dx * 0.8, y - dy * 0.8
+    sh.polygon(
+        [tip, (base_x + px * 1.8, base_y + py * 1.8), (base_x - px * 1.8, base_y - py * 1.8)],
+        stroke=INK,
+        fill=INK,
+        width=0.2,
+    )
+
+
 def hole(
     sh,
     hole_id,
@@ -299,20 +316,30 @@ def registration_mark(sh, x, y, label, scale=False):
 VIA_KINDS = ("slit", "wire", "eyelet", "mark")
 
 
+def _via_chevrons(sh, x, y):
+    """Opposing chevrons identify a through-page construction, not an electrical target."""
+    for side in (-1, 1):
+        outer_y = y + side * 5.0
+        tip_y = y + side * 2.7
+        sh.line(x - 1.6, outer_y, x, tip_y, width=0.35, color=INK)
+        sh.line(x + 1.6, outer_y, x, tip_y, width=0.35, color=INK)
+
+
 def via(sh, x, y, kind):
     """Where a horizontal lane passes to the other side of the page. "slit": cut here and
     thread the tape through. "wire": push a bare wire through and solder both sides.
     "eyelet": set a small eyelet through both lanes. "mark": your own method."""
+    _via_chevrons(sh, x, y)
     if kind == "slit":
         sh.rect(x - 0.4, y - 3.5, x + 0.4, y + 3.5, stroke=None, fill=INK)
     elif kind == "wire":
-        sh.circle(x, y, 4.0, stroke=INK, width=0.25, dash=(0.6, 0.6))
-        sh.circle(x, y, 1.2, stroke=None, fill=INK)
+        sh.line(x - 0.8, y, x + 0.8, y, width=0.35, color=INK)
+        sh.line(x, y - 0.8, x, y + 0.8, width=0.35, color=INK)
     elif kind == "eyelet":
-        sh.circle(x, y, 7.0, stroke=GUIDE, width=0.2, dash=(0.8, 0.8))
         sh.circle(x, y, 3.5, stroke=INK, fill=WHITE, width=0.3)
     else:
-        sh.circle(x, y, 3.0, stroke=INK, width=0.3)
+        sh.line(x - 1.0, y - 1.0, x + 1.0, y + 1.0, width=0.35, color=INK)
+        sh.line(x - 1.0, y + 1.0, x + 1.0, y - 1.0, width=0.35, color=INK)
 
 
 # Part footprints, actual size.

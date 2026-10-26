@@ -52,6 +52,10 @@ def _rails(sh, face):
             width=S.WIDE_TAPE_W,
         ),
     }
+    E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 4.0, "up")
+    E.wrap_arrow(sh, OUTER_WRAP_X, BUS_A_Y, "right")
+    E.wrap_arrow(sh, OUTER_WRAP_X, BUS_B_Y, "right")
+    E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 293.0, "down")
     labels = WORDS.fields("Rail labels")
     for net, y in (("V+", V_PLUS_Y), ("BUS A", BUS_A_Y), ("BUS B", BUS_B_Y), ("GND", GND_Y)):
         sh.text(56, y - (4.0 if net != "GND" else 7.5), labels[net], size=7, bold=True)

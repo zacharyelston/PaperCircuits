@@ -98,6 +98,9 @@ def _coupons(sh):
         E.test_point(sh, TP_X, _contract_y(i))
     for _, width, pts, (tx, ty) in WRAPS:
         E.lane(sh, pts, width=width)
+        edge_x, edge_y = pts[0]
+        direction = "up" if edge_y < 10 else "down" if edge_y > 287 else "right"
+        E.wrap_arrow(sh, edge_x, edge_y, direction)
         E.test_point(sh, tx, ty)
     _wrap_codes(sh)
 

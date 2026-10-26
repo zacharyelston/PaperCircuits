@@ -62,6 +62,7 @@ V2 format test
 2. Lay GND the same way with 12 mm tape, using the bottom-edge wrap.
 3. Lay BUS A as one continuous 5 mm strip from the side-A spine, around the outer edge and back to the side-B spine. Repeat for BUS B.
 4. Burnish every fold. Do not add a through-page via.
+5. Follow each solid arrow to the physical edge even though the printed lane stops short. Round circle-and-dot marks are electrical test or clip points, not vias.
 
 ## 3 · Add the loads
 

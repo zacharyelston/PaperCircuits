@@ -76,7 +76,9 @@ Pass: within 1.5 mm everywhere. Lanes overlap 4 mm at wire and eyelet vias.
    and solder it.
 3. **V3:** lay the three pieces, pierce a small hole through both at each eyelet mark, and set an
    eyelet.
-4. Measure A to B. **Flexed** and **Day 7** work as on T0.
+4. Inward chevrons identify every through-page construction. Round circle-and-dot marks elsewhere
+   are electrical test points, not vias.
+5. Measure A to B. **Flexed** and **Day 7** work as on T0.
 
 ## Via table
 

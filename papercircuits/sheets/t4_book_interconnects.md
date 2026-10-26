@@ -93,6 +93,8 @@ link can be probed at once. Sheet 3 says how to build and test the links.
    Keep the clear gap between adjacent lanes at least twice as wide as the tape itself.
 2. Make the contract block's wire vias: push a cut-off resistor leg through each via mark and
    solder it on both sides. Each via is an independent route between sides A and B.
+   The inward chevrons identify the through-page construction; round circle-and-dot marks are
+   electrical test points. At each solid arrow, continue the tape to the physical edge and fold it.
 3. Bind the cards in order, page 1 on top.
 4. For every row, join the back of page 1 to the front of page 2, and the back of page 2 to the
    front of page 3, the way the row's label says. Keep each solder joint at least 5 mm from the

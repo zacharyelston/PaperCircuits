@@ -48,6 +48,8 @@ The rail centres are provisional until T5 is built, but their order is the forma
 
 **Wrap-first side changes.** V+ wraps over the top edge, GND over the bottom edge, and BUS A/B around the outer edge. A rail is one continuous tape path from side A to side B whenever the lesson geometry allows it. A soldered wire through the page is the last resort: the page must document why no edge route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
 
+**Printed notation.** A solid arrow at the end of a copper lane means continue the tape to the page edge and fold it onto the other face; the printer is not expected to reach the physical edge. Opposing chevrons point toward every through-page construction. A circle with a centre point is reserved for an electrical solder, clip or meter target and never denotes a layer change.
+
 **Pass-through.** Every V2 page carries all four rails from its side A spine pads to its side B spine pads whether it uses them or not. The book's power never depends on which lessons are bound in it. A lesson branches from the fixed rails without moving them. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
 
 **T4 remains useful.** Its link-construction and flex coupons still select wire, ribbon and solder methods for the four distributed spine links. Its compact C1-C5 block is no longer the proposed page format.
