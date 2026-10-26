@@ -76,7 +76,7 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 - 5 mm and 12 mm copper tape, solder and a soldering iron
 - Stranded hookup wire, about 28 AWG, and a strip of ribbon cable
 - Thin card, clear tape, a needle and thread for strain relief
-- A 100 Ω resistor (¼ W or more), a 3 × AA holder and clip leads
+- A 100 Ω resistor (½ W or more), a 3 × AA holder and clip leads
 - A multimeter with a 200 mV range
 
 ## 1 · Wraps
@@ -97,7 +97,9 @@ link can be probed at once. Sheet 3 says how to build and test the links.
    front of page 3, the way the row's label says. Keep each solder joint at least 5 mm from the
    ring axis, except X4's, which tests a joint on it. On the axis rows, lay the wire or ribbon
    along the axis between the two joints.
-5. Join C1 to C5 the same way, with a five-conductor strip of ribbon laid along the axis.
+5. Join C1 to C5 the same way, with a five-conductor strip of ribbon laid along the axis. Mark
+   the C1 edge with a stripe and keep that stripe on C1 at both ends; reversing the ribbon swaps
+   BUS A and BUS B even though V+ and GND stay safe.
 
 ## 3 · Measuring a link
 
@@ -109,10 +111,15 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 ## 4 · The spine contract chain
 
-1. Clip the holder to page 1: red to C3 (V+), black to C1 (GND).
-2. Clip the 100 Ω resistor across C3 and C1 on page 3.
-3. Measure each of C1, C3 and C5 from one page to the next on the 200 mV range. Measure C2 and
-   C4 as in step 3.
+1. Clip the holder to page 1: red to C3 (V+), black to both C1 and C5 (the GND pair).
+2. Clip the 100 Ω resistor across C3 and the joined C1/C5 pair on page 3.
+3. Measure C3 from one page to the next. Its drop divided by the total current must be 0.1 Ω or
+   less.
+4. Measure the GND pair from one page to the next: one probe touches both C1 and C5 on the first
+   page, and the other touches both on the next page. Its drop divided by total current must be
+   0.05 Ω or less. Do not calculate either GND conductor from total current; the current splits.
+5. Test C2 and C4 one at a time in the separate loop from section 3. Confirm that the ribbon's
+   striped edge is on C1 at both ends before applying power.
 
 ## 5 · Flex cycles
 
@@ -130,7 +137,8 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 ## Pass or fail
 
-- **Pass:** 0.1 Ω or less after the flex-life target, and steady while the pages turn.
+- **Pass:** each individual link is 0.1 Ω or less, the contract's GND pair is 0.05 Ω or less,
+  and the load stays steady while the pages turn.
 - **Fail:** a crack, lifted tape, torn paper or any flicker.
 - Links at the edge move about 24 mm each cycle. If they fail, the V2 standard will prohibit
   them.
@@ -151,6 +159,10 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 - current: Current, from the load: ________ mA
 - first: 1 to 2
 - second: 2 to 3
+- gnd_pair: C1 + C5  GND pair
+- bus_a: C2  BUS A
+- power: C3  V+
+- bus_b: C4  BUS B
 - links_1: Links, page 1 to page 2
 - links_2: Links, page 2 to page 3
 - flicker: Flicker?
@@ -158,6 +170,7 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 ## Results for the standard
 
 - Best link construction
+- Pin-1 stripe stayed on C1 at every joint
 - Closest safe distance from the axis
 - Service loop needed
 - Wrap tape: 5 mm or 12 mm

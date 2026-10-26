@@ -9,12 +9,12 @@ V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes on
 | Question | Proposal | Status |
 |---|---|---|
 | Shared nets | Five conductors: GND, BUS A, V+, BUS B, GND | Proposed |
-| Pin order | Symmetric, so a link turned end for end still puts V+ on V+ and GND on GND | Proposed |
+| Pin order | Supply-symmetric, plus an orientation mark so BUS A and BUS B cannot be swapped | Proposed |
 | Topology | A chain of short links, one per page boundary, with every page passing all five conductors on | Proposed; construction **[T4]** |
 | Where links sit | Between holes, on or close to the ring axis, not at the page edge | **[T4]** |
 | Supply | 3 × AA, 4.5 V nominal, as V1 | Proposed |
 | Protection | One resettable fuse (0.1 A hold) at power entry; no series diode | Proposed |
-| Book budget | 16 pages, 100 mA in total, 0.25 V drop at most | Proposed; link resistance **[T4]** |
+| Book budget | 16 pages (15 boundaries), 100 mA total, 0.25 V drop at most | Proposed; link resistance **[T4]** |
 | Removable pages | Not while powered; a page is replaced by cutting and resoldering its two links | Proposed |
 | V1 compatibility | V1 and V2 pages don't share a binder | Proposed |
 
@@ -41,7 +41,7 @@ Each page boundary has one link of five conductors, in this order from the top o
 | 4 | BUS B | Signal, 0 V to V+ |
 | 5 | GND | Return, conductor 2 of 2 |
 
-- **Symmetric on purpose.** A link turned end for end, or a page bound upside down, maps GND to GND and V+ to V+. Only BUS A and BUS B swap, and that's harmless at signal currents. A learner can't reverse the supply by wiring a link backwards.
+- **Supply-symmetric on purpose.** A link turned end for end maps GND to GND and V+ to V+, so it cannot reverse the supply. It does swap BUS A and BUS B, which is **not** harmless: the wrong receiver may hear a signal, or two drivers may contend. Every ribbon therefore has a visible pin-1 stripe at C1, every pad block marks C1, and assembly instructions require the stripe to stay on C1 at both ends. A later connector must be keyed as well as marked.
 - **Two GND conductors.** They share the return current, halve the return resistance, and keep the book powered if one GND joint cracks. Tie them together on every page.
 - **Same nets as V1.** V1 already shares V+, GND, BUS A and BUS B through its holes, so V1 lessons need no new nets, only a new way of reaching them.
 
@@ -61,13 +61,13 @@ Resistances below are for a 35 µm copper foil, the thin end of craft tape.
 | Good solder joint | about 1 mΩ |
 | Unsoldered tape overlap | not yet measured (T0, T1) |
 
-**Design point:** 16 pages and 100 mA in total. That's roughly ten lessons with an LED lit on each, or an oscillator page or two. The limit is 0.25 V dropped between the supply and the last page.
+**Design point:** 16 pages, including the power-entry page, and 100 mA in total. The last page is 15 page-to-page boundaries from the source. That's roughly ten lessons with an LED lit on each, or an oscillator page or two. The limit is 0.25 V dropped between the supply and the last page.
 
-- **V+ path:** 16 links in series.
-- **GND return:** the same 16 links, with two conductors in parallel.
-- **Allowed per link conductor:** at most **0.1 Ω after the flex-life target**. That gives 1.6 Ω on V+ and 0.8 Ω on GND, 2.4 Ω in all, so 0.24 V at 100 mA.
+- **V+ path:** 15 links in series, each at most **0.1 Ω after the flex-life target**.
+- **GND return:** 15 pairs in series. The two conductors in each pair are tied together at both ends and must measure at most **0.05 Ω as a pair**.
+- **Whole path:** 1.5 Ω on V+ plus 0.75 Ω on GND gives 2.25 Ω, or 0.225 V at 100 mA.
 
-That 0.1 Ω limit is T4's pass mark.
+Those 0.1 Ω V+ and 0.05 Ω GND-pair limits are T4's pass marks. T4 measures the GND pair as one parallel return; dividing either GND conductor's voltage by the total current would understate its resistance because the current splits between them.
 
 **Measuring it.** A 0.1 Ω link is below what a meter's 200 Ω range can read (its resolution is 0.1 Ω). T4 measures each link as a voltage drop instead:
 - Pass a known load current through the book: a 100 Ω resistor at the far page draws about 45 mA.
@@ -80,12 +80,14 @@ That 0.1 Ω limit is T4's pass mark.
 
 | Fault | What happens | Protection |
 |---|---|---|
-| V+ shorted to GND on any page | Up to about 1.5 A for a few seconds through the links before the fuse trips | **Fuse:** 0.1 A hold, at power entry. Each link carries about 0.2 W briefly, which stays well short of hot. |
-| A link fitted end for end | Nothing on V+ or GND; BUS A and BUS B swap | The symmetric contract |
+| V+ shorted to GND on any page | Cell current flows until the fuse trips; the peak and duration depend on the cells, PTC and wiring | **Provisional [T4]:** characterize trip time and peak joint temperature with the intended 0.1 A-hold fuse before making a safety claim. |
+| A link fitted end for end | V+ and GND remain correct, but BUS A and BUS B swap | Pin-1 stripe at C1 now; a keyed connector if one is adopted later |
 | BUS A or BUS B shorted to V+ or GND | Under 5 mA flows | **Bus drivers:** every page that drives a bus does so through at least 1 kΩ, and receivers are high-impedance. |
 | One GND joint cracks | The book stays powered on the other GND conductor | Two GND pins; T4 records it as a fail even so |
 | A V+ joint cracks | Every page beyond it goes dark | **Spine test points:** each page has V+ and GND test points on its spine strip, so a builder can find the break page by page. |
 | An intermittent link while turning pages | Flicker or reset | The T4 flex tests set the construction and the service loop |
+
+At the provisional worst case of 1.5 A and the resistance limits above, one boundary could dissipate about 0.225 W in V+ and 0.113 W in the combined GND return. Heat is concentrated at joints and depends on PTC trip time, so the proposal does not claim this is safe until a fused fault test records current, trip time and temperature. Do not perform that test on an unfused T4 coupon.
 
 **No series diode at power entry.** The holder can only take its cells one way, and the contract can't reverse the supply, so a diode would cost about 0.3 V for no benefit. Revisit this if V2 ever allows other supplies, such as USB.
 
@@ -117,7 +119,7 @@ A three-page book that is run through T4's chosen flex-life cycles:
 It must show:
 - link drops within the budget at 45 mA, before and after cycling
 - no intermittent loss of V+ while turning pages, watched on the meter's minimum/maximum mode, or as LED flicker
-- the fuse tripping on a planted short at page 3, with no link or joint getting warm
+- the fuse tripping on a planted short at page 3, with peak current, trip time and the hottest joint temperature recorded against a pass limit chosen before the test
 
 ## Still open
 

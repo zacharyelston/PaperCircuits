@@ -52,6 +52,7 @@ LANE_END_X, TP_X, LABEL_X = 50.0, 44.0, 56.0
 # The proposed spine contract: five pads 8 mm apart on the ring axis between H2 and H3. The
 # two GND pads are one strip, joined round the far side of the others.
 CONTRACT = ("C1", "C2", "C3", "C4", "C5")
+CONTRACT_RESULTS = ("gnd_pair", "bus_a", "power", "bus_b")
 CONTRACT_Y0, CONTRACT_PITCH = 132.5, 8.0
 CONTRACT_VIA_X = 30.0
 GND_TIE_X = 60.0
@@ -181,12 +182,11 @@ def _procedure(sh):
 def _results(sh):
     sheet = WORDS.fields("Sheet 4")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="4/4")
-    E.spine(sh, mechanical=True)
+    E.spine(sh, mechanical=True, show_labels=False)
     words = WORDS.fields("Results")
     h, note = ts.H, ts.NOTE
     wraps = [["", words["new"], words["handled"], words["cracks"]]] + [[w[0], "", "", ""] for w in WRAPS]
-    contract = WORDS.fields("Contract")
-    chain = [["", words["first"], words["second"]]] + [[f"{c}  {contract[c]}", "", ""] for c in CONTRACT]
+    chain = [["", words["first"], words["second"]]] + [[words[key], "", ""] for key in CONTRACT_RESULTS]
     left = [Paragraph(words["wraps"], h), ts.table(wraps, [16, 20, 20, 24], 6.5)]
     left += [Paragraph(words["chain"], h), Paragraph(words["current"], note), ts.table(chain, [30, 25, 25], 6.5)]
     left += ts.section(

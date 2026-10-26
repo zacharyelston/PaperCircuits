@@ -96,7 +96,15 @@ def test_point(sh, cx, cy, label=None, side="right", size=6.5):
             sh.text(cx, cy + r + 3.2, label, size=size, bold=True, align="center")
 
 
-def hole(sh, hole_id, connected=True, strip_width=S.TAPE_W, label_below=False, mechanical=False):
+def hole(
+    sh,
+    hole_id,
+    connected=True,
+    strip_width=S.TAPE_W,
+    label_below=False,
+    mechanical=False,
+    show_label=True,
+):
     """Punch guide with eyelet flange ring and the hole's net name. A V2 page's holes are
     `mechanical`: they only bind the page, so the label says it has no net."""
     y, net = S.HOLES[hole_id]
@@ -106,18 +114,22 @@ def hole(sh, hole_id, connected=True, strip_width=S.TAPE_W, label_below=False, m
     arm = S.HOLE_D / 2 + 1.5
     sh.line(x - arm, y, x + arm, y, width=0.15, color=INK)
     sh.line(x, y - arm, x, y + arm, width=0.15, color=INK)
-    if mechanical:
-        tag = f"{hole_id} · no net"
-    else:
-        tag = f"{hole_id} {net}" if connected else f"{hole_id} {net} · NC"
-    label_y = y + strip_width / 2 + 3.8 if label_below else y - strip_width / 2 - 1.7
-    sh.text(x + 6.5, label_y, tag, size=6, color=MUTED)
+    if show_label:
+        if mechanical:
+            tag = f"{hole_id} · no net"
+        else:
+            tag = f"{hole_id} {net}" if connected else f"{hole_id} {net} · NC"
+        label_y = y + strip_width / 2 + 3.8 if label_below else y - strip_width / 2 - 1.7
+        sh.text(x + 6.5, label_y, tag, size=6, color=MUTED)
 
 
-def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=(), mechanical=False):
+def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=(), mechanical=False, show_labels=True):
     """All four holes, optionally the spine edge. `connected` lists hole ids that carry a net strip;
     `labels_below` moves a hole's net name under its strip (H4 when Bus B climbs the gutter).
-    `mechanical` labels every hole as having no net, for V2 pages, whose holes only bind."""
+    `mechanical` labels every hole as having no net, for V2 pages, whose holes only bind.
+    Dense procedure/results pages may set `show_labels=False` while keeping the punch guides."""
+    if mechanical and connected:
+        raise ValueError("a mechanical spine cannot connect binder holes to electrical nets")
     strip_widths = strip_widths or {}
     if edge:
         sh.line(S.SPINE_W, 26, S.SPINE_W, 280, width=0.15, color=GUIDE, dash=(0.4, 1.6))
@@ -129,6 +141,7 @@ def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=(), mech
             strip_width=strip_widths.get(hole_id, S.TAPE_W),
             label_below=hole_id in labels_below,
             mechanical=mechanical,
+            show_label=show_labels,
         )
 
 
