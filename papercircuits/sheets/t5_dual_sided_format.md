@@ -1,0 +1,125 @@
+# T5  Dual-sided page format
+
+Validate fixed V2 rails, wrap-first layer changes and a working circuit on both faces.
+
+## PDF title
+
+T5 dual-sided page format
+
+## Status
+
+V2 format test
+
+## Rail labels
+
+- V+: V+ · top rail
+- BUS A: BUS A · above centre ring
+- BUS B: BUS B · below centre ring
+- GND: GND · wide bottom rail
+- outer_wrap: continue tape to edge and fold
+
+## Side A
+
+- load_title: Side A load
+- load_body: R2 and LED2 run from BUS B down to GND. Test 2 drives BUS B from side B, through the outer-edge wrap.
+- rule_title: Routing rule
+- rule_body: Wrap around an edge to change faces. A soldered wire via is an exception only when no safe wrap path exists.
+- footer: sheet 1 of 4 (side A)
+
+## Side B
+
+- title: T5  Dual-sided format: side B
+- subtitle: This side prints behind sheet 1. The four rails meet side A only at their edge wraps.
+- load_title: Side B load
+- load_body: R1 and LED1 run from V+ down to BUS A. Test 1 returns BUS A to GND through the opposite face.
+- wrap_title: No page vias
+- wrap_body: V+ wraps over the top, GND over the bottom, and both buses around the outer edge. Build no through-page via on this test.
+- footer: sheet 2 of 4 (side B)
+
+## Sheet 3
+
+- title: T5  Build and test the dual-sided format
+- subtitle: Print sheets 1 and 2 double-sided on card, flipping on the long edge. Print sheets 3 and 4 once.
+- footer: sheet 3 of 4
+
+## You need
+
+- One card printed double-sided (sheets 1 and 2), a three-hole punch and a three-ring binder
+- 5 mm copper tape for V+ and the buses; 12 mm copper tape for GND
+- Two 1 kΩ resistors, R1 and R2; two red 5 mm LEDs, LED1 and LED2
+- A soldering iron and solder, clip leads and a multimeter
+- A fused 3 × AA holder, 4.5 V nominal
+
+## 1 · Print and inspect
+
+1. Check the 100 mm scale bar on both faces. Hold the card to a light: each side-B rail must sit directly behind its side-A partner.
+2. Punch the three mechanical holes. Confirm that no copper guide enters an 8 mm hole keep-out.
+3. Mark the two faces A and B before laying tape.
+
+## 2 · Lay the four rails
+
+1. Lay V+ as one continuous 5 mm strip from the side-A spine, across the top rail, over the top edge and along the side-B top rail to its spine.
+2. Lay GND the same way with 12 mm tape, using the bottom-edge wrap.
+3. Lay BUS A as one continuous 5 mm strip from the side-A spine, around the outer edge and back to the side-B spine. Repeat for BUS B.
+4. Burnish every fold. Do not add a through-page via.
+
+## 3 · Add the loads
+
+1. On side B, add R1 and LED1 between V+ and BUS A. Put the LED's long anode leg toward V+.
+2. On side A, add R2 and LED2 between BUS B and GND. Put the LED's long anode leg toward BUS B.
+3. Solder every component lead to its tape lane. Check that no trimmed lead reaches the other face.
+
+## 4 · Continuity before power
+
+1. Measure each rail from its side-A test point to its side-B test point. Record the resistance on sheet 4.
+2. V+, BUS A and BUS B must each be 0.1 Ω or less. The wide GND rail must be 0.05 Ω or less.
+3. Check every pair of different rails. Every reading must be OL; find any bridge before connecting power.
+
+## 5 · Powered proof
+
+1. Connect the fused holder red lead to V+ A and black lead to GND A.
+2. **Test 1:** clip BUS A A to GND B. LED1 on side B must light. This path uses the V+ top wrap, BUS A outer wrap and GND bottom wrap.
+3. Remove that clip. **Test 2:** clip V+ B to BUS B B. LED2 on side A must light. This path uses the V+ top wrap and BUS B outer wrap.
+4. Disconnect power before moving or inspecting tape.
+
+## 6 · Flex and inspect
+
+1. Flex each wrapped edge through 100 cycles, measure all four rails, and repeat at 1,000 cycles.
+2. Repeat both powered tests while gently opening and closing the card in the binder. Record flicker or resets.
+3. Inspect for cracked copper, lifted adhesive, torn card or a wrap that has crept sideways.
+
+## Pass or fail
+
+- **Pass:** both LEDs work only in their stated test, all four rails meet their resistance limits, no rail shorts another and no flicker occurs through 1,000 cycles.
+- **Fail:** any wrap needs a through-page via to complete this layout, or any copper, paper or electrical failure appears.
+- If a future lesson cannot reach an edge safely, record why before permitting a soldered wire via as a documented exception.
+
+## Results
+
+- title: T5  Results
+- subtitle: Record wrap resistance in ohms and decide whether this becomes the V2 page format.
+- footer: sheet 4 of 4
+- continuity: Side A to side B continuity
+- continuity_note: Measure at the labelled test points with power disconnected.
+- new: New
+- cycles_100: 100
+- cycles_1000: 1,000
+- powered: Powered proof
+- before: Before flex
+- after: After flex
+
+## Format decision
+
+- V+ stayed above the first hole
+- GND stayed at the bottom
+- BUS A and BUS B cleared the centre hole
+- Side A/B registration was usable
+- All four edge wraps passed
+- Any page via was required
+- Adopt this format for the first V2 lesson
+
+## Notes
+
+- Page-via exception and reason
+- Damage, flicker or routing changes
+- Builder / date

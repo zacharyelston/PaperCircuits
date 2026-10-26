@@ -180,7 +180,7 @@ def header(sh, page_id, title, subtitle, part=None, status=None):
     sh.line(x0, 22, x1, 22, width=0.2, color=GUIDE)
 
 
-def footer(sh, page_id):
+def footer(sh, page_id, label_x=None):
     x0, y0, x1, _ = S.ZONE_FOOTER
     bar_y = y0 + 1.5
     sh.line(x0, bar_y, x0 + S.SCALE_BAR, bar_y, width=0.3)
@@ -189,7 +189,12 @@ def footer(sh, page_id):
         sh.line(x0 + i * 10, bar_y - tick, x0 + i * 10, bar_y, width=0.2)
     sh.text(x0, bar_y + 3.6, "Print at 100 %: this bar should measure 100 mm.", size=6, color=MUTED)
     sh.text(
-        x1, bar_y + 3.6, f"PaperCircuits page standard v{S.VERSION} · {page_id}", size=6, color=MUTED, align="right"
+        label_x or x1,
+        bar_y + 3.6,
+        f"PaperCircuits page standard v{S.VERSION} · {page_id}",
+        size=6,
+        color=MUTED,
+        align="right",
     )
 
 
