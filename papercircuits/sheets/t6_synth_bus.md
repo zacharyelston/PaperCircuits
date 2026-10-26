@@ -19,7 +19,7 @@ V2 synth test
 ## Side B
 
 - page_title: T6  Synth bus: side B
-- subtitle: BUS B receives audio from M1; V+ and GND arrive through their edge wraps.
+- subtitle: BUS B receives audio from M1; V+ and GND arrive through their spine wraps.
 - title: BUS B · pencil tone filter
 - body: Adapted from M6. BUS B is the audio input. The wiper selects pencil resistance before OUT, while C1 sends high-frequency buzz to GND. OUT still goes through M7 before an amp.
 - footer: sheet 2 of 4 (side B)
@@ -42,7 +42,7 @@ V2 synth test
 ## 1 · Print and lay power
 
 1. Check the 100 mm scale bars and side registration. Punch the three mechanical holes.
-2. Lay V+ over the top edge and GND over the bottom edge, following the solid arrows.
+2. Lay V+ and GND around the spine edge at their fixed rail heights, following the solid arrows.
 3. Confirm V+ and GND are continuous face-to-face and read OL between them.
 
 ## 2 · Build side A
@@ -74,7 +74,7 @@ V2 synth test
 
 ## 6 · Flex and inspect
 
-1. Flex both power wraps through 100 cycles, then repeat both signal tests while opening and closing the binder.
+1. Flex both power spine wraps through 100 cycles, then repeat both signal tests while opening and closing the binder.
 2. Record crackle, dropouts, changing pitch or lifted pencil/tape contacts. Repeat at 1,000 cycles if the 100-cycle test passes.
 
 ## Pass or fail

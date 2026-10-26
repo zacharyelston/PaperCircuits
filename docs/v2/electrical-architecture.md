@@ -13,7 +13,7 @@ V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes on
 | Rail positions | V+ above H1; BUS A above H2; BUS B below H2; GND below H3 | Power **[T5]**; signals **[T6]** |
 | Topology | Four short links per page boundary, with every page passing all four rails on | Proposed; construction **[T4]**, format **[T5]** |
 | Where links sit | Between holes, on or close to the ring axis, not at the page edge | **[T4]** |
-| Layer changes | Wrap a safe page edge first; use a soldered wire via only as a documented exception | Proposed **[T5/T6]** |
+| Layer changes | Wrap the spine edge first; use a soldered wire via only as a documented exception | Proposed **[T5/T6]** |
 | Supply | 3 × AA, 4.5 V nominal, as V1 | Proposed |
 | Protection | One resettable fuse (0.1 A hold) at power entry; no series diode | Proposed |
 | Book budget | 16 pages (15 boundaries), 100 mA total, 0.25 V drop at most | Proposed; link resistance **[T4]** |
@@ -46,7 +46,7 @@ The compact five-pin T4 block is replaced by four rails distributed over the who
 
 The power-rail centres are provisional until T5 is built and the bus centres until T6 is built, but their order is the format: **V+ is always at the top, GND is always at the bottom, and the buses flank the centre ring.** The wide GND rail preserves the 0.05 Ω boundary target without requiring a second return conductor.
 
-**Wrap-first side changes.** V+ wraps over the top edge and GND over the bottom edge. BUS A remains on side A and BUS B remains on side B; neither bus is duplicated across the opposite work area. A soldered wire through the page is the last resort: the page must document why no edge route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
+**Wrap-first side changes.** V+ and GND keep their fixed top and bottom rail positions, but both change faces by wrapping around the spine edge. Top- and bottom-edge wraps are unnecessary in the standard page format. BUS A remains on side A and BUS B remains on side B; neither bus is duplicated across the opposite work area. A soldered wire through the page is the last resort: the page must document why no spine-wrap route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
 
 **Printed notation.** A solid arrow at the end of a copper lane means continue the tape to the page edge and fold it onto the other face; the printer is not expected to reach the physical edge. Opposing chevrons point toward every through-page construction. A circle with a centre point is reserved for an electrical solder, clip or meter target and never denotes a layer change.
 
@@ -116,7 +116,7 @@ At the provisional worst case of 1.5 A and the resistance limits above, one boun
 
 ## 8. Prototypes that close #40
 
-First, one T5 card must demonstrate the fixed power rails and both power wraps with no bus and no page via. Both LEDs must work before and after the flex target, both rails must meet their resistance limits, and V+ must remain isolated from GND.
+First, one T5 card must demonstrate the fixed power rails and both spine wraps with no bus and no page via. Both LEDs must work before and after the flex target, both rails must meet their resistance limits, and V+ must remain isolated from GND.
 
 Then T6 adapts the synth's M3 controller and M6 filter onto one double-sided card. BUS A must carry pitch control only on side A, BUS B must carry audio only on side B, and disconnecting either bus must interrupt only its stated signal path. This is the first proof that the buses communicate rather than acting as extra power rails. It contributes the incremental controller/bus/filter evidence for [#46](https://github.com/zacharyelston/PaperCircuits/issues/46); M1 and M7 remain external pages for this test.
 

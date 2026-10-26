@@ -225,7 +225,7 @@ Module pages (M series) don't stack in the binder. They lie side by side on a ta
 3. **Hardware.** T0 test 3 decides the hole treatment and the binding.
 4. **Overlay printing.** Inkjet on vellum can smudge, so laser may be needed.
 5. **Paper.** Which card to build on. T1 compares smooth card, heavier card, cartridge paper, coated card and 80 gsm paper.
-6. **Two-sided pages.** If T2 passes, a back layer gives routes that cross without an insulating patch, and tape wrapped over the page edges gives rails: V+ over the top edge and GND over the bottom, reachable from either side and through a clipped stack. T2 also decides whether stacked two-sided pages need an interleaf.
+6. **Two-sided pages.** T2 established that a back layer can provide crossing routes without an insulating patch and tested top-edge wrapping. The V2 proposal supersedes that trial geometry: V+ and GND keep their top and bottom rail positions but both wrap around the spine edge. T2 also decides whether stacked two-sided pages need an interleaf.
 
 ## Changelog
 

@@ -35,7 +35,8 @@ SIDE_B = Circuit(
 
 AXIS_START = S.HOLE_X - S.TAPE_W / 2
 V_PLUS_Y, BUS_A_Y, BUS_B_Y, GND_Y = 29.0, 133.0, 164.0, 274.0
-WRAP_X = 184.0
+SPINE_WRAP_X = 4.0
+POWER_RAIL_END_X = 200.0
 
 A_RIBBON = (54.0, 70.0, 178.0, 90.0)
 A_WIPER = (106.0, 198.0, 122.0, 258.0)
@@ -60,14 +61,14 @@ def build(path):
 
 
 def _power_rails(lay, face):
-    v_plus = lay.lane("V+", [(AXIS_START, V_PLUS_Y), (WRAP_X, V_PLUS_Y), (WRAP_X, 4.0)])
+    v_plus = lay.lane("V+", [(SPINE_WRAP_X, V_PLUS_Y), (POWER_RAIL_END_X, V_PLUS_Y)])
     gnd = lay.lane(
         "GND",
-        [(AXIS_START, GND_Y), (WRAP_X, GND_Y), (WRAP_X, 293.0)],
+        [(SPINE_WRAP_X, GND_Y), (POWER_RAIL_END_X, GND_Y)],
         width=S.WIDE_TAPE_W,
     )
-    E.wrap_arrow(lay.sh, WRAP_X, 4.0, "up")
-    E.wrap_arrow(lay.sh, WRAP_X, 293.0, "down")
+    E.wrap_arrow(lay.sh, SPINE_WRAP_X, V_PLUS_Y, "left")
+    E.wrap_arrow(lay.sh, SPINE_WRAP_X, GND_Y, "left")
     E.test_point(lay.sh, 48, V_PLUS_Y, f"V+ {face}", side="below", size=6)
     E.test_point(lay.sh, 48, GND_Y, f"GND {face}", side="above", size=6)
     return v_plus, gnd

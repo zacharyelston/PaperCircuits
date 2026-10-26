@@ -16,10 +16,10 @@ from ..words import Words
 PAGE_ID = "T5"
 WORDS = Words.beside(__file__)
 
-AXIS_START = S.HOLE_X - S.TAPE_W / 2
 V_PLUS_Y = 29.0
 GND_Y = 274.0
-TOP_BOTTOM_WRAP_X = 184.0
+SPINE_WRAP_X = 4.0
+RAIL_END_X = 200.0
 
 
 def build(path):
@@ -38,16 +38,16 @@ def _rails(sh, face):
     rails = {
         "V+": E.lane(
             sh,
-            [(AXIS_START, V_PLUS_Y), (TOP_BOTTOM_WRAP_X, V_PLUS_Y), (TOP_BOTTOM_WRAP_X, 4.0)],
+            [(SPINE_WRAP_X, V_PLUS_Y), (RAIL_END_X, V_PLUS_Y)],
         ),
         "GND": E.lane(
             sh,
-            [(AXIS_START, GND_Y), (TOP_BOTTOM_WRAP_X, GND_Y), (TOP_BOTTOM_WRAP_X, 293.0)],
+            [(SPINE_WRAP_X, GND_Y), (RAIL_END_X, GND_Y)],
             width=S.WIDE_TAPE_W,
         ),
     }
-    E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 4.0, "up")
-    E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 293.0, "down")
+    E.wrap_arrow(sh, SPINE_WRAP_X, V_PLUS_Y, "left")
+    E.wrap_arrow(sh, SPINE_WRAP_X, GND_Y, "left")
     labels = WORDS.fields("Rail labels")
     for net, y in (("V+", V_PLUS_Y), ("GND", GND_Y)):
         sh.text(56, y - (4.0 if net != "GND" else 7.5), labels[net], size=7, bold=True)
