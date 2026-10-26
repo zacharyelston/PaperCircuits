@@ -16,12 +16,11 @@ V2 format test
 - BUS A: BUS A · above centre ring
 - BUS B: BUS B · below centre ring
 - GND: GND · wide bottom rail
-- outer_wrap: continue tape to edge and fold
 
 ## Side A
 
 - load_title: Side A load
-- load_body: R1 and LED1 run from V+ down to BUS A. Test 1 returns BUS A to GND through the opposite face.
+- load_body: R1 and LED1 run from V+ down to BUS A. BUS A exists only on side A.
 - rule_title: Routing rule
 - rule_body: Wrap around an edge to change faces. A soldered wire via is an exception only when no safe wrap path exists.
 - footer: sheet 1 of 4 (side A)
@@ -29,11 +28,11 @@ V2 format test
 ## Side B
 
 - title: T5  Dual-sided format: side B
-- subtitle: This side prints behind sheet 1. The four rails meet side A only at their edge wraps.
+- subtitle: This side prints behind sheet 1. V+ and GND wrap between faces; BUS B stays on side B.
 - load_title: Side B load
-- load_body: R2 and LED2 run from BUS B down to GND. Test 2 drives BUS B from side A, through the outer-edge wrap.
+- load_body: R2 and LED2 run from BUS B down to GND. BUS B exists only on side B.
 - wrap_title: No page vias
-- wrap_body: V+ wraps over the top, GND over the bottom, and both buses around the outer edge. Build no through-page via on this test.
+- wrap_body: V+ wraps over the top and GND over the bottom. BUS A stays on side A and BUS B stays on side B. Build no through-page via.
 - footer: sheet 2 of 4 (side B)
 
 ## Sheet 3
@@ -60,7 +59,7 @@ V2 format test
 
 1. Lay V+ as one continuous 5 mm strip from the side-A spine, across the top rail, over the top edge and along the side-B top rail to its spine.
 2. Lay GND the same way with 12 mm tape, using the bottom-edge wrap.
-3. Lay BUS A as one continuous 5 mm strip from the side-A spine, around the outer edge and back to the side-B spine. Repeat for BUS B.
+3. Lay BUS A across side A only. Lay BUS B across side B only. Do not wrap either bus onto the opposite face.
 4. Burnish every fold. Do not add a through-page via.
 5. Follow each solid arrow to the physical edge even though the printed lane stops short. Round circle-and-dot marks are electrical test or clip points, not vias.
 
@@ -72,15 +71,15 @@ V2 format test
 
 ## 4 · Continuity before power
 
-1. Measure each rail from its side-A test point to its side-B test point. Record the resistance on sheet 4.
+1. Measure V+ and GND from side A to side B. Measure BUS A end-to-end on side A and BUS B end-to-end on side B. Record the resistance on sheet 4.
 2. V+, BUS A and BUS B must each be 0.1 Ω or less. The wide GND rail must be 0.05 Ω or less.
 3. Check every pair of different rails. Every reading must be OL; find any bridge before connecting power.
 
 ## 5 · Powered proof
 
 1. Connect the fused holder red lead to V+ A and black lead to GND A.
-2. **Test 1:** clip BUS A B to GND B. LED1 on side A must light. This path uses the BUS A outer wrap and GND bottom wrap.
-3. Remove that clip. **Test 2:** clip V+ B to BUS B A. LED2 on side B must light. This path uses the V+ top wrap, BUS B outer wrap and GND bottom wrap.
+2. **Test 1:** clip BUS A's outer test point to GND A. LED1 on side A must light without using side B.
+3. Remove that clip. **Test 2:** clip V+ B to BUS B's outer test point. LED2 on side B must light. This path proves the V+ top wrap and GND bottom wrap.
 4. Disconnect power before moving or inspecting tape.
 
 ## 6 · Flex and inspect
@@ -98,10 +97,10 @@ V2 format test
 ## Results
 
 - title: T5  Results
-- subtitle: Record wrap resistance in ohms and decide whether this becomes the V2 page format.
+- subtitle: Record rail resistance in ohms and decide whether this becomes the V2 page format.
 - footer: sheet 4 of 4
-- continuity: Side A to side B continuity
-- continuity_note: Measure at the labelled test points with power disconnected.
+- continuity: Power wraps and bus continuity
+- continuity_note: Measure power rails face-to-face and each bus end-to-end on its named face.
 - new: New
 - cycles_100: 100
 - cycles_1000: 1,000
@@ -115,7 +114,8 @@ V2 format test
 - GND stayed at the bottom
 - BUS A and BUS B cleared the centre hole
 - Side A/B registration was usable
-- All four edge wraps passed
+- Both power edge wraps passed
+- BUS A stayed on side A and BUS B stayed on side B
 - Any page via was required
 - Adopt this format for the first V2 lesson
 

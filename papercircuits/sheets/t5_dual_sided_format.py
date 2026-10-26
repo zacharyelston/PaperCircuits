@@ -1,9 +1,9 @@
 """T5: validate the proposed V2 dual-sided page format.
 
-The four shared rails have fixed vertical homes: V+ below the header, BUS A and BUS B
-on opposite sides of the centre ring, and a wide GND rail at the bottom. Copper changes
-face by wrapping a page edge. The two LED loads deliberately live on opposite faces so
-the powered tests exercise every wrap without using a page via.
+The power rails have fixed vertical homes and wrap between faces: V+ below the header
+and a wide GND rail at the bottom. BUS A belongs to side A above the centre ring; BUS B
+belongs to side B below it. The two LED loads validate the face-specific buses and both
+power wraps without using a page via.
 """
 
 from reportlab.platypus import Paragraph
@@ -44,25 +44,22 @@ def _rails(sh, face):
             sh,
             [(AXIS_START, V_PLUS_Y), (TOP_BOTTOM_WRAP_X, V_PLUS_Y), (TOP_BOTTOM_WRAP_X, 4.0)],
         ),
-        "BUS A": E.lane(sh, [(AXIS_START, BUS_A_Y), (OUTER_WRAP_X, BUS_A_Y)]),
-        "BUS B": E.lane(sh, [(AXIS_START, BUS_B_Y), (OUTER_WRAP_X, BUS_B_Y)]),
         "GND": E.lane(
             sh,
             [(AXIS_START, GND_Y), (TOP_BOTTOM_WRAP_X, GND_Y), (TOP_BOTTOM_WRAP_X, 293.0)],
             width=S.WIDE_TAPE_W,
         ),
     }
+    bus_net, bus_y = ("BUS A", BUS_A_Y) if face == "A" else ("BUS B", BUS_B_Y)
+    rails[bus_net] = E.lane(sh, [(AXIS_START, bus_y), (OUTER_WRAP_X, bus_y)])
     E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 4.0, "up")
-    E.wrap_arrow(sh, OUTER_WRAP_X, BUS_A_Y, "right")
-    E.wrap_arrow(sh, OUTER_WRAP_X, BUS_B_Y, "right")
     E.wrap_arrow(sh, TOP_BOTTOM_WRAP_X, 293.0, "down")
     labels = WORDS.fields("Rail labels")
-    for net, y in (("V+", V_PLUS_Y), ("BUS A", BUS_A_Y), ("BUS B", BUS_B_Y), ("GND", GND_Y)):
+    for net, y in (("V+", V_PLUS_Y), (bus_net, bus_y), ("GND", GND_Y)):
         sh.text(56, y - (4.0 if net != "GND" else 7.5), labels[net], size=7, bold=True)
-    sh.text(202, BUS_A_Y - 4, labels["outer_wrap"], size=6, color=MUTED, align="right")
     E.test_point(sh, 48, V_PLUS_Y, f"V+ {face}", side="below", size=6)
-    E.test_point(sh, 48, BUS_A_Y, f"A {face}", side="above", size=6)
-    E.test_point(sh, 48, BUS_B_Y, f"B {face}", side="below", size=6)
+    E.test_point(sh, 48, bus_y, f"{bus_net[-1]} {face}", side="above", size=6)
+    E.test_point(sh, 194, bus_y, f"{bus_net[-1]} OUT", side="above", size=6)
     E.test_point(sh, 48, GND_Y, f"GND {face}", side="above", size=6)
     return rails
 
@@ -129,7 +126,7 @@ def _results(sh):
     E.spine(sh, mechanical=True, holes=S.V2_HOLES, show_labels=False)
     h, note = ts.H, ts.NOTE
     rail_rows = [["", words["new"], words["cycles_100"], words["cycles_1000"]]]
-    rail_rows += [[net, "", "", ""] for net in ("V+", "BUS A", "BUS B", "GND")]
+    rail_rows += [[net, "", "", ""] for net in ("V+ A-B", "BUS A on A", "BUS B on B", "GND A-B")]
     power_rows = [["", words["before"], words["after"]], ["LED1 / BUS A", "", ""], ["LED2 / BUS B", "", ""]]
     left = [Paragraph(words["continuity"], h), Paragraph(words["continuity_note"], note)]
     left += [ts.table(rail_rows, [20, 20, 20, 20], 8)]

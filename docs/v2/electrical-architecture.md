@@ -8,7 +8,7 @@ V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes on
 
 | Question | Proposal | Status |
 |---|---|---|
-| Shared nets | Four distributed rails: V+, BUS A, BUS B and a wide GND | Proposed **[T5]** |
+| Shared nets | Wrapped V+ and GND power rails; BUS A on side A and BUS B on side B | Proposed **[T5]** |
 | Binding | Three mechanical holes at the common 4.25 inch (107.95 mm) pitch, centred on A4 | Proposed |
 | Rail positions | V+ above H1; BUS A above H2; BUS B below H2; GND below H3 | Proposed **[T5]** |
 | Topology | Four short links per page boundary, with every page passing all four rails on | Proposed; construction **[T4]**, format **[T5]** |
@@ -46,11 +46,11 @@ The compact five-pin T4 block is replaced by four rails distributed over the who
 
 The rail centres are provisional until T5 is built, but their order is the format: **V+ is always at the top, GND is always at the bottom, and the buses flank the centre ring.** The wide GND rail preserves the 0.05 Ω boundary target without requiring a second return conductor.
 
-**Wrap-first side changes.** V+ wraps over the top edge, GND over the bottom edge, and BUS A/B around the outer edge. A rail is one continuous tape path from side A to side B whenever the lesson geometry allows it. A soldered wire through the page is the last resort: the page must document why no edge route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
+**Wrap-first side changes.** V+ wraps over the top edge and GND over the bottom edge. BUS A remains on side A and BUS B remains on side B; neither bus is duplicated across the opposite work area. A soldered wire through the page is the last resort: the page must document why no edge route was safe, keep the via outside fold and hole keep-outs, and expose test points on both faces.
 
 **Printed notation.** A solid arrow at the end of a copper lane means continue the tape to the page edge and fold it onto the other face; the printer is not expected to reach the physical edge. Opposing chevrons point toward every through-page construction. A circle with a centre point is reserved for an electrical solder, clip or meter target and never denotes a layer change.
 
-**Pass-through.** Every V2 page carries all four rails from its side A spine pads to its side B spine pads whether it uses them or not. The book's power never depends on which lessons are bound in it. A lesson branches from the fixed rails without moving them. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
+**Pass-through.** Every V2 page carries V+ and GND between its two faces, BUS A across side A and BUS B across side B whether the lesson uses them or not. The book's power never depends on which lessons are bound in it. A lesson branches from the fixed rails without moving them. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
 
 **T4 remains useful.** Its link-construction and flex coupons still select wire, ribbon and solder methods for the four distributed spine links. Its compact C1-C5 block is no longer the proposed page format.
 
@@ -116,7 +116,7 @@ At the provisional worst case of 1.5 A and the resistance limits above, one boun
 
 ## 8. Prototypes that close #40
 
-First, one T5 card must demonstrate the fixed rails, both layer directions and all four wraps with no page via. Both LEDs must work before and after the flex target, every rail must meet its resistance limit, and every unlike pair must remain open-circuit.
+First, one T5 card must demonstrate the fixed power rails, face-specific buses and both power wraps with no page via. Both LEDs must work before and after the flex target, every rail must meet its resistance limit, and every unlike pair must remain open-circuit.
 
 A three-page book is then run through T4's chosen flex-life cycles:
 1. A V2 power-entry page: the holder, fuse, switch and LED, with the spine pads.
