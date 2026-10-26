@@ -62,9 +62,33 @@ SCALE_BAR = 100.0
 EDGE_V_Y, EDGE_GND_Y = 135.0, 145.0
 EDGE_LEFT_X, EDGE_RIGHT_X = 6.0, 204.0
 RING_TOP, RING_BOTTOM = 46.0, 176.0
-RING_LEFT = (40.0, 45.0)    # x where V+ climbs and GND drops on the left
+RING_LEFT = (40.0, 45.0)  # x where V+ climbs and GND drops on the left
 RING_RIGHT = (194.0, 189.0)  # x where they come back on the right
 PATCH_LOOP = 15.0
+
+# Normative values repeated in docs/page-standard.md. The documentation checker reads
+# the compact table there and fails when code and the standard disagree.
+DOCUMENTED_VALUES = {
+    "VERSION": VERSION,
+    "PAGE_W": PAGE_W,
+    "PAGE_H": PAGE_H,
+    "HOLE_X": HOLE_X,
+    "HOLE_D": HOLE_D,
+    "HOLE_KEEP_OUT": HOLE_KEEP_OUT,
+    "SPINE_W": SPINE_W,
+    "TAPE_W": TAPE_W,
+    "WIDE_TAPE_W": WIDE_TAPE_W,
+    "NET_CLEARANCE": NET_CLEARANCE,
+    "JOINT_OVERLAP": JOINT_OVERLAP,
+    "PART_GAP": PART_GAP,
+    "TEST_POINT_D": TEST_POINT_D,
+    "FLAP_PAD_LEN": FLAP_PAD_LEN,
+    "SWITCH_PAD_GAP": SWITCH_PAD_GAP,
+    "SCALE_BAR": SCALE_BAR,
+    "EDGE_V_Y": EDGE_V_Y,
+    "EDGE_GND_Y": EDGE_GND_Y,
+    "PATCH_LOOP": PATCH_LOOP,
+}
 
 
 def hole_y(hole):

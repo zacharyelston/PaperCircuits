@@ -120,10 +120,14 @@ BOUGHT = ("resistor", "capacitor", "electrolytic", "led", "diode", "transistor",
 
 
 class Circuit:
-    def __init__(self, *parts):
+    def __init__(self, *parts, allow=()):
         self.parts = {p.ref: p for p in parts}
+        self.allow = frozenset(allow)
         if len(self.parts) != len(parts):
             raise ValueError("two parts share a ref")
+        problems = self.problems()
+        if problems:
+            raise ValueError("invalid circuit:\n  " + "\n  ".join(problems))
 
     def __getitem__(self, ref):
         if ref not in self.parts:
@@ -144,3 +148,47 @@ class Circuit:
         drops out of its old line."""
         p = self.parts[ref]
         return [q.ref for q in self.parts.values() if (q.kind, q.value, q.note) == (p.kind, p.value, p.note)]
+
+    def problems(self):
+        """Conservative graph checks only; this is deliberately not analogue simulation.
+
+        An intentional exception is named narrowly in ``allow``, for example
+        ``Circuit(..., allow={"same-net:R1"})``.
+        """
+        problems = []
+        for part in self.parts.values():
+            if len(set(part.nets)) != len(part.nets) and f"same-net:{part.ref}" not in self.allow:
+                problems.append(f"{part.ref} has more than one terminal on {part.nets[0]}")
+            if part.kind == "wire" and set(part.nets) == {"V+", "GND"} and f"rail-short:{part.ref}" not in self.allow:
+                problems.append(f"{part.ref} directly shorts V+ to GND")
+        if self.parts and "disconnected" not in self.allow:
+            groups = self._connected_part_groups()
+            if len(groups) > 1:
+                descriptions = [", ".join(group) for group in groups]
+                problems.append("disconnected part groups: " + " / ".join(descriptions))
+        unknown = sorted(
+            exception
+            for exception in self.allow
+            if exception != "disconnected"
+            and not any(exception == f"{rule}:{ref}" for rule in ("same-net", "rail-short") for ref in self.parts)
+        )
+        problems += [f"unknown electrical-check exception: {exception}" for exception in unknown]
+        return problems
+
+    def _connected_part_groups(self):
+        remaining = set(self.parts)
+        groups = []
+        while remaining:
+            group = {remaining.pop()}
+            nets = set(self.parts[next(iter(group))].nets)
+            changed = True
+            while changed:
+                changed = False
+                for ref in list(remaining):
+                    if nets.intersection(self.parts[ref].nets):
+                        remaining.remove(ref)
+                        group.add(ref)
+                        nets.update(self.parts[ref].nets)
+                        changed = True
+            groups.append(sorted(group))
+        return sorted(groups)

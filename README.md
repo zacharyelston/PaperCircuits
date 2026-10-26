@@ -115,6 +115,19 @@ Commit `out/` and `docs/img/` along with the code. Every pull request runs the s
 
 The last check compares fingerprints in `docs/img/previews.sha256` rather than images, because poppler renders slightly differently on each platform.
 
+For development, run the fast checks before rebuilding artifacts:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+uv run build.py --check
+```
+
+`build.py --check` builds into a temporary directory and does not modify `out/` or
+`docs/img/`. To add a sheet, add its output filename and module once to the ordered
+`SHEETS` registry near the top of `build.py`.
+
 ## Code
 
 Every page is built in three layers, one source of truth each. [docs/page-layers.md](docs/page-layers.md) explains them and how to make or change a page.
@@ -134,5 +147,6 @@ The rest of the package:
 - `papercircuits/module.py`: what every table-top module page shares: the power ring, edge connectors and layout.
 - `papercircuits/testsheet.py`: what the T-series test sheets share: result columns, steps and tables.
 - `papercircuits/drc.py`: the clearance check every page runs before it's saved.
+- `docs/electrical-checks.md`: the conservative circuit-graph checks and the analogue properties they intentionally do not claim to prove.
 - `papercircuits/sheets/`: one module and one words file per sheet. Add new sheets to `SHEETS` in `build.py`.
 - `tools/plant.py`: plants a mistake in a sheet and reports whether the build catches it.
