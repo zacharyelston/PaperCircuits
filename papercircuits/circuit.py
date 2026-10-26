@@ -10,6 +10,7 @@ check holds each named pin to its own net. A pencil part is a 6B track: its "tra
 is the pencil itself, and its wiper joins it to the "wiper" net's lane.
 """
 
+import heapq
 from dataclasses import dataclass, field
 
 COLOUR_CODE = ("black", "brown", "red", "orange", "yellow", "green", "blue", "violet", "grey", "white")
@@ -120,10 +121,16 @@ BOUGHT = ("resistor", "capacitor", "electrolytic", "led", "diode", "transistor",
 
 
 class Circuit:
-    def __init__(self, *parts):
+    def __init__(self, *parts, allow=(), controller=False, controller_outputs=()):
         self.parts = {p.ref: p for p in parts}
+        self.allow = frozenset(allow)
+        self.controller = controller
+        self.controller_outputs = tuple(controller_outputs) or ("PITCH",)
         if len(self.parts) != len(parts):
             raise ValueError("two parts share a ref")
+        problems = self.problems()
+        if problems:
+            raise ValueError("invalid circuit:\n  " + "\n  ".join(problems))
 
     def __getitem__(self, ref):
         if ref not in self.parts:
@@ -144,3 +151,79 @@ class Circuit:
         drops out of its old line."""
         p = self.parts[ref]
         return [q.ref for q in self.parts.values() if (q.kind, q.value, q.note) == (p.kind, p.value, p.note)]
+
+    def problems(self):
+        """Conservative graph checks only; this is deliberately not analogue simulation.
+
+        An intentional exception is named narrowly in ``allow``, for example
+        ``Circuit(..., allow={"same-net:R1"})``.
+        """
+        problems = []
+        for part in self.parts.values():
+            if len(set(part.nets)) != len(part.nets) and f"same-net:{part.ref}" not in self.allow:
+                problems.append(f"{part.ref} has more than one terminal on {part.nets[0]}")
+            if part.kind == "wire" and set(part.nets) == {"V+", "GND"} and f"rail-short:{part.ref}" not in self.allow:
+                problems.append(f"{part.ref} directly shorts V+ to GND")
+        if self.parts and "disconnected" not in self.allow:
+            groups = self._connected_part_groups()
+            if len(groups) > 1:
+                descriptions = [", ".join(group) for group in groups]
+                problems.append("disconnected part groups: " + " / ".join(descriptions))
+        if self.controller:
+            paths = [self.shortest_fixed_resistance("V+", output) for output in self.controller_outputs]
+            reachable = [resistance for resistance in paths if resistance is not None]
+            if len(reachable) != len(paths):
+                problems.append("controller has no path from V+ to PITCH")
+            elif (resistance := min(reachable)) < 10e3:
+                problems.append(f"controller's shortest V+ to PITCH path is {si(resistance, 'Ω')}, below 10 kΩ")
+        unknown = sorted(
+            exception
+            for exception in self.allow
+            if exception != "disconnected"
+            and not any(exception == f"{rule}:{ref}" for rule in ("same-net", "rail-short") for ref in self.parts)
+        )
+        problems += [f"unknown electrical-check exception: {exception}" for exception in unknown]
+        return problems
+
+    def shortest_fixed_resistance(self, start, end):
+        """Shortest path using fixed resistor values; variable and non-resistive parts cost 0 Ω."""
+        graph = {}
+        for part in self.parts.values():
+            if len(part.nets) != 2 or part.kind not in {"resistor", "pencil", "ldr"}:
+                continue
+            a, b = part.nets
+            weight = part.value if part.kind == "resistor" else 0.0
+            graph.setdefault(a, []).append((b, weight))
+            graph.setdefault(b, []).append((a, weight))
+        queue = [(0.0, start)]
+        best = {start: 0.0}
+        while queue:
+            distance, net = heapq.heappop(queue)
+            if net == end:
+                return distance
+            if distance != best[net]:
+                continue
+            for neighbour, weight in graph.get(net, []):
+                candidate = distance + weight
+                if candidate < best.get(neighbour, float("inf")):
+                    best[neighbour] = candidate
+                    heapq.heappush(queue, (candidate, neighbour))
+        return None
+
+    def _connected_part_groups(self):
+        remaining = set(self.parts)
+        groups = []
+        while remaining:
+            group = {remaining.pop()}
+            nets = set(self.parts[next(iter(group))].nets)
+            changed = True
+            while changed:
+                changed = False
+                for ref in list(remaining):
+                    if nets.intersection(self.parts[ref].nets):
+                        remaining.remove(ref)
+                        group.add(ref)
+                        nets.update(self.parts[ref].nets)
+                        changed = True
+            groups.append(sorted(group))
+        return sorted(groups)

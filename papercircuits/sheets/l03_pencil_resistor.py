@@ -40,7 +40,7 @@ CIRCUIT = Circuit(
 WORDS = Words.beside(__file__, CIRCUIT)
 
 V_PLUS_Y = 50.0
-TRACK_A = (46.0, 57.5, 146.0, 72.5)   # 100 × 15 mm
+TRACK_A = (46.0, 57.5, 146.0, 72.5)  # 100 × 15 mm
 TRACK_B = (46.0, 96.0, 126.0, 100.0)  # 80 × 4 mm
 R1_X, R1_CY = 140.0, 80.0
 N_TOP, N_Y, N_END = 88.0, 104.0, 165.0
@@ -155,7 +155,9 @@ def _workbook(sh):
     E.workbook_box(sh, boxes[1], "Measure", WORDS.fields("Measure")["prompt"])
     col_x, pitch, box_w = tx + 18, 20.0, 13.0
     for j, mark in enumerate(MEASURE_MARKS):
-        sh.text(col_x + j * pitch + box_w / 2, my0 + 9.5, f"{mark} mm", size=6.5, bold=True, color=MUTED, align="center")
+        sh.text(
+            col_x + j * pitch + box_w / 2, my0 + 9.5, f"{mark} mm", size=6.5, bold=True, color=MUTED, align="center"
+        )
     for i, row in enumerate(WORDS.items("Measure rows")):
         ry = my0 + 15 + i * 6
         sh.text(tx, ry, row, size=7, bold=True)

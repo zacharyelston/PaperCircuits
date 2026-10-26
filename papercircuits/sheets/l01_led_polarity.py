@@ -36,9 +36,9 @@ WORDS = Words.beside(__file__, CIRCUIT)
 
 # Each branch: its node's net, resistor, LED, test point, and x.
 BRANCHES = (("N1", "R1", "LED1", "TP2", 95.0), ("N2", "R2", "LED2", "TP3", 150.0))
-RAIL_TOP = 46.0       # unswitched V+, on its way to the switch
-RAIL_SW = 62.0        # switched V+, past R1 and R2
-RAIL_GND = 124.5      # GND, past LED1 and LED2
+RAIL_TOP = 46.0  # unswitched V+, on its way to the switch
+RAIL_SW = 62.0  # switched V+, past R1 and R2
+RAIL_GND = 124.5  # GND, past LED1 and LED2
 NODE = (74.5, 112.0)  # each branch's lane between its resistor and LED
 SW_JOG = (34.0, 194.0)
 
@@ -55,9 +55,13 @@ def build(path):
     E.spine(sh, connected=("H2", "H3"))
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"),
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
         WORDS.items("Build it", lanes=number(lay.laid)),
-        (54.0, 137.0, 104.0, 196.0), (110.0, 137.0, 202.0, 196.0))
+        (54.0, 137.0, 104.0, 196.0),
+        (110.0, 137.0, 202.0, 196.0),
+    )
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
@@ -73,7 +77,9 @@ def _lanes(lay):
     # V+ from H2, up the left side and along the top into the switch.
     v_in = lay.lane("V+", [(x_in, v_plus), (40, v_plus), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)])
     # Switched V+: out of the switch, jog clear of the V+ lane, then along the rail.
-    v_sw = lay.lane("VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (75, RAIL_SW)])
+    v_sw = lay.lane(
+        "VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (75, RAIL_SW)]
+    )
     lay.sh.allow(v_in, v_sw, S.SWITCH_PAD_GAP)
     for net, _, _, _, bx in BRANCHES:
         lay.lane(net, [(bx, NODE[0]), (bx, NODE[1])])
@@ -145,8 +151,17 @@ def _workbook(sh):
     E.workbook_box(sh, boxes[1], "Measure", measure["prompt"])
     for i, label in enumerate(("TP1", "TP2", "TP3")):
         sh.runs(tx + i * 32, my0 + 11, [(label + "  ", True), ("_______ V", False)], size=7.5)
-    sh.runs(tx, my0 + 19, [(f"{measure['lit']}   {leds[0]}  ", True), (measure["yes_no"], False),
-                           (f"      {leds[1]}  ", True), (measure["yes_no"], False)], size=7.5)
+    sh.runs(
+        tx,
+        my0 + 19,
+        [
+            (f"{measure['lit']}   {leds[0]}  ", True),
+            (measure["yes_no"], False),
+            (f"      {leds[1]}  ", True),
+            (measure["yes_no"], False),
+        ],
+        size=7.5,
+    )
 
     _, ey0, _, _ = boxes[2]
     explain = WORDS.fields("Explain")

@@ -27,12 +27,20 @@ WORDS = Words.beside(__file__)
 LEFT, RIGHT = S.ZONE_BUILD[0], S.ZONE_BUILD[2]
 
 # Each overlap row's code, and whether its lane is two pieces joined at J.
-OVERLAPS = [("O0", False), ("O1", True), ("O2", True), ("O3", True), ("O4", True), ("O5", True),
-            ("O6", True), ("O7", True)]
+OVERLAPS = [
+    ("O0", False),
+    ("O1", True),
+    ("O2", True),
+    ("O3", True),
+    ("O4", True),
+    ("O5", True),
+    ("O6", True),
+    ("O7", True),
+]
 OVERLAP_A, OVERLAP_B, OVERLAP_J = 80.0, 152.0, 116.0
 
 JOINS = ("K1", "K2", "K3", "K4", "K5")
-TRACK = (96.0, 136.0)            # 40 mm of pencil between the two joins
+TRACK = (96.0, 136.0)  # 40 mm of pencil between the two joins
 TRACK_W = 10.0
 JOIN_OVERLAP = 10.0
 LANE_A, LANE_B = (74.0, TRACK[0] + JOIN_OVERLAP), (TRACK[1] - JOIN_OVERLAP, 158.0)
@@ -69,8 +77,17 @@ def _overlaps(sh):
     words = WORDS.fields("Overlap fixtures")
     sh.text(LEFT, 30, words["title"], size=10, bold=True)
     sh.paragraph(LEFT, 32, 136, words["intro"], style(7, color=MUTED))
-    sh.runs(LEFT, 43.5, [(words["zero"] + " ", True), ("_______ Ω", False), ("      " + words["built"] + " ", True),
-                         ("______________", False)], size=7)
+    sh.runs(
+        LEFT,
+        43.5,
+        [
+            (words["zero"] + " ", True),
+            ("_______ Ω", False),
+            ("      " + words["built"] + " ", True),
+            ("______________", False),
+        ],
+        size=7,
+    )
     sh.runs(LEFT, 48.5, [(words["paper"] + " ", True), ("_________________________", False)], size=7)
     ts.result_headers(sh, 48.5)
     for i, (code, joined) in enumerate(OVERLAPS):
@@ -124,8 +141,9 @@ def _procedure(sh):
     left += [Paragraph("Trying different papers", ts.H), Paragraph(intro, style(7.5, leading=9.6))]
     left += ts.bullets(papers)
     left += [Paragraph(note, ts.NOTE)]
-    right += ts.section(WORDS, "Results for standard v0.2",
-                      lambda questions: [ts.decision_table(questions, widths=(38, 42))])
+    right += ts.section(
+        WORDS, "Results for standard v0.2", lambda questions: [ts.decision_table(questions, widths=(38, 42))]
+    )
 
     rest = sh.flow([(LEFT, 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, RIGHT, 282.0)], right)
     if rest:

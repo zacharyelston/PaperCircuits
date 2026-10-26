@@ -12,8 +12,7 @@ say where things go, and m7_output.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import C, Circuit, R
@@ -78,8 +77,9 @@ def _safety(sh):
     x0, y0, x1, y1 = SAFETY
     sh.rect(x0, y0, x1, y1, stroke=INK, width=0.4, radius=1.2)
     h = sh.paragraph(x0 + 2.5, y0 + 2.5, x1 - x0 - 5, "<b>Before you plug in</b>", style(7.5))
-    sh.paragraph(x0 + 2.5, y0 + 3.5 + h, x1 - x0 - 5, "<br/><br/>".join(WORDS.items("Before you plug in")),
-                 style(7, leading=8.6))
+    sh.paragraph(
+        x0 + 2.5, y0 + 3.5 + h, x1 - x0 - 5, "<br/><br/>".join(WORDS.items("Before you plug in")), style(7, leading=8.6)
+    )
 
 
 def _schematic(sh, lay):

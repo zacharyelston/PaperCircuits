@@ -57,9 +57,13 @@ def build(path):
     E.spine(sh, connected=("H2", "H3"))
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"),
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
         WORDS.items("Build it", lanes=number(lay.laid)),
-        (54.0, 136.0, 104.0, 196.0), (110.0, 136.0, 202.0, 196.0))
+        (54.0, 136.0, 104.0, 196.0),
+        (110.0, 136.0, 202.0, 196.0),
+    )
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
@@ -71,10 +75,13 @@ def _lanes(lay):
     sw_in, sw_out = S.SWITCH_LANE_X
     jog_y, jog_x = SW_JOG
     x_in = S.NET_STRIP_START_X
-    v_in = lay.lane("V+", [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP),
-                           (sw_in, S.SWITCH_LANE_TOP)])
-    v_sw = lay.lane("VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW),
-                            (70, RAIL_SW)])
+    v_in = lay.lane(
+        "V+",
+        [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)],
+    )
+    v_sw = lay.lane(
+        "VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (70, RAIL_SW)]
+    )
     lay.sh.allow(v_in, v_sw, S.SWITCH_PAD_GAP)
     for net, _, _, _, bx in DIVIDERS:
         lay.lane(net, [(bx, MID[0]), (bx, MID[1])])
@@ -138,8 +145,18 @@ def _workbook(sh):
     _, my0, _, _ = boxes[1]
     measure = WORDS.fields("Measure")
     E.workbook_box(sh, boxes[1], "Measure", measure["prompt"])
-    lesson.answer_table(sh, tx, my0 + 9.3, measure["table"], tuple(measure[net] for net, *_ in DIVIDERS),
-                        (measure["measured"], measure["worked_out"]), label_w=20, pitch=21, box_w=13, unit="V")
+    lesson.answer_table(
+        sh,
+        tx,
+        my0 + 9.3,
+        measure["table"],
+        tuple(measure[net] for net, *_ in DIVIDERS),
+        (measure["measured"], measure["worked_out"]),
+        label_w=20,
+        pitch=21,
+        box_w=13,
+        unit="V",
+    )
     sh.runs(tx + 66, my0 + 9.3, [("TP1  ", True), ("______ V", False)], size=7)
     sh.text(tx + 66, my0 + 15.5, measure["rule"], size=6.5, bold=True, color=MUTED)
     sh.text(tx + 66, my0 + 19.3, measure["rule_top"], size=6.5, color=MUTED)

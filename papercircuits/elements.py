@@ -117,8 +117,13 @@ def spine(sh, connected=(), strip_widths=None, edge=False, labels_below=()):
     if edge:
         sh.line(S.SPINE_W, 26, S.SPINE_W, 280, width=0.15, color=GUIDE, dash=(0.4, 1.6))
     for hole_id in S.HOLES:
-        hole(sh, hole_id, connected=hole_id in connected,
-             strip_width=strip_widths.get(hole_id, S.TAPE_W), label_below=hole_id in labels_below)
+        hole(
+            sh,
+            hole_id,
+            connected=hole_id in connected,
+            strip_width=strip_widths.get(hole_id, S.TAPE_W),
+            label_below=hole_id in labels_below,
+        )
 
 
 def net_strip(sh, hole_id, to_x=S.ZONE_BUILD[0], width=S.TAPE_W):
@@ -152,7 +157,9 @@ def footer(sh, page_id):
         tick = 1.4 if i in (0, 5, 10) else 0.8
         sh.line(x0 + i * 10, bar_y - tick, x0 + i * 10, bar_y, width=0.2)
     sh.text(x0, bar_y + 3.6, "Print at 100 %: this bar should measure 100 mm.", size=6, color=MUTED)
-    sh.text(x1, bar_y + 3.6, f"PaperCircuits page standard v{S.VERSION} · {page_id}", size=6, color=MUTED, align="right")
+    sh.text(
+        x1, bar_y + 3.6, f"PaperCircuits page standard v{S.VERSION} · {page_id}", size=6, color=MUTED, align="right"
+    )
 
 
 def zone(sh, rect, name, note=None):
@@ -274,6 +281,7 @@ def via(sh, x, y, kind):
 
 # Part footprints, actual size.
 
+
 def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):
     """1/4 W resistor: 6.3 × 2.4 mm body, leads reaching `lead` mm from the centre.
     Returns its two leads as segments from tip to body, top or left one first."""
@@ -297,16 +305,25 @@ def resistor(sh, cx, cy, vertical=True, lead=11.0, label=None):
 
 def _leads(cx, cy, dx, dy, lead, body):
     """A two-lead part's leads along (dx, dy), each from its tip to the body's edge."""
-    return [((cx - dx * lead, cy - dy * lead), (cx - dx * body, cy - dy * body)),
-            ((cx + dx * body, cy + dy * body), (cx + dx * lead, cy + dy * lead))]
+    return [
+        ((cx - dx * lead, cy - dy * lead), (cx - dx * body, cy - dy * body)),
+        ((cx + dx * body, cy + dy * body), (cx + dx * lead, cy + dy * lead)),
+    ]
 
 
 def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None):
     """5 mm LED seen from above, legs splayed flat. The anode (long leg, +) points
     `anode`: left, right, up or down. Returns its leads by name, each from tip to body."""
     dx, dy = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1)}[anode]
-    sh.line(cx + dx * lead_anode, cy + dy * lead_anode, cx - dx * lead_cathode, cy - dy * lead_cathode,
-            width=0.5, color=MUTED, cap=1)
+    sh.line(
+        cx + dx * lead_anode,
+        cy + dy * lead_anode,
+        cx - dx * lead_cathode,
+        cy - dy * lead_cathode,
+        width=0.5,
+        color=MUTED,
+        cap=1,
+    )
     sh.circle(cx, cy, 5.8, stroke=MUTED, fill=WHITE, width=0.3)
     sh.circle(cx, cy, 5.0, stroke=MUTED, width=0.2)
     if dy:
@@ -318,8 +335,10 @@ def led(sh, cx, cy, anode="left", lead_anode=12.0, lead_cathode=9.0, label=None)
         if label:
             sh.text(cx, cy - 4.2, label, size=6, color=MUTED, align="center")
     r = 5.8 / 2
-    return {"anode": ((cx + dx * lead_anode, cy + dy * lead_anode), (cx + dx * r, cy + dy * r)),
-            "cathode": ((cx - dx * r, cy - dy * r), (cx - dx * lead_cathode, cy - dy * lead_cathode))}
+    return {
+        "anode": ((cx + dx * lead_anode, cy + dy * lead_anode), (cx + dx * r, cy + dy * r)),
+        "cathode": ((cx - dx * r, cy - dy * r), (cx - dx * lead_cathode, cy - dy * lead_cathode)),
+    }
 
 
 def ptc(sh, cx, cy, lead=12.0, label=None):
@@ -482,8 +501,10 @@ def diode(sh, cx, cy, lead=8.0, label=None, cathode="right"):
         if label:
             sh.text(cx + bw / 2 + 1, cy + 1, label, size=6, color=MUTED)
     dx, dy = {"right": (1, 0), "left": (-1, 0), "down": (0, 1), "up": (0, -1)}[cathode]
-    return {"anode": ((cx - dx * lead, cy - dy * lead), (cx - dx * bl / 2, cy - dy * bl / 2)),
-            "cathode": ((cx + dx * bl / 2, cy + dy * bl / 2), (cx + dx * lead, cy + dy * lead))}
+    return {
+        "anode": ((cx - dx * lead, cy - dy * lead), (cx - dx * bl / 2, cy - dy * bl / 2)),
+        "cathode": ((cx + dx * bl / 2, cy + dy * bl / 2), (cx + dx * lead, cy + dy * lead)),
+    }
 
 
 def electrolytic(sh, x, y_plus, y_minus, label=None):

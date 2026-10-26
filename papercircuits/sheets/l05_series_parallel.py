@@ -63,9 +63,13 @@ def build(path):
     E.spine(sh, connected=("H2", "H3"))
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"),
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
         WORDS.items("Build it", lanes=number(lay.laid)),
-        (54.0, 151.0, 104.0, 196.0), (110.0, 151.0, 202.0, 196.0))
+        (54.0, 151.0, 104.0, 196.0),
+        (110.0, 151.0, 202.0, 196.0),
+    )
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
@@ -78,10 +82,13 @@ def _lanes(lay):
     jog_y, jog_x = SW_JOG
     x_in = S.NET_STRIP_START_X
     rail_gap = RAIL_SW + S.TAPE_W / 2 + 10
-    v_in = lay.lane("V+", [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP),
-                           (sw_in, S.SWITCH_LANE_TOP)])
-    v_sw = lay.lane("VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW),
-                            (70, RAIL_SW)])
+    v_in = lay.lane(
+        "V+",
+        [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)],
+    )
+    v_sw = lay.lane(
+        "VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (70, RAIL_SW)]
+    )
     lay.sh.allow(v_in, v_sw, S.SWITCH_PAD_GAP)
     lay.lane("N1", [(A_X, rail_gap), (A_X, NODE_END)])
     lay.lane("MID", [(B_X, rail_gap), (B_X, B_M[1])])
@@ -172,16 +179,33 @@ def _workbook(sh):
     _, py0, _, _ = boxes[0]
     predict = WORDS.fields("Predict")
     E.workbook_box(sh, boxes[0], "Predict", predict["prompt"])
-    sh.runs(tx, py0 + 12, [(f"{predict['brightest']}  ", True), ("_________    _________    _________", False),
-                           (f"  {predict['dimmest']}", True)], size=7.5)
+    sh.runs(
+        tx,
+        py0 + 12,
+        [
+            (f"{predict['brightest']}  ", True),
+            ("_________    _________    _________", False),
+            (f"  {predict['dimmest']}", True),
+        ],
+        size=7.5,
+    )
     sh.text(tx, py0 + 19.5, predict["question"], size=7, color=MUTED)
 
     _, my0, _, _ = boxes[1]
     measure = WORDS.fields("Measure")
     E.workbook_box(sh, boxes[1], "Measure", measure["prompt"])
-    lesson.answer_table(sh, tx, my0 + 9.3, measure["table"],
-                        (measure["one"], measure["in_a_row"], measure["side_by_side"]), (measure["ohms"],),
-                        label_w=40, pitch=24, box_w=16, unit="Ω")
+    lesson.answer_table(
+        sh,
+        tx,
+        my0 + 9.3,
+        measure["table"],
+        (measure["one"], measure["in_a_row"], measure["side_by_side"]),
+        (measure["ohms"],),
+        label_w=40,
+        pitch=24,
+        box_w=16,
+        unit="Ω",
+    )
     sh.text(tx + 66, my0 + 14.1, measure["then"], size=7, bold=True, color=MUTED)
     sh.text(tx + 66, my0 + 18.9, measure["match"], size=6.5, color=MUTED)
 

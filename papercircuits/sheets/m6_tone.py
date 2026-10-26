@@ -17,8 +17,7 @@ things go, and m6_tone.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import PENCIL, WIRE, C, Circuit
@@ -61,8 +60,13 @@ def build(path):
     module.need(sh, PAGE_ID, need[:3], need[3:])
     module.caption(sh, WORDS.text("Caption"))
     _schematic(sh, lay)
-    module.steps(sh, PAGE_ID, WORDS.items("Build it", wiper_strip=f"{WIPER_STRIP:g}"), WORDS.items("Play it"),
-                 note=TAG_NOTE_WITH_T1)
+    module.steps(
+        sh,
+        PAGE_ID,
+        WORDS.items("Build it", wiper_strip=f"{WIPER_STRIP:g}"),
+        WORDS.items("Play it"),
+        note=TAG_NOTE_WITH_T1,
+    )
     E.footer(sh, PAGE_ID)
     lay.check(listed=WORDS.refs("You need"))
     sh.save()
@@ -74,8 +78,9 @@ def _track(lay):
     sh.text(TRACK[0], TRACK[3] + 9, labels["soft"], size=6.5, bold=True, color=MUTED)
     sh.text(TRACK[2], TRACK[3] + 9, labels["bright"], size=6.5, bold=True, color=MUTED, align="right")
     gx, half, mid = WIPER_GHOST_X, S.TAPE_W / 2, (IN_Y + TRACK[3]) / 2
-    sh.rect(gx - half, mid - WIPER_STRIP / 2, gx + half, mid + WIPER_STRIP / 2, stroke=MUTED, width=0.3,
-            dash=(0.8, 0.8))
+    sh.rect(
+        gx - half, mid - WIPER_STRIP / 2, gx + half, mid + WIPER_STRIP / 2, stroke=MUTED, width=0.3, dash=(0.8, 0.8)
+    )
     sh.text(gx, TRACK[3] + 9, labels["wiper_strip"], size=6, color=MUTED, align="center")
     lay.lane("IN", [(IN_X[0], IN_Y), (IN_X[1], IN_Y)])
     lay.lane("OUT", [(OUT_X, IN_Y), (OUT_X, OUT_TURN_Y), (OUT_END_X, OUT_TURN_Y)])

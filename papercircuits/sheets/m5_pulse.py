@@ -22,8 +22,7 @@ _schematic() say where things go, and m5_pulse.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import CE, LED, Circuit, Q, R
@@ -78,15 +77,15 @@ def build(path):
 
 
 def _lanes(lay):
-    lay.lane("Q1C", [(COL_A, LANE_TOP), (COL_A, 158)])                          # Q1 collector
+    lay.lane("Q1C", [(COL_A, LANE_TOP), (COL_A, 158)])  # Q1 collector
     b1 = lay.lane("Q1B", [(COL_C, LANE_TOP), (COL_C, B1_Y), (Q1[0] + 2, B1_Y)])  # Q1 base, the lower lane
     E.crossing(lay.sh, COL_B, B1_Y)
     b2 = lay.lane("Q2B", [(COL_B, LANE_TOP), (COL_B, B2_Y), (Q2[0] - 4, B2_Y)])  # Q2 base, crossing over it
     lay.sh.allow(b1, b2, 0)
-    lay.lane("N1", [(COL_D, LANE_TOP), (COL_D, 75)])                            # R2 to LED1
-    lay.lane("Q2C", [(COL_D, 85), (COL_D, 158)])                                # Q2 collector
-    lay.lane("Q3B", [(Q3B_X, R5_Y - 4), (Q3B_X, 158)])                          # Q3 base
-    lay.lane("GATE", [(GATE_X, LANE_TOP), (GATE_X, 158)])                       # Q3 collector, GATE
+    lay.lane("N1", [(COL_D, LANE_TOP), (COL_D, 75)])  # R2 to LED1
+    lay.lane("Q2C", [(COL_D, 85), (COL_D, 158)])  # Q2 collector
+    lay.lane("Q3B", [(Q3B_X, R5_Y - 4), (Q3B_X, 158)])  # Q3 base
+    lay.lane("GATE", [(GATE_X, LANE_TOP), (GATE_X, 158)])  # Q3 collector, GATE
 
 
 def _parts(lay):

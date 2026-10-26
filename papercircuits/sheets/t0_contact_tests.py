@@ -24,8 +24,7 @@ LEFT, RIGHT = 62.0, 202.0  # tests 1 and 2 sit right of the hole treatments
 # Test 3: each hole's treatment, by the width of tape it's built on.
 HOLE_TAPE = {"H1": S.TAPE_W, "H2": S.TAPE_W, "H3": S.WIDE_TAPE_W, "H4": S.TAPE_W}
 
-TAPE_JOINTS = [("J1", "straight"), ("J2", "joint"), ("J3", "joint"), ("J4", "folded"), ("J5", "cut"),
-               ("J6", "joint")]
+TAPE_JOINTS = [("J1", "straight"), ("J2", "joint"), ("J3", "joint"), ("J4", "folded"), ("J5", "cut"), ("J6", "joint")]
 PART_JOINTS = ("M1", "M2", "M3", "M4", "M5")
 
 # Test 4: the corner switch, then three tab switches that differ only in the pair's gap.
@@ -70,8 +69,17 @@ def _tape_joints(sh):
     words = WORDS.fields("Tape joint fixtures")
     sh.text(LEFT, 30, words["title"], size=10, bold=True)
     sh.paragraph(LEFT, 32, RIGHT - LEFT, words["intro"], style(7, color=MUTED))
-    sh.runs(LEFT, 44, [(words["zero"] + " ", True), ("_______ Ω", False), ("      " + words["built"] + " ", True),
-                       ("______________", False)], size=7)
+    sh.runs(
+        LEFT,
+        44,
+        [
+            (words["zero"] + " ", True),
+            ("_______ Ω", False),
+            ("      " + words["built"] + " ", True),
+            ("______________", False),
+        ],
+        size=7,
+    )
     ts.result_headers(sh, 44)
 
     x_a, x_b, x_bend = 102.0, 154.0, 126.0
@@ -105,8 +113,9 @@ def _part_joints(sh):
     words = WORDS.fields("Part joint fixtures")
     sh.text(LEFT, 140, words["title"], size=10, bold=True)
     sh.paragraph(LEFT, 142, RIGHT - LEFT, words["intro"], style(7, color=MUTED))
-    sh.runs(LEFT, 154, [(words["alone"] + " ", True), ("_______ Ω", False), ("   " + words["alone_hint"], False)],
-            size=7)
+    sh.runs(
+        LEFT, 154, [(words["alone"] + " ", True), ("_______ Ω", False), ("   " + words["alone_hint"], False)], size=7
+    )
 
     col_w, top, gap0, gap1, bottom = 25.0, 172.0, 197.0, 207.0, 232.0
     mid = (gap0 + gap1) / 2

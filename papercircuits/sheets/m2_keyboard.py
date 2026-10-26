@@ -16,8 +16,7 @@ where things go, and m2_keyboard.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import Circuit, R
@@ -42,6 +41,8 @@ CIRCUIT = Circuit(
     R("R6", 2.4e3, "F4", "E4"),
     R("R7", 5.1e3, "E4", "D4"),
     R("R8", 6.2e3, "D4", "C4"),
+    controller=True,
+    controller_outputs=KEYS,
 )
 WORDS = Words.beside(__file__, CIRCUIT)
 

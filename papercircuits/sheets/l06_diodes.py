@@ -42,7 +42,7 @@ BRANCHES = (
 )
 RAIL_TOP, RAIL_SW, RAIL_GND = 46.0, 62.0, 137.5
 SW_JOG = (34.0, 194.0)
-NODE_X = (74.5, 95.0)   # resistor to diode
+NODE_X = (74.5, 95.0)  # resistor to diode
 NODE_Y = (105.0, 125.0)  # diode to LED
 R_CY = (RAIL_SW + S.TAPE_W / 2 + NODE_X[0]) / 2
 D_CY = (NODE_X[1] + NODE_Y[0]) / 2
@@ -57,9 +57,13 @@ def build(path):
     E.spine(sh, connected=("H2", "H3"))
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"),
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
         WORDS.items("Build it", lanes=number(lay.laid)),
-        (54.0, 151.0, 104.0, 196.0), (110.0, 151.0, 202.0, 196.0))
+        (54.0, 151.0, 104.0, 196.0),
+        (110.0, 151.0, 202.0, 196.0),
+    )
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
@@ -71,10 +75,13 @@ def _lanes(lay):
     sw_in, sw_out = S.SWITCH_LANE_X
     jog_y, jog_x = SW_JOG
     x_in = S.NET_STRIP_START_X
-    v_in = lay.lane("V+", [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP),
-                           (sw_in, S.SWITCH_LANE_TOP)])
-    v_sw = lay.lane("VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW),
-                            (75, RAIL_SW)])
+    v_in = lay.lane(
+        "V+",
+        [(x_in, S.hole_y("H2")), (40, S.hole_y("H2")), (40, RAIL_TOP), (sw_in, RAIL_TOP), (sw_in, S.SWITCH_LANE_TOP)],
+    )
+    v_sw = lay.lane(
+        "VSW", [(sw_out, S.SWITCH_LANE_TOP), (sw_out, jog_y), (jog_x, jog_y), (jog_x, RAIL_SW), (75, RAIL_SW)]
+    )
     lay.sh.allow(v_in, v_sw, S.SWITCH_PAD_GAP)
     for bx, _, _, _, (upper, _), (lower, _) in BRANCHES:
         lay.lane(upper, [(bx, NODE_X[0]), (bx, NODE_X[1])])
@@ -147,9 +154,19 @@ def _workbook(sh):
     _, my0, _, _ = boxes[1]
     measure = WORDS.fields("Measure")
     E.workbook_box(sh, boxes[1], "Measure", measure["prompt"])
-    lesson.answer_table(sh, tx, my0 + 9.3, measure["table"], (measure["D1"], measure["D2"]),
-                        (measure["before"], measure["after"], measure["across"]),
-                        label_w=26, pitch=22, box_w=14, row_h=5.4, unit="V")
+    lesson.answer_table(
+        sh,
+        tx,
+        my0 + 9.3,
+        measure["table"],
+        (measure["D1"], measure["D2"]),
+        (measure["before"], measure["after"], measure["across"]),
+        label_w=26,
+        pitch=22,
+        box_w=14,
+        row_h=5.4,
+        unit="V",
+    )
     sh.text(tx + 26, my0 + 23.2, measure["rule"], size=6.5, color=MUTED)
 
     _, ey0, _, _ = boxes[2]

@@ -21,8 +21,7 @@ _schematic() say where things go, and m1_oscillator.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import LED, C, Circuit, Q, R
@@ -72,14 +71,14 @@ def build(path):
 
 
 def _lanes(lay):
-    lay.lane("N1", [(COL_A, LANE_TOP), (COL_A, 75)])                      # R1 to LED1
-    lay.lane("Q1C", [(COL_A, 85), (COL_A, 158)])                          # Q1 collector
-    lay.lane("PITCH", [(COL_B, RAIL_EDGE + 3.5), (COL_B, 70)])            # PITCH
+    lay.lane("N1", [(COL_A, LANE_TOP), (COL_A, 75)])  # R1 to LED1
+    lay.lane("Q1C", [(COL_A, 85), (COL_A, 158)])  # Q1 collector
+    lay.lane("PITCH", [(COL_B, RAIL_EDGE + 3.5), (COL_B, 70)])  # PITCH
     b1 = lay.lane("Q1B", [(COL_C, LANE_TOP), (COL_C, B1_Y), (70, B1_Y)])  # Q1 base, the lower lane
     E.crossing(lay.sh, COL_B, B1_Y)
-    b2 = lay.lane("Q2B", [(COL_B, 80), (COL_B, B2_Y), (146, B2_Y)])       # Q2 base, crossing over it
+    b2 = lay.lane("Q2B", [(COL_B, 80), (COL_B, B2_Y), (146, B2_Y)])  # Q2 base, crossing over it
     lay.sh.allow(b1, b2, 0)
-    lay.lane("OUT", [(COL_D, LANE_TOP), (COL_D, 158)])                    # Q2 collector, OUT
+    lay.lane("OUT", [(COL_D, LANE_TOP), (COL_D, 158)])  # Q2 collector, OUT
 
 
 def _parts(lay):

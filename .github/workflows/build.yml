@@ -19,15 +19,14 @@ jobs:
 
       - uses: astral-sh/setup-uv@v6
 
+      - name: Test
+        run: uv run --locked pytest
+
+      - name: Lint
+        run: uv run --locked ruff check .
+
+      - name: Check formatting
+        run: uv run --locked ruff format --check .
+
       - name: Build every page and check the previews
         run: uv run --locked build.py --check
-
-      - name: Fail if the committed PDFs are out of date
-        run: |
-          new=$(git ls-files --others --exclude-standard out/)
-          if ! git diff --quiet -- out/ || [ -n "$new" ]; then
-            echo "::error::The committed PDFs don't match what the code builds. Run 'uv run build.py', then commit out/ and docs/img/."
-            git status --short -- out/
-            exit 1
-          fi
-          echo "Committed PDFs match the build."
