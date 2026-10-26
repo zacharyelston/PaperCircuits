@@ -29,12 +29,12 @@ WORDS = Words.beside(__file__)
 LEFT, RIGHT = S.ZONE_BUILD[0], S.ZONE_BUILD[2]
 
 # Recipe and bin limits the first wafer will settle [T3].
-FOIL = "0.1–0.2 mm"   # thick enough to survive oxidising, thin enough for scissors
-PLATE_W = 1000        # the coil must glow red; a 700 W plate may not get hot enough
-HEAT_MIN = 30         # minutes at full heat once the coil glows
-COOL_MIN = 20         # minutes cooling on the switched-off plate
-SHORT_V = 0.05        # V: both readings under this is a short
-FAIR, WEAK = 3, 1.5   # Rev ÷ Fwd at least this for bins 2 and 3
+FOIL = "0.1–0.2 mm"  # thick enough to survive oxidising, thin enough for scissors
+PLATE_W = 1000  # the coil must glow red; a 700 W plate may not get hot enough
+HEAT_MIN = 30  # minutes at full heat once the coil glows
+COOL_MIN = 20  # minutes cooling on the switched-off plate
+SHORT_V = 0.05  # V: both readings under this is a short
+FAIR, WEAK = 3, 1.5  # Rev ÷ Fwd at least this for bins 2 and 3
 # Fwd puts the red probe on T: Grondahl's easy direction ran from the top contact into the
 # copper. Nobody has checked it with pencil graphite instead of his lead.
 BINS = ("1", "2", "3", "R", "S", "O")
@@ -56,14 +56,20 @@ S_OPEN = (11.0, 0.0, 15.0, 4.0)
 # Packages: a die face up in a landing, with a copper-tape lead from each test point onto it.
 PACKAGES = ("D1", "D2", "D3", "D4")
 PACKAGE_X = (47.0, 89.0, 131.0, 173.0)  # landings' left edges
-PACKAGE_Y = 190.0                        # landings' top edge
-LEAD = 24.0                              # how far each lead runs off the die
+PACKAGE_Y = 190.0  # landings' top edge
+LEAD = 24.0  # how far each lead runs off the die
 
 # What the words fill in, besides the words layer's own tags.
 VALUES = {
-    "foil": FOIL, "plate_w": PLATE_W, "heat_min": HEAT_MIN, "cool_min": COOL_MIN,
-    "fair": f"{FAIR:g}", "weak": f"{WEAK:g}", "short_v": f"{SHORT_V:g}",
-    "wafer": f"{WAFER:g}", "die": f"{DIE:g}",
+    "foil": FOIL,
+    "plate_w": PLATE_W,
+    "heat_min": HEAT_MIN,
+    "cool_min": COOL_MIN,
+    "fair": f"{FAIR:g}",
+    "weak": f"{WEAK:g}",
+    "short_v": f"{SHORT_V:g}",
+    "wafer": f"{WAFER:g}",
+    "die": f"{DIE:g}",
 }
 
 
@@ -108,17 +114,27 @@ def _die_marks(sh, x, y, scale=1.0, dot_stroke=MUTED):
     """The scraped corner S and the pencil dot T of a die whose top-left corner is (x, y)."""
     sx0, sy0, sx1, sy1 = S_OPEN
     _hatch(sh, x + sx0 * scale, y + sy0 * scale, x + sx1 * scale, y + sy1 * scale, step=0.8 * scale)
-    sh.circle(x + T_DOT[0] * scale, y + T_DOT[1] * scale, T_DOT_D * scale, stroke=dot_stroke, width=0.3,
-              dash=(0.8, 0.6))
+    sh.circle(
+        x + T_DOT[0] * scale, y + T_DOT[1] * scale, T_DOT_D * scale, stroke=dot_stroke, width=0.3, dash=(0.8, 0.6)
+    )
 
 
 def _clipped_outline(x0, y0, size, cut):
     x1, y1 = x0 + size, y0 + size
-    return [(x0 + cut, y0), (x1 - cut, y0), (x1, y0 + cut), (x1, y1 - cut),
-            (x1 - cut, y1), (x0 + cut, y1), (x0, y1 - cut), (x0, y0 + cut)]
+    return [
+        (x0 + cut, y0),
+        (x1 - cut, y0),
+        (x1, y0 + cut),
+        (x1, y1 - cut),
+        (x1 - cut, y1),
+        (x0 + cut, y1),
+        (x0, y1 - cut),
+        (x0, y0 + cut),
+    ]
 
 
 # Sheet 1: the frame, packages and trays
+
 
 def _fixtures(sh):
     E.header(sh, PAGE_ID, WORDS.title, WORDS.subtitle, part="1/3")
@@ -140,8 +156,12 @@ def _wafer(sh):
         d = k * DIE
         sh.line(x0 + d, y0, x0 + d, y1, width=0.25, color=GUIDE, dash=(1.5, 1))
         sh.line(x0, y0 + d, x1, y0 + d, width=0.25, color=GUIDE, dash=(1.5, 1))
-        for a, b, c, e in ((x0 + d, y0 - TICK, x0 + d, y0 - 0.8), (x0 + d, y1 + 0.8, x0 + d, y1 + TICK),
-                           (x0 - TICK, y0 + d, x0 - 0.8, y0 + d), (x1 + 0.8, y0 + d, x1 + TICK, y0 + d)):
+        for a, b, c, e in (
+            (x0 + d, y0 - TICK, x0 + d, y0 - 0.8),
+            (x0 + d, y1 + 0.8, x0 + d, y1 + TICK),
+            (x0 - TICK, y0 + d, x0 - 0.8, y0 + d),
+            (x1 + 0.8, y0 + d, x1 + TICK, y0 + d),
+        ):
             sh.line(a, b, c, e, width=0.35)
     sh.polygon(_clipped_outline(x0, y0, WAFER, DIE), stroke=INK, width=0.4)
     for n, (r, c) in enumerate(DIES, 1):
@@ -164,8 +184,14 @@ def _die_key(sh):
     _die_marks(sh, x, y, scale=k, dot_stroke=INK)
     sh.text(x + 2.4, y + 7.2, "17", size=7, bold=True, color=MUTED)
     sh.text(x + T_DOT[0] * k, y + T_DOT[1] * k + 1.3, "T", size=8, bold=True, align="center")
-    sh.text(x + (S_OPEN[0] + S_OPEN[2]) * k / 2, y + (S_OPEN[1] + S_OPEN[3]) * k / 2 + 1.3, "S",
-            size=8, bold=True, align="center")
+    sh.text(
+        x + (S_OPEN[0] + S_OPEN[2]) * k / 2,
+        y + (S_OPEN[1] + S_OPEN[3]) * k / 2 + 1.3,
+        "S",
+        size=8,
+        bold=True,
+        align="center",
+    )
     sh.paragraph(142, 90, 60, "<br/>".join(key), style(6.5, leading=8.4, color=INK))
 
 
@@ -203,13 +229,15 @@ def _trays(sh):
 
 # Sheet 2: the wafer map and results
 
+
 def _results(sh):
     sheet = _fields("Sheet 2")
     E.header(sh, PAGE_ID, sheet["title"], sheet["subtitle"], part="2/3", status=HEADER_STATUS)
     E.spine(sh)
     sh.runs(LEFT, 30, _record("Wafer record", ("________", "________________", "______ V", "______ mA")), size=7)
-    sh.runs(LEFT, 36, _record("Recipe record", ("______ W", "______ min", "______ min", "______ mm", "__________")),
-            size=7)
+    sh.runs(
+        LEFT, 36, _record("Recipe record", ("______ W", "______ min", "______ min", "______ mm", "__________")), size=7
+    )
     # Tables first: they draw with whatever dash the canvas was last given.
     side = [Paragraph(sheet["bins"], ts.H), _bin_table(), Paragraph(sheet["yield"], ts.H), _yield_table()]
     rest = sh.flow([(116.0, 42.0, RIGHT, 142.0)], side)
@@ -263,8 +291,12 @@ def _bin_table():
 
 
 def _yield_table():
-    counts = {"sort": str(len(DIES)), "overall": str(len(DIES)),
-              "centre": str(sum(_is_centre(*d) for d in DIES)), "edge": str(sum(not _is_centre(*d) for d in DIES))}
+    counts = {
+        "sort": str(len(DIES)),
+        "overall": str(len(DIES)),
+        "centre": str(sum(_is_centre(*d) for d in DIES)),
+        "edge": str(sum(not _is_centre(*d) for d in DIES)),
+    }
     data = [_items("Yield table columns")]
     data += [[stage, counts.get(key, ""), "", ""] for key, stage in _fields("Yield table").items()]
     t = ts.table(data, [34, 17, 17, 18], 5.6)
@@ -278,17 +310,20 @@ def _die_table(numbers):
     data = [["", stages["sort"], "", "", stages["final"], "", ""], [die, *readings, *readings]]
     data += [[str(n), "", "", "", "", "", ""] for n in numbers]
     t = ts.table(data, [9, 13, 13, 9, 13, 13, 9], 6.0)
-    t.setStyle([
-        ("SPAN", (1, 0), (3, 0)),
-        ("SPAN", (4, 0), (6, 0)),
-        ("FONT", (0, 0), (-1, 1), FONT_BOLD, 7),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("LINEAFTER", (3, 0), (3, -1), 1.0, INK),
-    ])
+    t.setStyle(
+        [
+            ("SPAN", (1, 0), (3, 0)),
+            ("SPAN", (4, 0), (6, 0)),
+            ("FONT", (0, 0), (-1, 1), FONT_BOLD, 7),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LINEAFTER", (3, 0), (3, -1), 1.0, INK),
+        ]
+    )
     return t
 
 
 # Sheet 3: the procedure
+
 
 def _procedure(sh):
     sheet = _fields("Sheet 3")
@@ -305,8 +340,9 @@ def _procedure(sh):
     right += _section("5 · Dice and final test", ts.steps)
     right += _section("6 · Package, if you like", ts.steps)
     right += _section("Pass or fail", ts.bullets)
-    right += _section("Results", lambda questions: [ts.decision_table(questions, widths=(38, 43), row_height=7)],
-                      notes=1)
+    right += _section(
+        "Results", lambda questions: [ts.decision_table(questions, widths=(38, 43), row_height=7)], notes=1
+    )
     rest = sh.flow([(LEFT, 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, RIGHT, 282.0)], right)
     if rest:
         raise RuntimeError(f"T3 sheet 3 overflowed by {len(rest)} items")

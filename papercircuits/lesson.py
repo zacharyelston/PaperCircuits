@@ -13,8 +13,14 @@ HEADING = style(8.5, bold=True, spaceAfter=1.5)
 def items(texts, numbered, size=7, leading=8.8, space_after=1.2):
     out = []
     for i, t in enumerate(texts, 1):
-        p_style = style(size, leading=leading, leftIndent=8 if numbered else 7, bulletIndent=0,
-                        bulletFontSize=size, spaceAfter=space_after)
+        p_style = style(
+            size,
+            leading=leading,
+            leftIndent=8 if numbered else 7,
+            bulletIndent=0,
+            bulletFontSize=size,
+            spaceAfter=space_after,
+        )
         out.append(Paragraph(t, p_style, bulletText=f"{i}." if numbered else "•"))
     return out
 

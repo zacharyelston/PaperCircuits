@@ -120,7 +120,7 @@ def _parse(text, name="shared.md"):
         elif not line.strip():
             block = None
         elif (m := _ITEM.match(line)) or block is None:
-            block = [line[m.end():] if m else line.strip()]
+            block = [line[m.end() :] if m else line.strip()]
             target.append(block)
         else:
             block.append(line.strip())
@@ -153,4 +153,5 @@ def _fill(text, values, circuit=None):
         if key in TAGS:
             return TAGS[key]
         raise KeyError(key)
+
     return _BOLD.sub(r"<b>\1</b>", _FIELD.sub(field, text))

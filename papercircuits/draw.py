@@ -41,9 +41,7 @@ def _register_fonts():
     }
     for name, filename in faces.items():
         pdfmetrics.registerFont(TTFont(name, os.path.join(fonts, filename)))
-    pdfmetrics.registerFontFamily(
-        FONT, normal=FONT, bold=FONT_BOLD, italic="Vera-Italic", boldItalic="Vera-BoldItalic"
-    )
+    pdfmetrics.registerFontFamily(FONT, normal=FONT, bold=FONT_BOLD, italic="Vera-Italic", boldItalic="Vera-BoldItalic")
 
 
 _register_fonts()
@@ -171,8 +169,15 @@ class Sheet:
             if self.mirrored:
                 x0, x1 = S.PAGE_W - x1, S.PAGE_W - x0
             frame = Frame(
-                x0 * mm, (S.PAGE_H - y1) * mm, (x1 - x0) * mm, (y1 - y0) * mm,
-                leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0, showBoundary=0,
+                x0 * mm,
+                (S.PAGE_H - y1) * mm,
+                (x1 - x0) * mm,
+                (y1 - y0) * mm,
+                leftPadding=0,
+                rightPadding=0,
+                topPadding=0,
+                bottomPadding=0,
+                showBoundary=0,
             )
             frame.addFromList(story, self.c)
         return story
@@ -187,8 +192,11 @@ class Sheet:
 
         found = violations(self.lanes, self.allowed)
         if found:
-            lines = [f"lanes {i} (from {self.lanes[i][0]}) and {j} (from {self.lanes[j][0]}) are {d:.1f} mm "
-                     f"apart, need {limit:g}" for i, j, d, limit in found]
+            lines = [
+                f"lanes {i} (from {self.lanes[i][0]}) and {j} (from {self.lanes[j][0]}) are {d:.1f} mm "
+                f"apart, need {limit:g}"
+                for i, j, d, limit in found
+            ]
             raise RuntimeError(f"{self.title}, page {self.page_no}: copper too close\n  " + "\n  ".join(lines))
 
     def next_page(self, mirrored=False):

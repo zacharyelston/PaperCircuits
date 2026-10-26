@@ -17,8 +17,7 @@ things go, and m3_pencil_ribbon.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import PENCIL, Circuit, R
@@ -59,8 +58,13 @@ def build(path):
     module.need(sh, PAGE_ID, need[:3], need[3:])
     module.caption(sh, WORDS.text("Caption"))
     _schematic(sh, lay)
-    module.steps(sh, PAGE_ID, WORDS.items("Build it", wiper_strip=f"{WIPER_STRIP:g}"), WORDS.items("Play it"),
-                 note=TAG_NOTE_WITH_T1)
+    module.steps(
+        sh,
+        PAGE_ID,
+        WORDS.items("Build it", wiper_strip=f"{WIPER_STRIP:g}"),
+        WORDS.items("Play it"),
+        note=TAG_NOTE_WITH_T1,
+    )
     E.footer(sh, PAGE_ID)
     lay.check(listed=WORDS.refs("You need"))
     sh.save()
@@ -76,8 +80,9 @@ def _ribbon(lay):
     sh.text(RIBBON[2], RIBBON[3] + 9, labels["high"], size=6.5, bold=True, color=MUTED, align="right")
     # The wiper in use: its copper strip lies across the PITCH lane and the ribbon.
     gx, half, mid = WIPER_GHOST_X, S.TAPE_W / 2, (PITCH_Y + RIBBON[3]) / 2
-    sh.rect(gx - half, mid - WIPER_STRIP / 2, gx + half, mid + WIPER_STRIP / 2, stroke=MUTED, width=0.3,
-            dash=(0.8, 0.8))
+    sh.rect(
+        gx - half, mid - WIPER_STRIP / 2, gx + half, mid + WIPER_STRIP / 2, stroke=MUTED, width=0.3, dash=(0.8, 0.8)
+    )
     sh.text(gx, RIBBON[3] + 9, labels["wiper_strip"], size=6, color=MUTED, align="center")
     lay.lane("PITCH", [(PITCH_X[0], PITCH_Y), (PITCH_X[1], PITCH_Y)])
 

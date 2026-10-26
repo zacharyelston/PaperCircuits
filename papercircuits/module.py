@@ -8,8 +8,12 @@ from . import lesson
 from . import standard as S
 from .draw import COPPER, MUTED, style
 
-RING_INSIDE = (S.RING_LEFT[1] + S.TAPE_W / 2 + S.NET_CLEARANCE, S.RING_TOP + S.TAPE_W / 2 + S.NET_CLEARANCE,
-               S.RING_RIGHT[1] - S.TAPE_W / 2 - S.NET_CLEARANCE, S.RING_BOTTOM - S.TAPE_W / 2 - S.NET_CLEARANCE)
+RING_INSIDE = (
+    S.RING_LEFT[1] + S.TAPE_W / 2 + S.NET_CLEARANCE,
+    S.RING_TOP + S.TAPE_W / 2 + S.NET_CLEARANCE,
+    S.RING_RIGHT[1] - S.TAPE_W / 2 - S.NET_CLEARANCE,
+    S.RING_BOTTOM - S.TAPE_W / 2 - S.NET_CLEARANCE,
+)
 
 
 def power_ring(sh):
@@ -18,10 +22,28 @@ def power_ring(sh):
     Returns the two lanes' ids."""
     lv, lg = S.RING_LEFT
     rv, rg = S.RING_RIGHT
-    v = E.lane(sh, [(S.EDGE_LEFT_X, S.EDGE_V_Y), (lv, S.EDGE_V_Y), (lv, S.RING_TOP), (rv, S.RING_TOP),
-                    (rv, S.EDGE_V_Y), (S.EDGE_RIGHT_X, S.EDGE_V_Y)])
-    g = E.lane(sh, [(S.EDGE_LEFT_X, S.EDGE_GND_Y), (lg, S.EDGE_GND_Y), (lg, S.RING_BOTTOM), (rg, S.RING_BOTTOM),
-                    (rg, S.EDGE_GND_Y), (S.EDGE_RIGHT_X, S.EDGE_GND_Y)])
+    v = E.lane(
+        sh,
+        [
+            (S.EDGE_LEFT_X, S.EDGE_V_Y),
+            (lv, S.EDGE_V_Y),
+            (lv, S.RING_TOP),
+            (rv, S.RING_TOP),
+            (rv, S.EDGE_V_Y),
+            (S.EDGE_RIGHT_X, S.EDGE_V_Y),
+        ],
+    )
+    g = E.lane(
+        sh,
+        [
+            (S.EDGE_LEFT_X, S.EDGE_GND_Y),
+            (lg, S.EDGE_GND_Y),
+            (lg, S.RING_BOTTOM),
+            (rg, S.RING_BOTTOM),
+            (rg, S.EDGE_GND_Y),
+            (S.EDGE_RIGHT_X, S.EDGE_GND_Y),
+        ],
+    )
     for x, align in ((S.EDGE_LEFT_X + 1, "left"), (S.EDGE_RIGHT_X - 1, "right")):
         sh.text(x, S.EDGE_V_Y - S.TAPE_W / 2 - 1.2, "V+", size=6, bold=True, color=COPPER, align=align)
         sh.text(x, S.EDGE_GND_Y + S.TAPE_W / 2 + 3.4, "GND", size=6, bold=True, color=COPPER, align=align)
@@ -54,4 +76,3 @@ def steps(sh, page_id, build, play, note=None):
 def caption(sh, text):
     """One muted line just under the ring, saying what the page does on the table."""
     sh.text(S.ZONE_BUILD[0], S.RING_BOTTOM + S.TAPE_W / 2 + 8, text, size=6.5, color=MUTED)
-

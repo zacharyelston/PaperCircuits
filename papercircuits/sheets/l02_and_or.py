@@ -37,13 +37,13 @@ CIRCUIT = Circuit(
 )
 WORDS = Words.beside(__file__, CIRCUIT)
 
-AND_UPPER = 56.0                      # M, between A1 and B1
+AND_UPPER = 56.0  # M, between A1 and B1
 AND_LOWER = AND_UPPER + S.PAIR_PITCH  # V+ into A1, then N out of B1
-OR_UPPER = 120.0                      # V+ past A2 and B2
-OR_LOWER = OR_UPPER + S.PAIR_PITCH    # OUT, past A2 and B2
+OR_UPPER = 120.0  # V+ past A2 and B2
+OR_LOWER = OR_UPPER + S.PAIR_PITCH  # OUT, past A2 and B2
 A1_X, B1_X = 70.0, 110.0
 A2_X, B2_X = 110.0, 140.0
-V_DROP_X = 86.0                       # V+ drops from the AND row to the OR row here
+V_DROP_X = 86.0  # V+ drops from the AND row to the OR row here
 GND_X = 194.0
 LED_X = 186.0
 R1_X, R2_X = 145.0, 165.0
@@ -61,9 +61,13 @@ def build(path):
     _switches(lay)
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"),
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
         WORDS.items("Build it", lanes=number(lay.laid), pad_gap=f"{S.SWITCH_PAD_GAP:g}"),
-        (38.0, 137.0, 90.0, 184.0), (96.0, 137.0, 189.0, 184.0))
+        (38.0, 137.0, 90.0, 184.0),
+        (96.0, 137.0, 189.0, 184.0),
+    )
     _schematic(sh, lay)
     _workbook(sh)
     E.footer(sh, PAGE_ID)
@@ -74,8 +78,17 @@ def build(path):
 def _lanes(lay):
     x_in = S.NET_STRIP_START_X
     v_plus, gnd = S.hole_y("H2"), S.hole_y("H3")
-    v_in = lay.lane("V+", [(x_in, v_plus), (40, v_plus), (40, AND_LOWER), (V_DROP_X, AND_LOWER),
-                           (V_DROP_X, OR_UPPER), (B2_X + 6, OR_UPPER)])
+    v_in = lay.lane(
+        "V+",
+        [
+            (x_in, v_plus),
+            (40, v_plus),
+            (40, AND_LOWER),
+            (V_DROP_X, AND_LOWER),
+            (V_DROP_X, OR_UPPER),
+            (B2_X + 6, OR_UPPER),
+        ],
+    )
     m = lay.lane("M", [(A1_X - 8, AND_UPPER), (B1_X + 8, AND_UPPER)])
     n = lay.lane("N", [(B1_X - 8, AND_LOWER), (R1_X - 5, AND_LOWER)])
     lay.lane("N1", [(R1_X + 5, AND_LOWER), (LED_X - 5, AND_LOWER)])

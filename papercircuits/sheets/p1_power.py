@@ -53,8 +53,13 @@ def build(path):
     E.spine(sh, connected=("H2", "H3"))
     _parts(lay)
     lesson.need_and_steps(
-        sh, PAGE_ID, WORDS.items("You need"), WORDS.items("Build it", lanes=number(lay.laid)),
-        (38.0, 31.0, 92.0, 99.0), (98.0, 31.0, 170.0, 99.0))
+        sh,
+        PAGE_ID,
+        WORDS.items("You need"),
+        WORDS.items("Build it", lanes=number(lay.laid)),
+        (38.0, 31.0, 92.0, 99.0),
+        (98.0, 31.0, 170.0, 99.0),
+    )
     _binder_note(sh)
     _schematic(sh, lay)
     _workbook(sh)

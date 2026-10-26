@@ -142,8 +142,9 @@ def _procedure(sh):
     left = ts.section(WORDS, "You need", ts.bullets)
     *reg_steps, reg_note = WORDS.items("1 · Registration")
     left += [Paragraph("1 · Registration", h)] + ts.steps(reg_steps)
-    left += [ts.table([[""] + WORDS.items("Registration table")] + [[m[0], "", ""] for m in REG_MARKS],
-                      [20, 30, 30], 6.5)]
+    left += [
+        ts.table([[""] + WORDS.items("Registration table")] + [[m[0], "", ""] for m in REG_MARKS], [20, 30, 30], 6.5)
+    ]
     left += [Paragraph(reg_note, note)]
     left += ts.section(WORDS, "2 · Vias", ts.steps)
     left += [ts.table([[""] + WORDS.items("Via table")] + [[v[0], "", "", ""] for v in VIAS], [20, 20, 20, 20], 6.5)]
@@ -153,9 +154,14 @@ def _procedure(sh):
     right += ts.section(WORDS, "4 · Stacking shorts", ts.steps)
     right += [ts.table([[r, ""] for r in WORDS.items("Stacking table")], [50, 30], 6.5)]
     right += ts.section(WORDS, "Pass or fail", ts.bullets)
-    right += ts.section(WORDS, "Results for the standard",
-                      lambda questions: [ts.decision_table(questions, widths=(38, 42), row_height=7.5)])
-    rest = sh.flow([(S.ZONE_BUILD[0], 27.0, 115.0, 282.0)], left) + sh.flow([(121.0, 27.0, S.ZONE_BUILD[2], 282.0)], right)
+    right += ts.section(
+        WORDS,
+        "Results for the standard",
+        lambda questions: [ts.decision_table(questions, widths=(38, 42), row_height=7.5)],
+    )
+    rest = sh.flow([(S.ZONE_BUILD[0], 27.0, 115.0, 282.0)], left) + sh.flow(
+        [(121.0, 27.0, S.ZONE_BUILD[2], 282.0)], right
+    )
     if rest:
         raise RuntimeError(f"T2 sheet 3 overflowed by {len(rest)} items")
     E.footer(sh, f"{PAGE_ID} {sheet['footer']}")

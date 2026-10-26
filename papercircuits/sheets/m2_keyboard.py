@@ -16,8 +16,7 @@ where things go, and m2_keyboard.md holds the words.
 """
 
 from .. import elements as E
-from .. import lesson
-from .. import module
+from .. import lesson, module
 from .. import schematic as sch
 from .. import standard as S
 from ..circuit import Circuit, R

@@ -25,8 +25,12 @@ def build(path):
     x0, y0, x1, y1 = S.ZONE_BUILD
     sx0, _, _, sy1 = S.ZONE_SWITCH
     notch_x, notch_y = sx0 - 2, sy1 + 2
-    sh.polygon([(x0, y0), (notch_x, y0), (notch_x, notch_y), (x1, notch_y), (x1, y1), (x0, y1)],
-               stroke=MUTED, width=0.25, dash=(1.5, 1))
+    sh.polygon(
+        [(x0, y0), (notch_x, y0), (notch_x, notch_y), (x1, notch_y), (x1, y1), (x0, y1)],
+        stroke=MUTED,
+        width=0.25,
+        dash=(1.5, 1),
+    )
     sh.text(x1 - 1.5, y1 - 2, labels["build_zone"], size=6.5, bold=True, color=MUTED, align="right")
 
     E.fold_switch(sh)

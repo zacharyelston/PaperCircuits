@@ -34,11 +34,11 @@ WIPER_OVERLAP = 2.0  # how far a wiper's strip must reach past the lane and into
 class Placement:
     def __init__(self, sh, circuit):
         self.sh, self.circuit = sh, circuit
-        self.strips = {}   # net -> [polygons]: lanes and pencil tracks
-        self.laid = 0      # lanes laid with lane(), so not counting an M page's ring
-        self.leads = []    # (ref, [lead segments]) or (ref, {pin: lead segment})
-        self.loops = []    # (net, feet segment)
-        self.points = []   # (label, net, centre) for test points
+        self.strips = {}  # net -> [polygons]: lanes and pencil tracks
+        self.laid = 0  # lanes laid with lane(), so not counting an M page's ring
+        self.leads = []  # (ref, [lead segments]) or (ref, {pin: lead segment})
+        self.loops = []  # (net, feet segment)
+        self.points = []  # (label, net, centre) for test points
         self.pencils = {}  # ref -> (track polygon, wiper strip length or None)
         self.symbols = []  # refs and test point labels drawn in the schematic
 
@@ -89,8 +89,18 @@ class Placement:
         self._place(ref, E.ptc(self.sh, cx, cy, lead=lead, label=self._label(ref, label)))
 
     def led(self, ref, cx, cy, anode, lead_anode=12.0, lead_cathode=9.0, label="ref"):
-        self._place(ref, E.led(self.sh, cx, cy, anode=anode, lead_anode=lead_anode,
-                               lead_cathode=lead_cathode, label=self._label(ref, label)))
+        self._place(
+            ref,
+            E.led(
+                self.sh,
+                cx,
+                cy,
+                anode=anode,
+                lead_anode=lead_anode,
+                lead_cathode=lead_cathode,
+                label=self._label(ref, label),
+            ),
+        )
 
     def diode(self, ref, cx, cy, cathode="right", lead=8.0, label="ref"):
         self._place(ref, E.diode(self.sh, cx, cy, lead=lead, label=self._label(ref, label), cathode=cathode))
@@ -150,8 +160,7 @@ class Placement:
     # The check.
 
     def _touches(self, seg):
-        return {net for net, polys in self.strips.items()
-                for poly in polys if distance(list(seg), poly) < 0.01}
+        return {net for net, polys in self.strips.items() for poly in polys if distance(list(seg), poly) < 0.01}
 
     def check(self, listed=None):
         """Fail the build if the page doesn't match its circuit. `listed` is the set of
@@ -172,16 +181,23 @@ class Placement:
             if part.polar:
                 for pin, seg in leads.items():
                     if self._touches(seg) != {part.pins[pin]}:
-                        problems.append(f"{ref}'s {pin} lands on {_names(self._touches(seg))}, "
-                                        f"but the circuit puts it on {part.pins[pin]}")
+                        problems.append(
+                            f"{ref}'s {pin} lands on {_names(self._touches(seg))}, "
+                            f"but the circuit puts it on {part.pins[pin]}"
+                        )
                 continue
             landed = [self._touches(seg) for seg in leads]
             if any(len(nets) != 1 for nets in landed):
-                problems.append(f"{ref}: its leads touch " + "; ".join(_names(n) for n in landed)
-                                + " (each must touch exactly one net)")
+                problems.append(
+                    f"{ref}: its leads touch "
+                    + "; ".join(_names(n) for n in landed)
+                    + " (each must touch exactly one net)"
+                )
             elif sorted(n for nets in landed for n in nets) != sorted(part.nets):
-                problems.append(f"{ref} lands on {[n for nets in landed for n in nets]}, "
-                                f"but the circuit puts it on {list(part.nets)}")
+                problems.append(
+                    f"{ref} lands on {[n for nets in landed for n in nets]}, "
+                    f"but the circuit puts it on {list(part.nets)}"
+                )
         for ref, (track, strip_len) in self.pencils.items():
             placed[ref] = placed.get(ref, 0) + 1
             problems += self._check_wiper(ref, track, strip_len)
@@ -214,8 +230,10 @@ class Placement:
         if gap < S.NET_CLEARANCE - 0.01:
             return [f"{ref}'s track is {gap:.1f} mm from {wiper_net}, closer than {S.NET_CLEARANCE:g} mm"]
         if gap + S.TAPE_W + WIPER_OVERLAP > strip_len + 0.01:
-            return [f"{ref}'s wiper strip ({strip_len:g} mm) can't reach from {wiper_net} across "
-                    f"the {gap:.1f} mm gap and into the pencil"]
+            return [
+                f"{ref}'s wiper strip ({strip_len:g} mm) can't reach from {wiper_net} across "
+                f"the {gap:.1f} mm gap and into the pencil"
+            ]
         return []
 
 
