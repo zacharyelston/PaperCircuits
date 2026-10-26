@@ -128,6 +128,9 @@ uv run build.py --check
 `docs/img/`. To add a sheet, add its output filename and module once to the ordered
 `SHEETS` registry near the top of `build.py`.
 
+The full build stages every artifact before publishing it. For targeted work, run only
+one phase with `--phase=pdfs`, `--phase=previews`, or `--phase=composites`.
+
 ## Code
 
 Every page is built in three layers, one source of truth each. [docs/page-layers.md](docs/page-layers.md) explains them and how to make or change a page.

@@ -1,6 +1,6 @@
 import pytest
 
-from papercircuits.circuit import WIRE, C, Circuit, R, si
+from papercircuits.circuit import LDR, WIRE, C, Circuit, R, si
 
 
 @pytest.mark.parametrize(
@@ -54,6 +54,10 @@ def test_rejects_direct_bare_wire_rail_short():
         Circuit(WIRE("W1", "V+", "GND"))
 
 
+def test_allows_named_rail_short_exception():
+    Circuit(WIRE("W1", "V+", "GND"), allow={"rail-short:W1"})
+
+
 def test_rejects_disconnected_part_groups_and_can_declare_intent():
     parts = (R("R1", 220, "A", "B"), R("R2", 1000, "C", "D"))
     with pytest.raises(ValueError, match=r"disconnected part groups: R1 / R2"):
@@ -64,3 +68,17 @@ def test_rejects_disconnected_part_groups_and_can_declare_intent():
 def test_unknown_exception_is_rejected():
     with pytest.raises(ValueError, match="unknown electrical-check exception: typo:R1"):
         Circuit(R("R1", 220, "A", "B"), allow={"typo:R1"})
+
+
+def test_controller_requires_ten_kilohms_on_shortest_fixed_path():
+    good = Circuit(R("R1", 10e3, "V+", "PITCH"), controller=True)
+    assert good.shortest_fixed_resistance("V+", "PITCH") == 10e3
+    with pytest.raises(ValueError, match="shortest V\\+ to PITCH path is 9 kΩ, below 10 kΩ"):
+        Circuit(R("R1", 9e3, "V+", "PITCH"), controller=True)
+
+
+def test_controller_counts_variable_parts_as_zero_and_requires_a_path():
+    with pytest.raises(ValueError, match="shortest V\\+ to PITCH path is 5 kΩ"):
+        Circuit(R("R1", 5e3, "V+", "N1"), LDR("LDR1", "N1", "PITCH"), controller=True)
+    with pytest.raises(ValueError, match="controller has no path from V\\+ to PITCH"):
+        Circuit(R("R1", 10e3, "V+", "N1"), controller=True)

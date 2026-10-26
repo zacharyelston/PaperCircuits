@@ -6,9 +6,14 @@ drawn. It catches declarations that are unambiguously wrong from connectivity al
 - two terminals of one part assigned to the same net
 - a bare wire directly joining `V+` and `GND`
 - separate groups of parts with no shared net
+- a controller whose shortest `V+` to `PITCH` path contains less than 10 kΩ of fixed resistance
+
+For the controller rule, fixed resistors contribute their value and every variable or
+non-resistive part contributes 0 Ω. This pessimistic calculation proves the documented
+minimum even when an LDR or pencil track approaches zero resistance.
 
 These checks do **not** simulate a circuit. They cannot prove current, voltage, timing,
-stability, controller resistance, or electrolytic bias without a richer model. Those
+stability, or electrolytic bias without a richer model. Those
 properties remain design calculations and bench tests. Adding speculative rules here
 would give false confidence.
 

@@ -33,6 +33,7 @@ CIRCUIT = Circuit(
     LDR("LDR1", "N1", "PITCH", note="5 mm LDR, such as a GL5528"),
     R("R1", 68e3, "N1", "PITCH"),
     R("R2", 10e3, "V+", "N1"),
+    controller=True,
 )
 WORDS = Words.beside(__file__, CIRCUIT)
 

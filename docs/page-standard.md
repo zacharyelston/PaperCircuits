@@ -4,35 +4,7 @@ Every page in the workbook follows this standard: lessons, power pages, module p
 
 Items marked **[T0]** are provisional. The [T0 contact tests](../out/T0-contact-tests.pdf) decide them, and v0.2 of this standard records the results. Bench results so far are in the [test log](test-log.md).
 
-The numbers in this document are also in [`papercircuits/standard.py`](../papercircuits/standard.py), which draws every page. If you change one, change the other.
-
-The following table is the authoritative, machine-checked index of dimensions repeated
-in this standard. Values are millimetres except `VERSION`. Change the Python constant
-and this row together; `uv run pytest` reports any mismatch by name.
-
-<!-- standard-values:start -->
-| Constant | Value |
-|---|---:|
-| `VERSION` | 0.1 |
-| `PAGE_W` | 210 |
-| `PAGE_H` | 297 |
-| `HOLE_X` | 12 |
-| `HOLE_D` | 6 |
-| `HOLE_KEEP_OUT` | 8 |
-| `SPINE_W` | 30 |
-| `TAPE_W` | 5 |
-| `WIDE_TAPE_W` | 12 |
-| `NET_CLEARANCE` | 3 |
-| `JOINT_OVERLAP` | 10 |
-| `PART_GAP` | 10 |
-| `TEST_POINT_D` | 7 |
-| `FLAP_PAD_LEN` | 10 |
-| `SWITCH_PAD_GAP` | 2 |
-| `SCALE_BAR` | 100 |
-| `EDGE_V_Y` | 135 |
-| `EDGE_GND_Y` | 145 |
-| `PATCH_LOOP` | 15 |
-<!-- standard-values:end -->
+The numbers in this document are also in [`papercircuits/standard.py`](../papercircuits/standard.py), which draws every page. The test suite checks the existing normative tables and sentences directly against the code and names any rule that drifts.
 
 ![Standard page template](img/template-1.png)
 

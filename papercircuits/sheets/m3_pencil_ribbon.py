@@ -33,6 +33,7 @@ CIRCUIT = Circuit(
     # tests (K4 is this join, as on L03).
     R("R1", 13e3, "V+", "RIBBON"),
     PENCIL("Ribbon", track="RIBBON", wiper="PITCH", note="6B pencil"),
+    controller=True,
 )
 WORDS = Words.beside(__file__, CIRCUIT)
 

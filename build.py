@@ -39,7 +39,7 @@ class SheetSpec:
         except ModuleNotFoundError as error:
             if error.name != module_name:
                 raise
-            raise TypeError(f"{module_name} has no callable build") from error
+            raise ModuleNotFoundError(f"registered sheet module does not exist: {module_name}") from error
         builder = getattr(module, "build", None)
         if not callable(builder):
             raise TypeError(f"{module_name} has no callable build")
@@ -81,14 +81,21 @@ def validate_registry(sheets=SHEETS):
 
 def main(argv):
     check = "--check" in argv
-    unknown = set(argv) - {"--check"}
+    phases = [arg.split("=", 1)[1] for arg in argv if arg.startswith("--phase=")]
+    unknown = {arg for arg in argv if arg != "--check" and not arg.startswith("--phase=")}
     if unknown:
         print("Unknown option(s): " + ", ".join(sorted(unknown)))
+        return 2
+    if check and phases:
+        print("--check and --phase cannot be combined")
+        return 2
+    if len(phases) > 1 or (phases and phases[0] not in {"pdfs", "previews", "composites"}):
+        print("--phase must be one of: pdfs, previews, composites")
         return 2
     validate_registry()
     if check:
         return verify_artifacts()
-    return update_artifacts()
+    return update_artifacts(phases[0] if phases else "all")
 
 
 def generate_pdfs(out):
@@ -115,16 +122,46 @@ def render_previews(out=OUT, previews=PREVIEWS, executable=None):
     return True
 
 
-def update_artifacts():
-    """Full update: PDFs, previews when Poppler is present, fingerprints, and composites."""
-    generate_pdfs(OUT)
-    rendered = render_previews()
-    if rendered:
-        write_fingerprints(OUT, FINGERPRINTS)
-    else:
-        print("pdftoppm not found; skipping previews, so docs/img/ will be out of date")
-    compose_images(PREVIEWS)
+def update_artifacts(phase="all"):
+    """Stage a phase completely, then atomically replace each destination artifact."""
+    with tempfile.TemporaryDirectory(prefix="papercircuits-build-") as directory:
+        staging = Path(directory)
+        staged_out, staged_previews = staging / "out", staging / "img"
+        if phase in {"all", "pdfs"}:
+            generate_pdfs(staged_out)
+        if phase in {"all", "previews"}:
+            pdf_source = staged_out if phase == "all" else OUT
+            if not render_previews(pdf_source, staged_previews):
+                raise RuntimeError("preview phase requires pdftoppm from Poppler")
+            write_fingerprints(pdf_source, staged_previews / FINGERPRINTS.name)
+        if phase == "all":
+            compose_images(staged_previews)
+        elif phase == "composites":
+            staged_previews.mkdir()
+            for stem in set(HERO_PAGES + SYNTH_PAGES):
+                source = PREVIEWS / f"{stem}-1.png"
+                if source.exists():
+                    shutil.copy2(source, staged_previews / source.name)
+            compose_images(staged_previews)
+
+        if phase in {"all", "pdfs"}:
+            publish_files(staged_out, OUT)
+        if phase in {"all", "previews"}:
+            publish_files(staged_previews, PREVIEWS)
+        elif phase == "composites":
+            publish_files(staged_previews, PREVIEWS, names={"hero.png", "synth-table.png"})
     return 0
+
+
+def publish_files(source, destination, names=None):
+    """Publish staged files with an atomic replace for each destination path."""
+    destination.mkdir(parents=True, exist_ok=True)
+    paths = [path for path in source.iterdir() if path.is_file() and (names is None or path.name in names)]
+    for path in paths:
+        target = destination / path.name
+        temporary = target.with_name(f".{target.name}.tmp")
+        shutil.copy2(path, temporary)
+        temporary.replace(target)
 
 
 def verify_artifacts():
@@ -203,9 +240,9 @@ def _page_row(stems, name, width, gap, border, previews=PREVIEWS):
     """A row of page previews on a light backdrop. Returns the canvas and each page's frame
     (x0, x1), or None if a preview is missing."""
     pages = [previews / f"{stem}-1.png" for stem in stems]
-    if not all(p.exists() for p in pages):
-        print(f"  previews missing; skipped {name}")
-        return None, []
+    missing = [path.name for path in pages if not path.exists()]
+    if missing:
+        raise FileNotFoundError(f"composite phase cannot build {name}; missing previews: {', '.join(missing)}")
     thumbs = []
     for p in pages:
         im = Image.open(p).convert("RGB")

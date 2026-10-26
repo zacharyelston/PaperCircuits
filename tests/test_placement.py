@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pytest
 
 from papercircuits.circuit import LED, PENCIL, Circuit, R
+from papercircuits.draw import Sheet
 from papercircuits.placement import Placement
 
 
@@ -91,3 +92,31 @@ def test_pencil_requires_wiper_and_clear_reachable_lane():
 
     lay.pencils["P1"] = (track, 10)
     lay.check()
+
+
+@pytest.mark.parametrize(("strip_len", "passes"), [(12.0, True), (11.5, False)])
+def test_wiper_reach_boundary(strip_len, passes):
+    circuit = Circuit(PENCIL("P1", "TRACK", "WIPER"))
+    lay = placement(circuit)
+    track = rect(0, 0, 10, 5)
+    lay.strips = {"TRACK": [track], "WIPER": [rect(15, 0, 20, 5)]}
+    lay.pencils = {"P1": (track, strip_len)}
+    lay.symbols = ["P1"]
+    if passes:
+        lay.check()
+    else:
+        with pytest.raises(RuntimeError, match="can't reach"):
+            lay.check()
+
+
+def test_real_sheet_lane_and_resistor_footprint(tmp_path):
+    circuit = Circuit(R("R1", 220, "TOP", "BOTTOM"))
+    sheet = Sheet(tmp_path / "placement.pdf", "placement test")
+    lay = Placement(sheet, circuit)
+    lay.lane("TOP", [(40, 40), (60, 40)])
+    lay.lane("BOTTOM", [(40, 60), (60, 60)])
+    lay.resistor("R1", 50, 50, vertical=True, lead=10)
+    lay.symbols = ["R1"]
+    lay.check(listed={"R1"})
+    sheet.save()
+    assert (tmp_path / "placement.pdf").stat().st_size > 0
