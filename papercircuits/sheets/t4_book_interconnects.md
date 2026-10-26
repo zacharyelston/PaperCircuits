@@ -89,17 +89,18 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 ## 2 · Build the test book
 
 1. On all three cards, lay every link lane (E1 to X5) and the contract lanes (C1 to C5) on both
-   sides.
+   sides. Keep all five contract lanes separate: do not join C1 to C5 at the contract block.
 2. Make the contract block's wire vias: push a cut-off resistor leg through each via mark and
-   solder it on both sides.
+   solder it on both sides. Each via is an independent route between sides A and B.
 3. Bind the cards in order, page 1 on top.
 4. For every row, join the back of page 1 to the front of page 2, and the back of page 2 to the
    front of page 3, the way the row's label says. Keep each solder joint at least 5 mm from the
    ring axis, except X4's, which tests a joint on it. On the axis rows, lay the wire or ribbon
    along the axis between the two joints.
-5. Join C1 to C5 the same way, with a five-conductor strip of ribbon laid along the axis. Mark
-   the C1 edge with a stripe and keep that stripe on C1 at both ends; reversing the ribbon swaps
-   BUS A and BUS B even though V+ and GND stay safe.
+5. Join each of C1 to C5 to its matching pin on the next page with a five-conductor strip of
+   ribbon laid along the axis. Do not bridge C1 and C5 in the contract footprint. Mark the C1
+   edge with a stripe and keep that stripe on C1 at both ends; reversing the ribbon swaps BUS A
+   and BUS B even though V+ and GND stay safe.
 
 ## 3 · Measuring a link
 
@@ -111,15 +112,18 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 ## 4 · The spine contract chain
 
-1. Clip the holder to page 1: red to C3 (V+), black to both C1 and C5 (the GND pair).
-2. Clip the 100 Ω resistor across C3 and the joined C1/C5 pair on page 3.
+1. Temporarily join C1 and C5 with clip leads on page 1, outside the contract footprint. Clip
+   the holder to page 1: red to C3 (V+), black to that temporary GND junction.
+2. Temporarily join C1 and C5 on page 3. Clip the 100 Ω resistor across C3 and that temporary
+   GND junction.
 3. Measure C3 from one page to the next. Its drop divided by the total current must be 0.1 Ω or
    less.
-4. Measure the GND pair from one page to the next: one probe touches both C1 and C5 on the first
-   page, and the other touches both on the next page. Its drop divided by total current must be
-   0.05 Ω or less. Do not calculate either GND conductor from total current; the current splits.
-5. Test C2 and C4 one at a time in the separate loop from section 3. Confirm that the ribbon's
-   striped edge is on C1 at both ends before applying power.
+4. Measure between the temporary GND junctions from one page to the next. The drop divided by
+   total current must be 0.05 Ω or less. Do not calculate either GND conductor from total
+   current; the current splits.
+5. Remove the temporary GND joins. Test C1, C2, C4 and C5 one at a time in the separate loop
+   from section 3; each must be 0.1 Ω or less. Confirm that the ribbon's striped edge is on C1
+   at both ends before applying power.
 
 ## 5 · Flex cycles
 
@@ -137,8 +141,8 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 
 ## Pass or fail
 
-- **Pass:** each individual link is 0.1 Ω or less, the contract's GND pair is 0.05 Ω or less,
-  and the load stays steady while the pages turn.
+- **Pass:** each individual link and contract conductor is 0.1 Ω or less, the temporarily
+  paired GND conductors are 0.05 Ω or less, and the load stays steady while the pages turn.
 - **Fail:** a crack, lifted tape, torn paper or any flicker.
 - Links at the edge move about 24 mm each cycle. If they fail, the V2 standard will prohibit
   them.
@@ -159,10 +163,12 @@ link can be probed at once. Sheet 3 says how to build and test the links.
 - current: Current, from the load: ________ mA
 - first: 1 to 2
 - second: 2 to 3
+- gnd_1: C1  GND 1
 - gnd_pair: C1 + C5  GND pair
 - bus_a: C2  BUS A
 - power: C3  V+
 - bus_b: C4  BUS B
+- gnd_2: C5  GND 2
 - links_1: Links, page 1 to page 2
 - links_2: Links, page 2 to page 3
 - flicker: Flicker?

@@ -42,12 +42,12 @@ Each page boundary has one link of five conductors, in this order from the top o
 | 5 | GND | Return, conductor 2 of 2 |
 
 - **Supply-symmetric on purpose.** A link turned end for end maps GND to GND and V+ to V+, so it cannot reverse the supply. It does swap BUS A and BUS B, which is **not** harmless: the wrong receiver may hear a signal, or two drivers may contend. Every ribbon therefore has a visible pin-1 stripe at C1, every pad block marks C1, and assembly instructions require the stripe to stay on C1 at both ends. A later connector must be keyed as well as marked.
-- **Two GND conductors.** They share the return current, halve the return resistance, and keep the book powered if one GND joint cracks. Tie them together on every page.
+- **Two GND conductors.** They share the return current, halve the return resistance, and keep the book powered if one GND joint cracks. The contract footprint keeps C1 and C5 independent so every via can route freely on sides A and B. A page that uses GND joins them at a deliberate local ground junction outside the footprint; a pass-through page may keep them separate throughout.
 - **Same nets as V1.** V1 already shares V+, GND, BUS A and BUS B through its holes, so V1 lessons need no new nets, only a new way of reaching them.
 
 **Pads [T4].** Each pin is a 5 mm tape pad at an 8 mm pitch (5 mm tape plus 3 mm clearance), 37 mm overall. A strip between H2 and H3 has 64 mm clear of the hole keep-outs (y 116.5 to 180.5), so a block centred on y = 148.5 fits with room for strain relief. The x position follows the T4 results.
 
-**Pass-through.** Every V2 page carries all five conductors from its side A pads to its side B pads through a validated layer transition, whether it uses them or not. The book's power never depends on which lessons are bound in it. A page taps V+ or GND from its own spine strip with a soldered joint. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
+**Pass-through.** Every V2 page carries all five conductors independently from its side A pads to its side B pads through a validated layer transition, whether it uses them or not. There is no GND end cap around the contract block. The book's power never depends on which lessons are bound in it. A page taps V+ from C3 and, when it uses GND, routes C1 and C5 to a deliberate soldered ground junction outside the footprint. V2 allows soldered joints; V1's "no unsoldered overlaps" rule still applies.
 
 ## 3. Power budget
 
@@ -64,10 +64,10 @@ Resistances below are for a 35 µm copper foil, the thin end of craft tape.
 **Design point:** 16 pages, including the power-entry page, and 100 mA in total. The last page is 15 page-to-page boundaries from the source. That's roughly ten lessons with an LED lit on each, or an oscillator page or two. The limit is 0.25 V dropped between the supply and the last page.
 
 - **V+ path:** 15 links in series, each at most **0.1 Ω after the flex-life target**.
-- **GND return:** 15 pairs in series. The two conductors in each pair are tied together at both ends and must measure at most **0.05 Ω as a pair**.
+- **GND return:** 15 pairs in series. The two independent conductors in each boundary are joined by the page-level ground junctions at both ends and must measure at most **0.05 Ω as a pair**. Each conductor must also measure at most **0.1 Ω** on its own.
 - **Whole path:** 1.5 Ω on V+ plus 0.75 Ω on GND gives 2.25 Ω, or 0.225 V at 100 mA.
 
-Those 0.1 Ω V+ and 0.05 Ω GND-pair limits are T4's pass marks. T4 measures the GND pair as one parallel return; dividing either GND conductor's voltage by the total current would understate its resistance because the current splits between them.
+Those 0.1 Ω individual-conductor and 0.05 Ω GND-pair limits are T4's pass marks. T4 temporarily joins C1 and C5 outside the contract footprint to measure the pair as one parallel return, then removes those joins and measures each conductor separately. Dividing either GND conductor's voltage by the paired total current would understate its resistance because the current splits between them.
 
 **Measuring it.** A 0.1 Ω link is below what a meter's 200 Ω range can read (its resolution is 0.1 Ω). T4 measures each link as a voltage drop instead:
 - Pass a known load current through the book: a 100 Ω resistor at the far page draws about 45 mA.

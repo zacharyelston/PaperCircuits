@@ -49,13 +49,12 @@ LINKS = (
 )
 LANE_END_X, TP_X, LABEL_X = 50.0, 44.0, 56.0
 
-# The proposed spine contract: five pads 8 mm apart on the ring axis between H2 and H3. The
-# two GND pads are one strip, joined round the far side of the others.
+# The proposed spine contract: five independent pads 8 mm apart on the ring axis between H2
+# and H3. Each pad remains free to route independently on sides A and B.
 CONTRACT = ("C1", "C2", "C3", "C4", "C5")
-CONTRACT_RESULTS = ("gnd_pair", "bus_a", "power", "bus_b")
+CONTRACT_RESULTS = ("gnd_1", "bus_a", "power", "bus_b", "gnd_2", "gnd_pair")
 CONTRACT_Y0, CONTRACT_PITCH = 132.5, 8.0
 CONTRACT_VIA_X = 30.0
-GND_TIE_X = 60.0
 
 # Edge wraps: code, tape width, the lane from the edge in to its test point, and the test point.
 WRAPS = (
@@ -92,16 +91,7 @@ def _coupons(sh):
     for _, start, y in LINKS:
         E.lane(sh, [(start, y), (LANE_END_X, y)])
         E.test_point(sh, TP_X, y)
-    E.lane(
-        sh,
-        [
-            (AXIS_START, _contract_y(0)),
-            (GND_TIE_X, _contract_y(0)),
-            (GND_TIE_X, _contract_y(4)),
-            (AXIS_START, _contract_y(4)),
-        ],
-    )
-    for i in range(1, 4):
+    for i in range(5):
         E.lane(sh, [(AXIS_START, _contract_y(i)), (LANE_END_X, _contract_y(i))])
     for i in range(5):
         E.via(sh, CONTRACT_VIA_X, _contract_y(i), "wire")
@@ -138,7 +128,7 @@ def _front(sh):
             sh.text(LABEL_X, y + 3.2, hint, size=6.5, color=MUTED)
 
     contract = WORDS.fields("Contract")
-    label_x = GND_TIE_X + S.TAPE_W / 2 + 4
+    label_x = LABEL_X
     sh.text(label_x, 124, contract["title"], size=10, bold=True)
     sh.text(label_x, 128.3, contract["hint"], size=6.5, color=MUTED)
     for i, code in enumerate(CONTRACT):
@@ -161,7 +151,7 @@ def _back(sh):
     for code, _, y in LINKS:
         sh.text(LABEL_X, y + 1.1, code, size=6.5, bold=True)
     for i, code in enumerate(CONTRACT):
-        sh.text(GND_TIE_X + S.TAPE_W / 2 + 4, _contract_y(i) + 1.1, code, size=6.5, bold=True)
+        sh.text(LABEL_X, _contract_y(i) + 1.1, code, size=6.5, bold=True)
 
 
 def _procedure(sh):
