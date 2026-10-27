@@ -55,6 +55,8 @@ SHEETS = (
     SheetSpec("T3-oxide-wafer.pdf", "t3_oxide_wafer"),
     SheetSpec("T4-book-interconnects.pdf", "t4_book_interconnects"),
     SheetSpec("T5-dual-sided-format.pdf", "t5_dual_sided_format"),
+    SheetSpec("T6-multi-page-synth-buses.pdf", "t6_synth_bus"),
+    # Compatibility name retained for bookmarks and issue links from the first T6 draft.
     SheetSpec("T6-two-sided-synth-buses.pdf", "t6_synth_bus"),
     SheetSpec("P1-power.pdf", "p1_power"),
     SheetSpec("L01-led-polarity.pdf", "l01_led_polarity"),

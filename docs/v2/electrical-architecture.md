@@ -1,6 +1,6 @@
 # V2 electrical architecture (proposal)
 
-Status: **proposal** for [#40](https://github.com/zacharyelston/PaperCircuits/issues/40). Numbers marked **[T4]** wait on the [T4 book interconnect tests](../../out/T4-book-interconnects.pdf) ([#39](https://github.com/zacharyelston/PaperCircuits/issues/39)); power wraps marked **[T5]** wait on the [T5 dual-sided format test](../../out/T5-dual-sided-format.pdf), and face-specific signal buses marked **[T6]** wait on the [T6 synth bus test](../../out/T6-two-sided-synth-buses.pdf). Nothing here changes V1 pages.
+Status: **proposal** for [#40](https://github.com/zacharyelston/PaperCircuits/issues/40). Numbers marked **[T4]** wait on the [T4 book interconnect tests](../../out/T4-book-interconnects.pdf) ([#39](https://github.com/zacharyelston/PaperCircuits/issues/39)); power wraps marked **[T5]** wait on the [T5 dual-sided format test](../../out/T5-dual-sided-format.pdf), and face-specific signal buses marked **[T6]** wait on the [T6 synth bus test](../../out/T6-multi-page-synth-buses.pdf). Nothing here changes V1 pages.
 
 V2 pages are two-layer paper PCBs bound in a ring binder. The rings and holes only hold pages; they carry no current. Power and signals travel between pages through four **spine links** at fixed vertical positions.
 
@@ -100,7 +100,7 @@ At the provisional worst case of 1.5 A and the resistance limits above, one boun
 
 - **Levels:** BUS A and BUS B swing between GND and V+, at 1 mA or less.
 - **No fixed use:** a page states which bus it drives or reads. The build will check that no two pages drive the same bus at once.
-- **Audio:** signals that leave the book, such as the synth's audio, still go through an output page (V1's M7) to a line input. They never go to a speaker or headphones.
+- **Audio:** signals that leave the book go through an M7-style AC-coupled, attenuated output stage to a line input. T6 integrates a one-input version on its filter/output card. Audio never goes directly to a speaker or headphones.
 
 ## 6. Pages in and out
 
@@ -118,9 +118,9 @@ At the provisional worst case of 1.5 A and the resistance limits above, one boun
 
 First, one T5 card must demonstrate the fixed power rails and both spine wraps with no bus and no page via. Both LEDs must work before and after the flex target, both rails must meet their resistance limits, and V+ must remain isolated from GND.
 
-Then T6 builds a three-card synth book. Card 1 adapts M3 and drives BUS A; card 2 adapts M1, reads BUS A on side A and spine-wraps its output onto BUS B on side B; card 3 adapts M6 and reads BUS B. M7 remains the external line-output page. Disconnecting BUS A at boundary 1-2 must stop the oscillator, while disconnecting BUS B at boundary 2-3 must mute the output without stopping M1's LED. This proves both buses cross real page boundaries and communicate rather than acting as extra power rails. It contributes controller/oscillator/bus/filter evidence for [#46](https://github.com/zacharyelston/PaperCircuits/issues/46).
+Then T6 builds a self-contained four-card synth book. Card 1 provides switched, fused 4.5 V power; card 2 adapts M3 and drives BUS A; card 3 adapts M1, reads BUS A on side A, and drives BUS B through a separate 1 kΩ protection resistor; card 4 adapts M6 and includes a one-input M7-style line-output stage. Disconnecting BUS A at boundary 2-3 must stop the oscillator, while disconnecting BUS B at boundary 3-4 must mute LINE without stopping M1's LED. This proves both buses cross real page boundaries and communicate rather than acting as extra power rails. It contributes power/controller/oscillator/bus/filter/output evidence for [#46](https://github.com/zacharyelston/PaperCircuits/issues/46).
 
-A three-page book is then run through T4's chosen flex-life cycles:
+A four-card book is then run through T4's chosen flex-life cycles:
 1. A V2 power-entry page: the holder, fuse, switch and LED, with the spine pads.
 2. A T4 test page.
 3. A second T4 test page.
