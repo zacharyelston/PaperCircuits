@@ -42,17 +42,17 @@ V2 four-card synth test
 ## Oscillator A
 
 - page_title: T6  Card 3: oscillator input
-- subtitle: BUS A enters M1 on side A; protected audio returns to the spine at BUS B height.
+- subtitle: BUS A ends at R4; four separated node pairs wrap to the reverse routing layer.
 - title: M1 oscillator · BUS A in
-- body: The astable reads BUS A as PITCH. R5 separates its OUT node from BUS B, limiting a shorted-bus fault to less than 4.5 mA at 4.5 V.
+- body: The astable reads BUS A as PITCH. Its upper and lower copper islands never cross either bus; matching wrap labels continue each node on side B.
 - footer: sheet 5 of 10 · card 3 side A
 
 ## Oscillator B
 
 - page_title: T6  Card 3: oscillator output
-- subtitle: The R5-protected output becomes the full BUS B audio rail on this face.
-- title: BUS B protected audio out
-- body: Burnish the side-A BUS B wrap onto this rail. BUS A remains only a short spine stub. Test BUS B to GND here before linking card 4.
+- subtitle: Four parallel back routes replace every insulated crossing on the oscillator face.
+- title: Side-B routes · protected BUS B
+- body: Match both ends of each Q1C, Q2B, Q1B and OUT route to side A. R5 connects only OUT to the shortened BUS B rail; the four channels must remain isolated.
 - footer: sheet 6 of 10 · card 3 side B
 
 ## Filter A
@@ -102,9 +102,9 @@ V2 four-card synth test
 
 ## 3 · Build oscillator
 
-1. Lay the four rails and short opposite-face stubs. At every hatched crossing, insulate the lower conductor before laying the indicated top conductor.
-2. Build the oscillator on side A. BUS A is PITCH; OUT reaches BUS B only through R5 1 kΩ.
-3. Power only this card through protected V+ and confirm LED1 flashes. Short BUS B to GND briefly and verify supply current remains below 5 mA above idle.
+1. On side A, stop BUS A at R4 and keep BUS B as a spine stub. Lay the eight labelled node ends without extending any across a bus.
+2. On side B, join each matching pair through its own 10 mm-pitch channel. Fit R5 between OUT and the shortened BUS B rail; no channel may overlap another.
+3. Check Q1C, Q2B, Q1B and OUT end-to-end through their reverse routes, then check every unlike pair for OL. Power the card and confirm LED1 flashes.
 
 ## 4 · Build filter and output
 

@@ -41,6 +41,7 @@ class Placement:
         self.points = []  # (label, net, centre) for test points
         self.pencils = {}  # ref -> (track polygon, wiper strip length or None)
         self.symbols = []  # refs and test point labels drawn in the schematic
+        self.linked_pieces = {}  # net -> pieces joined by a documented reverse-face route
 
     # Copper and pencil.
 
@@ -144,6 +145,14 @@ class Placement:
         E.test_point(self.sh, x, y, label, side=side, **kw)
         self.points.append((label, net, (x, y)))
 
+    def reverse_link(self, net, pieces=2):
+        """Declare strips joined by a labelled route on the paired reverse face.
+
+        This is for spine-wrapped two-layer pages: the local placement still checks every
+        component landing, while the printed reverse face makes the inter-piece join.
+        """
+        self.linked_pieces[net] = pieces
+
     # Schematic.
 
     def symbol(self, ref):
@@ -169,8 +178,9 @@ class Placement:
         problems = []
         for net in self.circuit.nets:
             n = len(self.strips.get(net, []))
-            if n != 1:
-                problems.append(f"net {net} has {n} strips, not 1")
+            expected = self.linked_pieces.get(net, 1)
+            if n != expected:
+                problems.append(f"net {net} has {n} strips, not {expected}")
         for net in self.strips:
             if net not in self.circuit.nets and net not in RING_NETS:
                 problems.append(f"lane on {net}, which no part uses")

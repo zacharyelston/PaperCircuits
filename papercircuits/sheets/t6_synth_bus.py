@@ -39,12 +39,12 @@ OSCILLATOR = Circuit(
     R("R2", 1e3, "V+", "OUT"),
     R("R3", 10e3, "V+", "Q1B"),
     R("R4", 4.7e3, "PITCH", "Q2B"),
-    C("C1", 100e-9, "Q1C", "Q2B"),
     C("C2", 100e-9, "Q1B", "OUT"),
     Q("Q1", "2N3904", e="GND", b="Q1B", c="Q1C"),
     Q("Q2", "2N3904", e="GND", b="Q2B", c="OUT"),
-    R("R5", 1e3, "OUT", "BUS B"),
 )
+OSCILLATOR_OUTPUT = Circuit(R("R5", 1e3, "OUT", "BUS B"))
+OSCILLATOR_COUPLING = Circuit(C("C1", 100e-9, "Q1C", "Q2B"))
 
 V_PLUS_Y, BUS_A_Y, BUS_B_Y, GND_Y = 29.0, 133.0, 164.0, 274.0
 SPINE_WRAP_X = 4.0
@@ -84,7 +84,18 @@ def build(path):
     sh.save()
 
 
-def _rails(target, face, *, bus_a=None, bus_b=None, full_a=False, full_b=False, label_b=True):
+def _rails(
+    target,
+    face,
+    *,
+    bus_a=None,
+    bus_b=None,
+    full_a=False,
+    full_b=False,
+    bus_a_end=None,
+    bus_b_end=None,
+    label_b=True,
+):
     """Draw one face of the four-rail contract.
 
     A bus occupies the work area only on its named face. On the opposite face it stops
@@ -98,8 +109,14 @@ def _rails(target, face, *, bus_a=None, bus_b=None, full_a=False, full_b=False, 
     lanes = {
         "v_plus": lane("V+", [(SPINE_WRAP_X, V_PLUS_Y), (POWER_RAIL_END_X, V_PLUS_Y)]),
         "gnd": lane("GND", [(SPINE_WRAP_X, GND_Y), (POWER_RAIL_END_X, GND_Y)], width=S.WIDE_TAPE_W),
-        "bus_a": lane(bus_a, [(SPINE_WRAP_X, BUS_A_Y), (POWER_RAIL_END_X if full_a else 26.0, BUS_A_Y)]),
-        "bus_b": lane(bus_b, [(SPINE_WRAP_X, BUS_B_Y), (POWER_RAIL_END_X if full_b else 26.0, BUS_B_Y)]),
+        "bus_a": lane(
+            bus_a,
+            [(SPINE_WRAP_X, BUS_A_Y), (bus_a_end or (POWER_RAIL_END_X if full_a else 26.0), BUS_A_Y)],
+        ),
+        "bus_b": lane(
+            bus_b,
+            [(SPINE_WRAP_X, BUS_B_Y), (bus_b_end or (POWER_RAIL_END_X if full_b else 26.0), BUS_B_Y)],
+        ),
     }
     for y in (V_PLUS_Y, BUS_A_Y, BUS_B_Y, GND_Y):
         E.wrap_arrow(sh, SPINE_WRAP_X, y, "left")
@@ -109,12 +126,15 @@ def _rails(target, face, *, bus_a=None, bus_b=None, full_a=False, full_b=False, 
         E.test_point(sh, 18, y, net, side="right", size=5.5)
     for net, y, side in (("V+", V_PLUS_Y, "below"), ("GND", GND_Y, "above")):
         E.test_point(sh, 48, y, f"{net} {face}", side=side, size=6)
-    labels = (("BUS A", BUS_A_Y, full_a), ("BUS B", BUS_B_Y, full_b))
-    for net, y, full in labels:
+    labels = (
+        ("BUS A", BUS_A_Y, full_a, bus_a_end or (POWER_RAIL_END_X if full_a else 26.0)),
+        ("BUS B", BUS_B_Y, full_b, bus_b_end or (POWER_RAIL_END_X if full_b else 26.0)),
+    )
+    for net, y, full, end in labels:
         if net == "BUS B" and not label_b:
             continue
         if full:
-            sh.text(185, y - 4, f"{net} · work rail", size=6.5, bold=True, align="right")
+            sh.text(end - 2, y - 4, f"{net} · work rail", size=6.5, bold=True, align="right")
         else:
             sh.text(18, y - 4, f"{net} · spine stub", size=6.5, bold=True)
     return lanes
@@ -229,88 +249,50 @@ def _oscillator_a(sh):
     E.header(sh, PAGE_ID, words["page_title"], words["subtitle"], part="5/10")
     E.spine(sh, mechanical=True, holes=S.V2_HOLES)
     lay = Placement(sh, OSCILLATOR)
-    rails = _rails(lay, "A", bus_a="PITCH", bus_b="BUS B", full_a=True, label_b=False)
-    _oscillator_copper(lay, rails)
-    sh.text(88, 62, words["title"], size=9, bold=True)
-    sh.paragraph(88, 67, 45, words["body"], style(6.2, leading=7.8, color=MUTED))
+    _rails(lay, "A", bus_a="PITCH", full_a=True, bus_a_end=96.0, label_b=False)
+    _oscillator_copper(lay)
+    sh.text(92, 62, words["title"], size=9, bold=True)
+    sh.paragraph(92, 67, 50, words["body"], style(6.2, leading=7.8, color=MUTED))
     E.footer(sh, f"{PAGE_ID} {words['footer']}", label_x=168)
-    # The legible schematic is printed on the paired reverse face; bind its symbols to
-    # this physical placement so connectivity and component coverage remain checked.
+    # The legible schematic is printed on the paired reverse face. Four circuit nodes
+    # have two side-A pieces joined by the labelled, continuous side-B channels.
+    for net in ("Q1C", "Q2B", "Q1B", "OUT"):
+        lay.reverse_link(net)
     for ref in OSCILLATOR.parts:
         lay.symbol(ref)
     lay.check(listed=set(OSCILLATOR.parts))
 
 
-def _oscillator_copper(lay, rails):
+def _oscillator_copper(lay):
     sh = lay.sh
+    # Upper component islands stop before BUS A. Matching lower islands resume below
+    # BUS B; card 3B joins each pair through a separate spine-wrapped copper channel.
     lay.lane("N1", [(64.0, 55.0), (64.0, 60.0)])
-    q1c = lay.lane("Q1C", [(64.0, 80.0), (64.0, 202.0)])
-    q1b = lay.lane("Q1B", [(140.0, 55.0), (140.0, 205.0), (72.0, 205.0)])
-    q2b = lay.lane("Q2B", [(80.0, 157.0), (80.0, 215.0), (143.0, 215.0)])
-    out = lay.lane("OUT", [(155.0, 55.0), (155.0, 202.0), (170.0, 202.0), (170.0, BUS_B_Y), (48.0, BUS_B_Y)])
-    for x, y in (
-        (64.0, BUS_A_Y),
-        (140.0, BUS_A_Y),
-        (155.0, BUS_A_Y),
-        (64.0, BUS_B_Y),
-        (80.0, BUS_B_Y),
-        (140.0, BUS_B_Y),
-        (80.0, 205.0),
-    ):
-        E.crossing(sh, x, y, label=None)
-    # Redraw the insulated conductor on top of each hatched crossing so the intended
-    # over/under path is unambiguous when following tape through the crowded oscillator.
-    for x, y in (
-        (64.0, BUS_A_Y),
-        (140.0, BUS_A_Y),
-        (155.0, BUS_A_Y),
-        (64.0, BUS_B_Y),
-        (80.0, BUS_B_Y),
-        (140.0, BUS_B_Y),
-    ):
-        sh.rect(
-            x - 4.2,
-            y - S.TAPE_W / 2,
-            x + 4.2,
-            y + S.TAPE_W / 2,
-            stroke=COPPER,
-            fill=COPPER_TINT,
-            width=0.25,
-            dash=(1.2, 0.8),
-        )
-    sh.rect(
-        80.0 - S.TAPE_W / 2,
-        200.8,
-        80.0 + S.TAPE_W / 2,
-        209.2,
-        stroke=COPPER,
-        fill=COPPER_TINT,
-        width=0.25,
-        dash=(1.2, 0.8),
-    )
-    sh.text(110, 190, "hatched bridge = insulated crossing", size=6, color=MUTED)
-    for lane_id in (q1c, q1b, out):
-        sh.allow(rails["bus_a"], lane_id, 0)
-    sh.allow(rails["bus_b"], out, 0)
-    sh.allow(q1b, q2b, 0)
-    for lane_id in (q1c, q1b):
-        sh.allow(lane_id, out, 0)
-    sh.allow(q2b, out, 0)
+    lay.lane("Q1C", [(64.0, 80.0), (64.0, 90.0), (SPINE_WRAP_X, 90.0)])
+    lay.lane("Q1B", [(140.0, 55.0), (140.0, 100.0), (SPINE_WRAP_X, 100.0)])
+    lay.lane("OUT", [(155.0, 55.0), (155.0, 110.0), (SPINE_WRAP_X, 110.0)])
+    lay.lane("Q2B", [(80.0, 157.0), (80.0, 175.0), (SPINE_WRAP_X, 175.0)])
+    lay.lane("Q2B", [(SPINE_WRAP_X, 195.0), (133.0, 195.0)])
+    lay.lane("OUT", [(SPINE_WRAP_X, 205.0), (155.0, 205.0), (155.0, 215.0)])
+    lay.lane("Q1B", [(SPINE_WRAP_X, 220.0), (140.0, 220.0), (140.0, 225.0), (173.0, 225.0)])
+    lay.lane("Q1C", [(SPINE_WRAP_X, 240.0), (174.0, 240.0), (174.0, 245.0)])
+    for net, upper, lower in (("Q1C", 90, 240), ("Q1B", 100, 220), ("OUT", 110, 205), ("Q2B", 175, 195)):
+        E.wrap_arrow(sh, SPINE_WRAP_X, upper, "left")
+        E.wrap_arrow(sh, SPINE_WRAP_X, lower, "left")
+        sh.text(10, upper - 3.5, net, size=5.8, bold=True)
+        sh.text(10, lower - 3.5, net, size=5.8, bold=True)
     r_top = 42.0
     lay.resistor("R1", 64.0, r_top, vertical=True, lead=13.0, label="value")
     lay.led("LED1", 64.0, 70.0, anode="up", lead_anode=10.0, lead_cathode=10.0, label="ref")
     lay.resistor("R2", 155.0, r_top, vertical=True, lead=13.0, label="value")
     lay.resistor("R3", 140.0, r_top, vertical=True, lead=13.0, label="value")
     lay.resistor("R4", 80.0, 145.0, vertical=True, lead=12.0, label="value")
-    lay.resistor("R5", 37.0, BUS_B_Y, vertical=False, lead=11.0, label="value")
-    lay.ceramic_cap("C1", 72.0, 180.0, lead=8.0, label="value")
-    lay.ceramic_cap("C2", 147.5, 110.0, lead=7.5, label="value")
-    lay.transistor("Q1", 70.0, 210.0, {"E": (70.0, 268.0), "B": (72.0, 205.0), "C": (64.0, 202.0)}, label="ref")
-    lay.transistor("Q2", 150.0, 220.0, {"E": (150.0, 268.0), "B": (143.0, 215.0), "C": (155.0, 202.0)}, label="ref")
-    lay.loop("PITCH", 100.0, BUS_A_Y, side="above")
-    lay.loop("BUS B", 18.0, BUS_B_Y, side="above")
-    lay.loop("OUT", 54.0, BUS_B_Y, side="above")
-    sh.text(30, BUS_B_Y + 7, "R5 protects BUS B; the spine wrap continues on side B", size=6.5, bold=True)
+    lay.ceramic_cap("C2", 147.5, 80.0, lead=7.5, label="value")
+    lay.transistor("Q1", 180.0, 235.0, {"E": (190.0, 268.0), "B": (173.0, 225.0), "C": (174.0, 245.0)}, label="ref")
+    lay.transistor("Q2", 190.0, 205.0, {"E": (197.0, 268.0), "B": (133.0, 195.0), "C": (155.0, 215.0)}, label="ref")
+    lay.loop("PITCH", 68.0, BUS_A_Y, side="below")
+    lay.loop("OUT", 155.0, 210.0, side="right")
+    sh.text(106, 153, "No overlaps: four nodes continue on card 3B", size=6.5, bold=True)
 
 
 def _oscillator_b(sh):
@@ -318,26 +300,57 @@ def _oscillator_b(sh):
     with sh.unmirrored():
         E.header(sh, PAGE_ID, words["page_title"], words["subtitle"], part="6/10")
     E.spine(sh, mechanical=True, holes=S.V2_HOLES)
-    _rails(sh, "B", full_b=True)
-    sh.text(58, 70, words["title"], size=11, bold=True)
-    sh.paragraph(58, 76, 118, words["body"], style(7.0, leading=8.8, color=MUTED))
+    out_lay = Placement(sh, OSCILLATOR_OUTPUT)
+    coupling_lay = Placement(sh, OSCILLATOR_COUPLING)
+    _rails(out_lay, "B", bus_b="BUS B", full_b=True, bus_b_end=58.0)
+    _oscillator_back_routes(sh, out_lay, coupling_lay)
+    sh.text(114, 66, words["title"], size=10, bold=True)
+    sh.paragraph(114, 72, 78, words["body"], style(6.5, leading=8.2, color=MUTED))
     _oscillator_schematic(sh)
     with sh.unmirrored():
         E.footer(sh, f"{PAGE_ID} {words['footer']}", label_x=168)
+    out_lay.symbol("R5")
+    coupling_lay.symbol("C1")
+    coupling_lay.reverse_link("Q1C")
+    out_lay.check(listed={"R5"})
+    coupling_lay.check(listed={"C1"})
+
+
+def _oscillator_back_routes(sh, out_lay, coupling_lay):
+    q1c_main = coupling_lay.lane("Q1C", [(SPINE_WRAP_X, 90.0), (90.0, 90.0), (90.0, 240.0), (SPINE_WRAP_X, 240.0)])
+    q1c_branch = coupling_lay.lane("Q1C", [(90.0, 230.0), (50.0, 230.0)])
+    sh.allow(q1c_main, q1c_branch, 0)
+    E.lane(sh, [(SPINE_WRAP_X, 100.0), (80.0, 100.0), (80.0, 220.0), (SPINE_WRAP_X, 220.0)])
+    for net, x, upper, lower in (("Q1C", 90, 90, 240), ("Q1B", 80, 100, 220)):
+        for y in (upper, lower):
+            E.wrap_arrow(sh, SPINE_WRAP_X, y, "left")
+        sh.text(x + 4, (upper + lower) / 2, net, size=6, bold=True, color=MUTED)
+    out_lay.lane("OUT", [(SPINE_WRAP_X, 110.0), (70.0, 110.0), (70.0, 205.0), (SPINE_WRAP_X, 205.0)])
+    for y in (110.0, 205.0):
+        E.wrap_arrow(sh, SPINE_WRAP_X, y, "left")
+    coupling_lay.lane("Q2B", [(SPINE_WRAP_X, 175.0), (50.0, 175.0), (50.0, 195.0), (SPINE_WRAP_X, 195.0)])
+    for y in (175.0, 195.0):
+        E.wrap_arrow(sh, SPINE_WRAP_X, y, "left")
+    sh.text(54, 188, "Q2B", size=6, bold=True, color=MUTED)
+    out_lay.resistor("R5", 64.0, BUS_B_Y, vertical=False, lead=6.0, label="value")
+    coupling_lay.ceramic_cap("C1", 50.0, 212.5, vertical=True, lead=17.5, label="value")
+    sh.text(110, 145, "SIDE-B ROUTES · 10 mm PITCH", size=6.5, bold=True, align="center")
 
 
 def _oscillator_schematic(sh):
     """Compact functional schematic; the protected BUS B boundary is the key addition."""
-    sh.text(108, 196, "Protected oscillator output", size=8, bold=True, align="center")
-    sch.terminal(sh, 48, 220, "BUS A / PITCH", label_y=216.5)
-    sh.rect(69, 207, 126, 240, stroke=MUTED, width=0.35, radius=1.5)
-    sh.text(97.5, 220, "M1 ASTABLE", size=8, bold=True, align="center")
-    sh.text(97.5, 230, "Q1 · Q2 · C1 · C2", size=6.2, color=MUTED, align="center")
-    sch.wire(sh, [(48.8, 220), (69, 220), (126, 220)])
-    sch.resistor_h(sh, 126, 158, 220, "R5", "1 kΩ", box_w=8)
-    sch.wire(sh, [(158, 220), (176.2, 220)])
-    sch.terminal(sh, 177, 220, "BUS B", label_y=216.5, align="right")
-    sh.text(108, 248, "R5 limits a BUS B fault to less than 4.5 mA at 4.5 V.", size=6.2, color=MUTED, align="center")
+    sh.text(155, 198, "Protected oscillator output", size=8, bold=True, align="center")
+    sch.terminal(sh, 112, 220, "BUS A", label_y=216.5)
+    sh.rect(126, 207, 164, 240, stroke=MUTED, width=0.35, radius=1.5)
+    sh.text(145, 220, "M1", size=8, bold=True, align="center")
+    sh.text(145, 230, "ASTABLE", size=6.2, color=MUTED, align="center")
+    sch.wire(sh, [(112.8, 220), (126, 220), (164, 220)])
+    sch.resistor_h(sh, 164, 184, 220, "R5", "1 kΩ", box_w=7)
+    sch.wire(sh, [(184, 220), (196.2, 220)])
+    sch.terminal(sh, 197, 220, "BUS B", label_y=216.5, align="right")
+    sh.paragraph(
+        115, 246, 80, "R5 limits a BUS B fault to less than 4.5 mA at 4.5 V.", style(6.2, leading=7.4, color=MUTED)
+    )
 
 
 def _filter_a(sh):

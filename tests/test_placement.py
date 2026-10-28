@@ -23,6 +23,18 @@ def test_valid_nonpolar_part_and_parts_list():
     lay.check(listed={"R1"})
 
 
+def test_reverse_face_link_allows_declared_net_pieces():
+    lay = placement(Circuit(R("R1", 220, "A", "B")))
+    lay.strips = {
+        "A": [rect(0, 0, 2, 2), rect(3, 0, 5, 2)],
+        "B": [rect(8, 0, 10, 2)],
+    }
+    lay.leads = [("R1", [((1, 1), (1, 1)), ((9, 1), (9, 1))])]
+    lay.symbols = ["R1"]
+    lay.reverse_link("A")
+    lay.check(listed={"R1"})
+
+
 @pytest.mark.parametrize(
     ("mutate", "message"),
     [
